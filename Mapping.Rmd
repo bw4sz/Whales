@@ -1,0 +1,79 @@
+---
+title: "Mapping"
+author: "Ben Weinstein"
+date: "April 22, 2016"
+output: 
+  html_document:
+  keep_md: True
+  numbered_sections: True
+  toc: true
+  theme: spacelab
+---
+
+```{r}
+library(sp)
+library(dismo)
+library(raster)
+library(maps)
+library(maptools)
+library(ggplot2)
+library(dplyr)
+library(chron)
+```
+
+#Read in data
+
+```{r}
+dat<-read.csv("InputData/ArgosData_2016_03_14_22_54_50.csv")
+head(dat)
+```
+
+#Time
+
+Need to check time zone
+
+```{r}
+dat$Time<-strptime(dat$Loc..date,format="%d/%m/%Y %H:%M",tz = "GMT")
+dat$Month<-months(dat$Time)
+dat$Hour<-hours(dat$Time)
+dat$Day<-days(dat$Time)
+dat$Year<-years(dat$Time)
+qplot(x=dat$Time,y=1)
+```
+
+#Descriptive Statistics
+
+## Time Between Records
+```{r}
+for (x in 2:nrow(dat)){
+  dat$DTime[x]<-as.numeric(difftime(dat[x,"Time"],dat[x-1,"Time"],units="mins"))
+}
+```
+
+##Variogram
+
+
+#Space
+
+```{r}
+#Spatial Object
+spdat<-SpatialPointsDataFrame(cbind(dat$Latitude,dat$Longitude),dat)
+plot(spdat)
+map(add=TRUE)
+```
+
+##Plot track
+```{r, echo=FALSE}
+ggplot(dat,aes(y=Longitude,x=Latitude,col=Day)) + geom_point() + theme_bw() + geom_line() 
+```
+
+##Distance between points
+
+## Turning Angle between points
+
+#Variogram
+
+# Movement Model
+
+# Movement State
+
