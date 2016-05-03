@@ -14,11 +14,15 @@ output:
 library(sp)
 library(dismo)
 library(raster)
-library(maps)
-library(maptools)
+library(reshape2)
 library(ggplot2)
 library(dplyr)
 library(chron)
+library(moveHMM)
+library(move)
+library(ggmap)
+library(knitr)
+opts_chunk$set(echo=F)
 ```
 
 #Read in data
@@ -26,54 +30,49 @@ library(chron)
 ```{r}
 dat<-read.csv("InputData/ArgosData_2016_03_14_22_54_50.csv")
 head(dat)
+
+#move object
+
+#Time stamp
+dat$TimeStamp<-as.POSIXct(dat$Msg.Date,format="%d/%m/%Y  %H:%M",tz="GMT")
+
+#Need to remove duplicated timestamp?
+ddat<-dat %>% group_by(Platform.ID.No.,TimeStamp) %>% distinct() %>% arrange(TimeStamp)
+
+#sort time objects
+mdat<-move(x=ddat$Latitude,y=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$Platform.ID.No.)
 ```
 
-#Time
+#Summary statistics
 
-Need to check time zone
+## Number of locations
+```{r}
+n.locs(mdat)
+```
+
+## Time lag
 
 ```{r}
-dat$Time<-strptime(dat$Loc..date,format="%d/%m/%Y %H:%M",tz = "GMT")
-dat$Month<-months(dat$Time)
-dat$Hour<-hours(dat$Time)
-dat$Day<-days(dat$Time)
-dat$Year<-years(dat$Time)
-qplot(x=dat$Time,y=1)
+tm<-melt(timeLag(mdat,units="mins"))
+ggplot(tm,aes(x=value,fill=L1)) + geom_histogram() + facet_wrap(~L1,scales='free') + ggtitle("Time Lag") + xlab("Minutes") + theme_bw()
 ```
 
-#Descriptive Statistics
-
-## Time Between Records
+## Derived movement statistics
 ```{r}
-for (x in 2:nrow(dat)){
-  dat$DTime[x]<-as.numeric(difftime(dat[x,"Time"],dat[x-1,"Time"],units="mins"))
-}
+mss<-melt(summary(mdat))
+ggplot(mss,aes(x=L1,y=value)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw()
 ```
 
-##Variogram
-
-
-#Space
-
-```{r}
-#Spatial Object
-spdat<-SpatialPointsDataFrame(cbind(dat$Latitude,dat$Longitude),dat)
-plot(spdat)
-map(add=TRUE)
-```
-
-##Plot track
+##Plot raw track
 ```{r, echo=FALSE}
-ggplot(dat,aes(y=Longitude,x=Latitude,col=Day)) + geom_point() + theme_bw() + geom_line() 
+plot(mdat)
 ```
 
-##Distance between points
+### Overlay on googlemap
 
-## Turning Angle between points
-
-#Variogram
-
-# Movement Model
-
-# Movement State
+```{r}
+mdat_df <- as(mdat, "data.frame")
+m <- get_map(bbox(extent(mdat)*1.1), source="google", zoom=4)
+ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y))
+```
 
