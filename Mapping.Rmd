@@ -10,7 +10,10 @@ output:
   theme: spacelab
 ---
 
-```{r}
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
+
 library(sp)
 library(dismo)
 library(raster)
@@ -21,17 +24,15 @@ library(chron)
 library(moveHMM)
 library(move)
 library(ggmap)
-library(knitr)
-opts_chunk$set(echo=F)
+library(gridExtra)
 ```
 
 #Read in data
 
 ```{r}
 dat<-read.csv("InputData/ArgosData_2016_03_14_22_54_50.csv")
-head(dat)
 
-#move object
+#Create move object
 
 #Time stamp
 dat$TimeStamp<-as.POSIXct(dat$Msg.Date,format="%d/%m/%Y  %H:%M",tz="GMT")
@@ -58,21 +59,36 @@ ggplot(tm,aes(x=value,fill=L1)) + geom_histogram() + facet_wrap(~L1,scales='free
 ```
 
 ## Derived movement statistics
-```{r}
+```{r,fig.height=6,fig.width=8}
 mss<-melt(summary(mdat))
-ggplot(mss,aes(x=L1,y=value)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw()
+ggplot(mss,aes(x=L1,y=value,col=L1)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw() + theme(axis.text.x = element_blank())
+
 ```
 
-##Plot raw track
-```{r, echo=FALSE}
-plot(mdat)
-```
+#Visualize Tracks
 
-### Overlay on googlemap
-
+## Overall
 ```{r}
 mdat_df <- as(mdat, "data.frame")
-m <- get_map(bbox(extent(mdat)*1.1), source="google", zoom=4)
-ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y))
+m <- get_map(bbox(extent(mdat)*1.1), source="google", zoom=4,maptype = 'terrain')
+ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y,col=trackId))
 ```
 
+## Individual tracks
+
+```{r}
+sdat<-split(mdat_df,mdat_df$trackId)
+p<-lapply(sdat,function(j){
+  m <- get_map(bbox(extent(mdat[mdat@trackId %in% j$trackId])*1.1), source="google",zoom=7,scale=2,maptype="terrain")
+  p<-ggmap(m)+geom_path(data=j, aes(x=x, y=y),size=0.5,col='red',linetype='dashed')  + theme_inset()
+})
+p
+```
+
+#Utilization Distribution
+
+```{r}
+sptrans_mdat<-spTransform(mdat[mdat@trackId %in% j$trackId],center=T)
+mm1<-brownian.bridge.dyn(sptrans_mdat,dimSize=150,location.error = 20)
+plot(mm1)
+```
