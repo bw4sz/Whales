@@ -1,5 +1,5 @@
 ---
-title: "Mapping"
+title: "Antartic Whale Project: Data Exploration"
 author: "Ben Weinstein"
 date: "April 22, 2016"
 output: 
@@ -13,7 +13,6 @@ output:
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
-
 library(sp)
 library(dismo)
 library(raster)
@@ -25,23 +24,46 @@ library(moveHMM)
 library(move)
 library(ggmap)
 library(gridExtra)
+library(stringr)
 ```
 
-#Read in data
-
 ```{r}
-dat<-read.csv("InputData/ArgosData_2016_03_14_22_54_50.csv")
+d<-list.files("C:/Users/Ben/Dropbox/Whales/Data/",pattern="ArgosData",full.names = T)
+
+dat<-list()
+for (x in 1:length(d)){
+  a<-read.csv(d[[x]],sep=";",quote = "",header=F,skip=1)
+  
+  #sanitize those ugly file names
+  ta<-read.csv(d[[x]],sep=";",quote = "",header=F,nrow=1,as.is=T)
+
+  colnames(a)<-gsub(x=ta[1,],pattern = "\"",replacement="")
+  
+  #drop first column
+  dat[[x]]<-a[-1,]
+}
+
+dat<-rbind_all(dat)
 
 #Create move object
 
 #Time stamp
-dat$TimeStamp<-as.POSIXct(dat$Msg.Date,format="%d/%m/%Y  %H:%M",tz="GMT")
+dat$TimeStamp<-as.POSIXct(dat$`Loc. date`,format="%Y-%m-%d  %H:%M:%S",tz="GMT")
+#Animal stamp
+dat$Animal<-dat$'Platform ID No.'
 
-#Need to remove duplicated timestamp?
-ddat<-dat %>% group_by(Platform.ID.No.,TimeStamp) %>% distinct() %>% arrange(TimeStamp)
+ddat<-dat %>% group_by(Animal,TimeStamp) %>% distinct() %>% arrange(Animal,TimeStamp)
+
+#remove empty and impossible geo location
+ddat<-ddat[!is.na(ddat$Latitude),]
+ddat<-ddat[!ddat$Latitude < -90,]
 
 #sort time objects
-mdat<-move(x=ddat$Latitude,y=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$Platform.ID.No.)
+mdat<-move(y=ddat$Latitude,x=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$'Platform ID No.')
+
+#clip by reasonable extent
+se<-extent(matrix(c(-28.23786,-91.17032,-96.45729,-46.87883),nrow=2,byrow=T))
+mdat<-crop(mdat,se)
 ```
 
 #Summary statistics
@@ -53,15 +75,16 @@ n.locs(mdat)
 
 ## Time lag
 
-```{r}
+```{r,fig.height=12}
 tm<-melt(timeLag(mdat,units="mins"))
-ggplot(tm,aes(x=value,fill=L1)) + geom_histogram() + facet_wrap(~L1,scales='free') + ggtitle("Time Lag") + xlab("Minutes") + theme_bw()
+paste("Mean time lag is:",round(mean(tm$value),2),"minutes")
+ggplot(tm,aes(x=value)) + geom_histogram() + facet_wrap(~L1,scales='free') + ggtitle("Time Lag") + xlab("Minutes") + theme_bw()
 ```
 
 ## Derived movement statistics
-```{r,fig.height=6,fig.width=8}
+```{r,fig.height=10,fig.width=12}
 mss<-melt(summary(mdat))
-ggplot(mss,aes(x=L1,y=value,col=L1)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw() + theme(axis.text.x = element_blank())
+ggplot(mss,aes(x=L1,y=value,col=L1)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw() + theme(axis.text.x = element_blank()) + scale_fill_discrete(guide=F)
 
 ```
 
@@ -70,8 +93,9 @@ ggplot(mss,aes(x=L1,y=value,col=L1)) + geom_point() + facet_wrap(~variable,scale
 ## Overall
 ```{r}
 mdat_df <- as(mdat, "data.frame")
-m <- get_map(bbox(extent(mdat)*1.1), source="google", zoom=4,maptype = 'terrain')
-ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y,col=trackId))
+pp<-c(mean(mdat_df$x),mean(mdat_df$y))
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
+ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y,col=trackId)) + scale_color_discrete(guide=F)
 ```
 
 ## Individual tracks
@@ -79,7 +103,8 @@ ggmap(m)+geom_path(data=mdat_df, aes(x=x, y=y,col=trackId))
 ```{r}
 sdat<-split(mdat_df,mdat_df$trackId)
 p<-lapply(sdat,function(j){
-  m <- get_map(bbox(extent(mdat[mdat@trackId %in% j$trackId])*1.1), source="google",zoom=7,scale=2,maptype="terrain")
+  pp<-c(mean(j$x),mean(j$y))
+  m <- get_map(pp,source="google",zoom=7,scale=2,maptype="satellite")
   p<-ggmap(m)+geom_path(data=j, aes(x=x, y=y),size=0.5,col='red',linetype='dashed')  + theme_inset()
 })
 p
@@ -88,7 +113,33 @@ p
 #Utilization Distribution
 
 ```{r}
-sptrans_mdat<-spTransform(mdat[mdat@trackId %in% j$trackId],center=T)
-mm1<-brownian.bridge.dyn(sptrans_mdat,dimSize=150,location.error = 20)
-plot(mm1)
+pM<-list()
+  for(j in levels(mdat@trackId)){
+  sptrans_mdat<-spTransform(mdat[mdat@trackId %in% j],center=T)
+  try(pM[[j]]<-brownian.bridge.dyn(sptrans_mdat,dimSize=150,location.error = 20))
+  }
 ```
+
+##Overlay on map
+
+```{r}
+om<-list()
+for (x in 1:length(pM)){
+  r<-projectRaster(pM[[x]],crs=mdat@proj4string)
+
+  rtp <- rasterToPolygons(r)
+  rtp@data$id <- 1:nrow(rtp@data)   # add id column for join
+
+  rtpFort <- fortify(rtp, data = rtp@data)
+  rtpFortMer <- merge(rtpFort, rtp@data, by.x = 'id', by.y = 'id')  # join data
+
+  #cut out the very low probability areas.
+  rtpFortMer<-rtpFortMer[rtpFortMer[names(pM)[[x]]] > 0.0001,]
+
+  colnames(rtpFortMer)[8]<-'value'
+  om[[x]]<-p[[x]] + geom_polygon(data = rtpFortMer,aes(x = long, y = lat, group = group,fill=value), alpha = 0.7, size = 0) +  scale_fill_gradientn(colours = topo.colors(255))
+}
+
+om
+```
+
