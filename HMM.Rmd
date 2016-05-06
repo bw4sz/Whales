@@ -28,59 +28,119 @@ library(rjags)
 
 #Simulation
 
-Let's play around with a reasonable small simulations to understand what is happenning in the model. Just a random walk path with two states.
+##Correlated random walk
 
-The simulation depends on X known states
 
-$$ Distance =  \sim N(\)$$
-$$ Turning Angle = \gamma \sim $$
+*Process Model*
+
+$$ d_{t} \sim T*d_{t-1} + Normal(0,\sigma)$$
+$$ x+t = x_{t-1} + d_{t} $$
+
+## Parameters
+
+$$\theta = Mean turning angle$$
+$$\gamma = Move persistance $$
+$$\rho = Correlation in movement process $$
 
 I will then expand to include
 
 * Multiple behavioral states, each with theiir own distances and turning angles
 * Environmental features that predict behavioral states.
-* Variance among individuals
+* Hierarchical variance among individuals
 * Observation Error
 
 ```{r}
-
+traj<-function(gamma,theta,rho=0){
   #Total number of steps
-  steps=20
+  steps=100
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
 
+  #Displacement Vector
+  d<-matrix(nrow=steps,ncol=2)
+  
   #Initial position
   xy[1,]<-c(0,0)
+  d[1,]<-c(0,0)
+  
+  #Mean turning angle
+  theta=theta
+  
+  #Degree of autocorrelation
+  gamma=gamma
+  
+  #Process variance in latitude
+  sigma_lat=0.1
+  
+  #Process variance in longitude
+  sigma_lon=0.1
+  
+  #Correlation in process variance
+  rho=rho
   
   #Multivariate Normal Variance in random walk
-  iSigma<-matrix(nrow=2,ncol=2)
-  iSigma[1,1] <- 1
-  iSigma[1,2] <- 0
-  iSigma[2,1] <- 0
-  iSigma[2,2] <- 1
+  Sigma<-matrix(nrow=2,ncol=2)
+  Sigma[1,1] <- sigma_lon^2
+  Sigma[1,2] <- rho * sigma_lon * sigma_lat
+  Sigma[2,1] <- rho * sigma_lon * sigma_lat
+  Sigma[2,2] <- sigma_lat^2
+  
+  #Transition matrix for correlated movement
+  T<-matrix(nrow=2,ncol=2)
+  T[1,1] <- cos(theta)
+  T[1,2] <- -sin(theta)
+  T[2,1] <- sin(theta)
+  T[2,2] <- cos(theta)
   
   ####Process Model
-  ## Random walk to estimate subsequent positions
-  rw<-function(x,iSigma){
-    mvrnorm(n=1,mu=x,Sigma=iSigma)
+  ## Random walk to estimate subsequent displacements
+  rw<-function(Sigma){
+    mvrnorm(n=1,mu=c(0,0),Sigma=Sigma)
+  }
+
+  #Draw random walk locations
+  for (x in 2:steps){
+    #Displacement
+    d[x,]<-gamma*T %*% d[x-1,]+rw(Sigma)
+
+## matrix multiplication
+
+    #next position
+    xy[x,]<-xy[x-1,] + d[x,]
   }
   
-  #Draw random locations
-  for (x in 2:steps){
-    xy[x,]<-rw(xy[x-1,],iSigma)
-  }
+  #Format to data frame
+  dxy<-data.frame(xy)
+  colnames(dxy)<-c("x","y")
+  dxy$Step<-1:nrow(dxy)
+  return(dxy)
+}
 ```
 
 #Plot Trajectory
 
+Start with reasonable defaults
+$$\gamma = 1 = Strong Movement Persistance$$
+$$\theta = 0 = No preference in turns$$
+$$ \rho = 0 = no correlation between heading northwest or southeast$$
+$$ \sigma_lat = 0.1$$
+$$ \sigma_lon = 0.1$$
+
+These are mimicing values Jonsen 2005 fit for foraging seals.
+
 ```{r}
-
-dxy<-data.frame(xy)
-colnames(dxy)<-c("x","y")
-dxy$Step<-1:nrow(dxy)
-
+gamma=1
+theta=0
+dxy<-traj(gamma=1,theta=0)
 ggplot(dxy,aes(x=x,y=y)) + geom_point(size=5,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
+```
+
+### Plot many trajectories.
+```{r}
+mxy<-lapply(1:10,function(x) traj(gamma=1,theta=0,rho=0))
+mxy<-melt(mxy,id.vars=c("x","y","Step"))
+ggplot(mxy,aes(x=x,y=y)) + geom_point(size=5,col='black') + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
 ```
 
 #Model Fitting
@@ -93,14 +153,14 @@ source("Bayesian/RW.R")
 
 #print model
 print.noquote(readLines("Bayesian/RW.R"))
+
 #prior shape
 R <- diag(c(1,2))
-data=list(y=xy,steps=nrow(xy),R=R)
-yn<-matrix(nrow=nrow(xy),ncol=ncol(xy),data=1)
+data=list(y=dxy[,1:2],steps=nrow(dxy),R=R)
 
 jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=1000 )
 update(jags,10000)
-p<-coda.samples(model=jags,n.iter=1000,n.thin=1,variable.names=c("R","iSigma"))
+p<-coda.samples(model=jags,n.iter=1000,n.thin=1,variable.names=c("theta","gamma"))
 ```
 
 ##Chains
@@ -112,16 +172,20 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list(R=R,iSigma=iSigma))
-tv$par<-paste(tv$L1,"[",tv$Var1,",",tv$Var2,"]",sep="")
+tv<-melt(list(theta=theta,gamma=gamma))
+colnames(tv)<-c("value","par")
+
+#bind chains
 out<-rbind(p[[1]],p[[2]])
 pc<-melt(out)
 colnames(pc)<-c("Draw","par","value")
+
+#Plot
 ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 ```
 
 ##Prediction
-```{r}
+```{r,eval=F}
 pr<-coda.samples(model=jags,n.iter=5000,n.thin=1,variable.names=c("ynew"))
 ps<-posummary(pr)
 ps<-melt(ps)
@@ -147,7 +211,8 @@ ggplot(toplot,aes(x=x_mean,y=y_mean)) + geom_path() + theme_bw() + geom_path(dat
 ```
 
 Point Density
-```{r}
+
+```{r,eval=F}
 out<-rbind(pr[[1]],pr[[2]])
 pc<-melt(out)
 colnames(pc)<-c("Draw","param","value")

@@ -1,17 +1,61 @@
 sink("Bayesian/RW.jags")
 cat("
     model{
-    #Process Model
-    for(x in 2:steps){
-    y[x,] ~ dmnorm(y[x-1,],iSigma)
 
-    #Generate prediction
-    ynew[x,1:2] ~ dmnorm(y[x-1,1:2],iSigma)
+    #Constants
+    pi <- 3.141592653589
+
+    #Bivaraite Mean Displacement is 0
+    b[1,1] <- 0
+    b[1,2] <- 0
+
+    #Transition Matrix for turning angles
+    T[1,1] <- cos(theta)
+    T[1,2] <- (-sin(theta))
+    T[2,1] <- sin(theta)
+    T[2,2] <- cos(theta)
+
+    #First movement - random walk.
+    y[2,1:2] ~ dmnorm(y[1,1:2],Sigma[,])
+    
+    #First displacement
+    d[1,1] <- y[2,1] - y[1,1]
+    d[1,2] <- y[2,2] - y[2,2]
+
+    ###Prediction First Step#####
+    #First movement - random walk.
+    #ynew[2,1:2] ~ dmnorm(ynew[1,1:2],Sigma)
+    
+    #First predicted displacement
+    #dnew[1,1] <- ynew[2,1] - ynew[1,1]
+    #dnew[1,2] <- ynew[2,2] - ynew[2,2]
+    
+    #Process Model for movement
+    for(x in 2:(steps-1)){
+
+    #Gaussian Displacement
+    RW[x,1:2]~dmnorm(b,Sigma)
+    
+    #Correlation in movement change
+    d[x,1:2] <- gamma * T %*% d[x-1,] + RW[x,]
+
+    #New location
+    y[x+1,] <- y[x,] + d[x,]
+
+    ####Generate prediction####
+    #RWnew[x,1:2]~dmnorm(b,Sigma)
+    
+    #Correlation in movement change
+    #dnew[x,1:2] <- gamma * T %*% dnew[x-1,1:2] + RWnew[x,1:2]
+    
+    #Predicted location
+    #ynew[x+1,1:2] <- ynew[x,1:2] + dnew[x,1:2]
     }
 
     #Priors
-    iSigma~dwish(R,3)
-
+    Sigma~dwish(R,3)
+    gamma ~ dunif(0,1)
+    theta ~ dunif(-1*pi,pi)
     }"
     ,fill=TRUE)
 sink()
