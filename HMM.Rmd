@@ -45,7 +45,7 @@ I will then expand to include
 ```{r}
 
   #Total number of steps
-  steps=10
+  steps=100
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -80,14 +80,14 @@ dxy<-data.frame(xy)
 colnames(dxy)<-c("x","y")
 dxy$Step<-1:nrow(dxy)
 
-ggplot(dxy,aes(x=x,y=y)) + geom_point() + geom_line(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
+ggplot(dxy,aes(x=x,y=y)) + geom_point(size=5,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
 ```
 
 #Model Fitting
 
 The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
 
-```{r,eval=F}
+```{r,eval=T}
 #source model
 source("Bayesian/RW.R")
 
@@ -96,9 +96,11 @@ print.noquote(readLines("Bayesian/RW.R"))
 #prior shape
 R <- diag(c(1,2))
 data=list(y=xy,steps=nrow(xy),R=R)
-jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=1,n.adapt=1000)
-update(jags,1000)
-p<-coda.samples(model=jags,n.iter=100,n.hin=1,variable.names=c("R","iSigma"))
+yn<-matrix(nrow=nrow(xy),ncol=ncol(xy),data=1)
+
+jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=1000 )
+update(jags,10000)
+p<-coda.samples(model=jags,n.iter=1000,n.thin=1,variable.names=c("R","iSigma"))
 ```
 
 ##Chains
@@ -109,4 +111,29 @@ potrace(p)
 ##Posteriors
 ```{r}
 poplot(p)
+```
+
+##Prediction
+```{r}
+pr<-coda.samples(model=jags,n.iter=100,n.thin=1,variable.names=c("ynew"))
+ps<-posummary(pr)
+ps<-melt(ps)
+
+#extract positions
+sv<-data.frame(str_match(ps$Var1,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
+colnames(sv)<-c("par","step","xy")
+
+#format to combine
+ps<-data.frame(ps,sv)
+#relevel
+levels(ps$xy)<-c("x","y")
+levels(ps$Var2)<-c("mean","lower","median","upper","Rhat")
+
+#Just keep mean, upper and lower
+toplot<-dcast(ps,step~xy+Var2,value.var = "value")
+
+#arrange by step
+toplot<-toplot %>% arrange(step)
+
+ggplot(toplot,aes(x=x_mean,y=y_mean)) + geom_ribbon(alpha=0.5,aes(xmin=x_lower,xmax=x_upper,ymin=y_lower,ymax=y_upper)) + geom_path() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)")
 ```
