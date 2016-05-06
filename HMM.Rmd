@@ -45,7 +45,7 @@ I will then expand to include
 ```{r}
 
   #Total number of steps
-  steps=100
+  steps=20
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -122,7 +122,7 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 
 ##Prediction
 ```{r}
-pr<-coda.samples(model=jags,n.iter=100,n.thin=1,variable.names=c("ynew"))
+pr<-coda.samples(model=jags,n.iter=5000,n.thin=1,variable.names=c("ynew"))
 ps<-posummary(pr)
 ps<-melt(ps)
 
@@ -140,7 +140,32 @@ levels(ps$Var2)<-c("mean","lower","median","upper","Rhat")
 toplot<-dcast(ps,step~xy+Var2,value.var = "value")
 
 #arrange by step
+toplot$step<-as.numeric(as.character(toplot$step))
 toplot<-toplot %>% arrange(step)
 
-ggplot(toplot,aes(x=x_mean,y=y_mean)) + geom_ribbon(alpha=0.5,aes(xmin=x_lower,xmax=x_upper,ymin=y_lower,ymax=y_upper)) + geom_path() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)")
+ggplot(toplot,aes(x=x_mean,y=y_mean)) + geom_path() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") + geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
 ```
+
+Point Density
+```{r}
+out<-rbind(pr[[1]],pr[[2]])
+pc<-melt(out)
+colnames(pc)<-c("Draw","param","value")
+
+sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
+colnames(sv)<-c("par","step","xy")
+
+#format to combine
+pc<-data.frame(pc,sv)
+#relevel
+levels(pc$xy)<-c("x","y")
+toplot<-dcast(pc,Draw+step~xy,value.var = "value")
+
+#arrange by step
+toplot$step<-as.numeric(as.character(toplot$step))
+toplot<-toplot %>% arrange(step)
+
+ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
+```
+
+
