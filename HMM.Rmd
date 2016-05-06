@@ -109,8 +109,15 @@ potrace(p)
 ```
 
 ##Posteriors
+
 ```{r}
-poplot(p)
+#true values
+tv<-melt(list(R=R,iSigma=iSigma))
+tv$par<-paste(tv$L1,"[",tv$Var1,",",tv$Var2,"]",sep="")
+out<-rbind(p[[1]],p[[2]])
+pc<-melt(out)
+colnames(pc)<-c("Draw","par","value")
+ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 ```
 
 ##Prediction
