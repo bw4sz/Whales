@@ -1,0 +1,9 @@
+
+    model{
+    #Process Model
+    for(x in 2:steps){
+    y[x,] ~ dmnorm(y[x-1,],iSigma)
+    }
+    #Priors
+    iSigma~dwish(R,3)
+    }

@@ -1,0 +1,45 @@
+---
+title: "Behavioral Classification"
+author: "Ben Weinstein"
+date: "May 5, 2016"
+output: html_document
+---
+
+## Feature descriptors
+
+Following [DeRuiter](http://arxiv.org/pdf/1602.06570v1.pdf)
+Using the high-resolution, multivariate tag data and the the visual observations of behaviour and spatial locations, a number of variables were chosen to summarise the whales’ behaviour. These variables were computed on a dive-by-dive basis; in other words, the input data for modelling were
+time series for which the sampling unit was one dive. Here, a “dive” was defined as any excursion. from the surface to 10 m depth or greater. Dive start- and end-times were detected in the dive profile by visual inspection. The variables calculated for each dive were dive duration, post-dive
+surface duration, maximum depth, step length and turning angle in the horizontal dimension, number of feeding lunges, and variability of heading. Dive duration was the time (in seconds) from
+the start of a dive until the first surfacing following the dive. The post-dive surface duration was
+defined as the time (in seconds) from the end of one dive until the start of the subsequent dive.
+Maximum dive depth was the maximum depth attained by the whale over the course of the dive.
+To compute step lengths and turning angles based on position observations collected by human
+observers, we first used linear interpolation on the visual observation data on whale positions, which
+were unevenly spaced in time. The resulting interpolated tracks had a position estimate at the
+mid-point time of each dive
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Code and Output
+
+```{r}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r, echo=FALSE}
+plot(cars)
+```
+

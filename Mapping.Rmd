@@ -1,10 +1,10 @@
 ---
-title: "Antartic Whale Project: Data Exploration"
+title: "Antarctic Whale Project: Data Exploration"
 author: "Ben Weinstein"
 date: "April 22, 2016"
 output: 
   html_document:
-  keep_md: True
+    keep_md: True
   numbered_sections: True
   toc: true
   theme: spacelab
@@ -23,34 +23,31 @@ library(chron)
 library(moveHMM)
 library(move)
 library(ggmap)
+library(maps)
 library(gridExtra)
 library(stringr)
+library(rjags)
 ```
 
 ```{r}
-d<-list.files("C:/Users/Ben/Dropbox/Whales/Data/",pattern="ArgosData",full.names = T)
+d<-list.files("C:/Users/Ben/Dropbox/Whales/Data/",pattern="Argos.csv",full.names = T,recursive=T)
 
-dat<-list()
-for (x in 1:length(d)){
-  a<-read.csv(d[[x]],sep=";",quote = "",header=F,skip=1)
-  
-  #sanitize those ugly file names
-  ta<-read.csv(d[[x]],sep=";",quote = "",header=F,nrow=1,as.is=T)
-
-  colnames(a)<-gsub(x=ta[1,],pattern = "\"",replacement="")
-  
-  #drop first column
-  dat[[x]]<-a[-1,]
-}
-
+dat<-lapply(d,function(x){
+  a<-read.table(x,header=T,sep=",",row.names=NULL)
+  #column names were shifted
+  colnames(a)<-c(colnames(a)[-1],"x")
+  a$x<-NULL
+  return(a)
+  })
 dat<-rbind_all(dat)
 
 #Create move object
 
 #Time stamp
-dat$TimeStamp<-as.POSIXct(dat$`Loc. date`,format="%Y-%m-%d  %H:%M:%S",tz="GMT")
+dat$TimeStamp<-as.POSIXct(dat$Date,format="%H:%M:%S %d-%b-%Y",tz="GMT")
+
 #Animal stamp
-dat$Animal<-dat$'Platform ID No.'
+dat$Animal<-dat$DeployID
 
 ddat<-dat %>% group_by(Animal,TimeStamp) %>% distinct() %>% arrange(Animal,TimeStamp)
 
@@ -59,18 +56,23 @@ ddat<-ddat[!is.na(ddat$Latitude),]
 ddat<-ddat[!ddat$Latitude < -90,]
 
 #sort time objects
-mdat<-move(y=ddat$Latitude,x=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$'Platform ID No.')
+mdat<-move(y=ddat$Latitude,x=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$Animal)
+```
+
+```{r}
+map()
+points(mdat)
+title('Raw Data')
 
 #clip by reasonable extent
-se<-extent(matrix(c(-28.23786,-91.17032,-96.45729,-46.87883),nrow=2,byrow=T))
+se<-extent(matrix(c(-104.8229,-37.83292,-75.56089,11.72086),nrow=2,byrow=T))
 mdat<-crop(mdat,se)
 ```
 
 #Summary statistics
 
-## Number of locations
 ```{r}
-n.locs(mdat)
+paste("There are",length(n.locs(mdat)),"individuals","with an average number of",round(mean(n.locs(mdat)),2),"spatial locations")
 ```
 
 ## Time lag
@@ -78,14 +80,19 @@ n.locs(mdat)
 ```{r,fig.height=12}
 tm<-melt(timeLag(mdat,units="mins"))
 paste("Mean time lag is:",round(mean(tm$value),2),"minutes")
-ggplot(tm,aes(x=value)) + geom_histogram() + facet_wrap(~L1,scales='free') + ggtitle("Time Lag") + xlab("Minutes") + theme_bw()
+```
+
+There time lag distribution is almost perfectly log-normal.
+
+```{r}
+ggplot(tm,aes(x=log(value))) + geom_histogram() + labs(x="Log(Time between points)") 
 ```
 
 ## Derived movement statistics
-```{r,fig.height=10,fig.width=12}
-mss<-melt(summary(mdat))
-ggplot(mss,aes(x=L1,y=value,col=L1)) + geom_point() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement") + xlab("Individual") + theme_bw() + theme(axis.text.x = element_blank()) + scale_fill_discrete(guide=F)
 
+```{r,fig.height=7,fig.width=12}
+mss<-melt(summary(mdat))
+ggplot(mss,aes(x=value)) + geom_histogram() + facet_wrap(~variable,scales="free") + ggtitle("Average Movement Variables") + theme_bw() 
 ```
 
 #Visualize Tracks
@@ -110,36 +117,7 @@ p<-lapply(sdat,function(j){
 p
 ```
 
-#Utilization Distribution
-
 ```{r}
-pM<-list()
-  for(j in levels(mdat@trackId)){
-  sptrans_mdat<-spTransform(mdat[mdat@trackId %in% j],center=T)
-  try(pM[[j]]<-brownian.bridge.dyn(sptrans_mdat,dimSize=150,location.error = 20))
-  }
-```
-
-##Overlay on map
-
-```{r}
-om<-list()
-for (x in 1:length(pM)){
-  r<-projectRaster(pM[[x]],crs=mdat@proj4string)
-
-  rtp <- rasterToPolygons(r)
-  rtp@data$id <- 1:nrow(rtp@data)   # add id column for join
-
-  rtpFort <- fortify(rtp, data = rtp@data)
-  rtpFortMer <- merge(rtpFort, rtp@data, by.x = 'id', by.y = 'id')  # join data
-
-  #cut out the very low probability areas.
-  rtpFortMer<-rtpFortMer[rtpFortMer[names(pM)[[x]]] > 0.0001,]
-
-  colnames(rtpFortMer)[8]<-'value'
-  om[[x]]<-p[[x]] + geom_polygon(data = rtpFortMer,aes(x = long, y = lat, group = group,fill=value), alpha = 0.7, size = 0) +  scale_fill_gradientn(colours = topo.colors(255))
-}
-
-om
+save.image("Mapping.RData")
 ```
 

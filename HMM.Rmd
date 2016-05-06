@@ -1,0 +1,112 @@
+---
+title: "Hidden Markov Model"
+author: "Ben Weinstein"
+date: "May 5, 2016"
+output: html_document
+---
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
+library(sp)
+library(dismo)
+library(potools)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(MASS)
+library(dplyr)
+library(chron)
+library(moveHMM)
+library(move)
+library(ggmap)
+library(maps)
+library(gridExtra)
+library(stringr)
+library(rjags)
+```
+
+#Simulation
+
+Let's play around with a reasonable small simulations to understand what is happenning in the model. Just a random walk path with two states.
+
+The simulation depends on X known states
+
+$$ Distance =  \sim N(\)$$
+$$ Turning Angle = \gamma \sim $$
+
+I will then expand to include
+
+* Multiple behavioral states, each with theiir own distances and turning angles
+* Environmental features that predict behavioral states.
+* Variance among individuals
+* Observation Error
+
+```{r}
+
+  #Total number of steps
+  steps=10
+
+  #Position Vector
+  xy<-matrix(nrow=steps,ncol=2)
+
+  #Initial position
+  xy[1,]<-c(0,0)
+  
+  #Multivariate Normal Variance in random walk
+  iSigma<-matrix(nrow=2,ncol=2)
+  iSigma[1,1] <- 1
+  iSigma[1,2] <- 0
+  iSigma[2,1] <- 0
+  iSigma[2,2] <- 1
+  
+  ####Process Model
+  ## Random walk to estimate subsequent positions
+  rw<-function(x,iSigma){
+    mvrnorm(n=1,mu=x,Sigma=iSigma)
+  }
+  
+  #Draw random locations
+  for (x in 2:steps){
+    xy[x,]<-rw(xy[x-1,],iSigma)
+  }
+```
+
+#Plot Trajectory
+
+```{r}
+
+dxy<-data.frame(xy)
+colnames(dxy)<-c("x","y")
+dxy$Step<-1:nrow(dxy)
+
+ggplot(dxy,aes(x=x,y=y)) + geom_point() + geom_line(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
+```
+
+#Model Fitting
+
+The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
+
+```{r,eval=F}
+#source model
+source("Bayesian/RW.R")
+
+#print model
+print.noquote(readLines("Bayesian/RW.R"))
+#prior shape
+R <- diag(c(1,2))
+data=list(y=xy,steps=nrow(xy),R=R)
+jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=1,n.adapt=1000)
+update(jags,1000)
+p<-coda.samples(model=jags,n.iter=100,n.hin=1,variable.names=c("R","iSigma"))
+```
+
+##Chains
+```{r}
+potrace(p)
+```
+
+##Posteriors
+```{r}
+poplot(p)
+```
