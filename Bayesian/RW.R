@@ -11,41 +11,32 @@ cat("
     T[2,1] <- sin(theta)
     T[2,2] <- cos(theta)
 
-
     ###Prediction First Step#####
     #First movement - random walk.
     y[2,1:2] ~ dmnorm(y[1,1:2],iSigma)
     
-    #First displacement
-    d[1,1] <- y[2,1] - y[1,1]
-    d[1,2] <- y[2,2] - y[1,2]
-    
     #Process Model for movement
-    for(x in 2:(steps-1)){
+    for(t in 2:(steps-1)){
+      
+      #Correlation in movement change
+      d[t,1:2] <- y[t,] + gamma * T %*% (y[t,1:2] - y[t-1,1:2])
 
-      #Correlation in movement change
-      d[x,1:2] <- gamma * T %*% d[x-1,]
-      
-      #New location
-      yt[x,1:2]<-y[x,1:2] + d[x,1:2]
-      
       #Gaussian Displacement
-      y[x+1,1:2] ~ dmnorm(yt[x,1:2],iSigma)
+      y[t+1,1:2] ~ dmnorm(d[t,1:2],iSigma)
+
+      #
   
-      ####Generate prediction####
-      #RWnew[x,1:2]~dmnorm(b,Sigma)
-      
-      #Correlation in movement change
-      #dnew[x,1:2] <- gamma * T * dnew[x-1,1:2] + RWnew[x,1:2]
-      
-      #Predicted location
-      #ynew[x+1,1:2] <- ynew[x,1:2] + dnew[x,1:2]
     }
 
     #Priors
-    iSigma~dwish(R,2)
-    Sigma<-inverse(iSigma)
+    #Process Variance
+    iSigma ~ dwish(R,2)
+    Sigma <- inverse(iSigma)
+
+    #Persistance
     gamma ~ dbeta(1,1)
+  
+    #Mean angle
     theta ~ dunif(-1*pi,pi)
     }"
     ,fill=TRUE)

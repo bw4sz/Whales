@@ -57,19 +57,16 @@ I will then increase complexity to include:
 
 ```{r}
 traj<-function(gamma,theta,rho=0){
+  
   #Total number of steps
-  steps=100
+  steps=200
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
 
   #Displacement Vector
   d<-matrix(nrow=steps,ncol=2)
-  
-  #Initial position
-  xy[1,]<-c(0,0)
-  d[1,]<-c(0,0)
-  
+
   #Mean turning angle
   theta=theta
   
@@ -100,18 +97,22 @@ traj<-function(gamma,theta,rho=0){
   T[2,2] <- cos(theta)
   
   ####Process Model
-  ## Random walk to estimate subsequent displacements
-  rw<-function(mu,Sigma){
-    mvrnorm(n=1,mu,Sigma=Sigma)
-  }
-
+  
+  #Initial position
+  xy[1,]<-c(0,0)
+  
+  #First step is random walk
+  xy[2,]<-mvrnorm(mu=xy[1,],Sigma = Sigma)
+  
   #Draw random walk locations
-  for (x in 2:steps){
-    #Displacement
-    d[x,]<-gamma*T %*% d[x-1,] ## matrix multiplication
+  for (x in 2:(steps-1)){
 
+    # Add Correlated Displacement
+    d[x,]<-xy[x,] + gamma * T %*% (xy[x,]  - xy[x-1,])
+    
     #next position
-    xy[x,]<-rw(mu=(xy[x-1,] + d[x,]),Sigma)
+    ## Random walk
+    xy[x+1,]<-mvrnorm(n=1,mu=d[x,],Sigma=Sigma)
   }
   
   #Format to data frame
@@ -134,8 +135,9 @@ $$ \sigma_{longitude} = 0.1$$
 Values come from Jonsen (2005) fit for foraging seals.
 
 ```{r}
-gamma=0.7
+gamma=1
 theta=0
+
 dxy<-traj(gamma=gamma,theta=theta)
 ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
 ```
@@ -160,11 +162,11 @@ print.noquote(readLines("Bayesian/RW.R"))
 
 #prior shape
 R <- diag(c(1,1))
-data=list(y=dxy[,1:2],steps=nrow(dxy),R=R)
+data=list(y=as.matrix(dxy[,1:2]),steps=nrow(dxy),R=R)
 
-jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=2000 )
+jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
 system.time(update(jags,20000))
-p<-coda.samples(model=jags,n.iter=3000,n.thin=5,variable.names=c("Sigma","theta","gamma"))
+p<-coda.samples(model=jags,n.iter=5000,n.thin=2,variable.names=c("Sigma","theta","gamma"))
 ```
 
 ##Chains
@@ -176,7 +178,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list(theta=theta,gamma=gamma,Sigma=0.1))
+tv<-melt(list(theta=theta,gamma=gamma,'Sigma[1,1]'=0.025,'Sigma[1,2]'=0,'Sigma[2,1]'=0,'Sigma[2,2]'=0.025))
 colnames(tv)<-c("value","par")
 
 #bind chains
@@ -188,30 +190,35 @@ colnames(pc)<-c("Draw","par","value")
 ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 ```
 
-##Prediction
-```{r,eval=F}
-pr<-coda.samples(model=jags,n.iter=2000,n.thin=1,variable.names=c("ynew"))
-ps<-posummary(pr)
+##Prediction - no error
+
+```{r,eval=T}
+pr<-coda.samples(model=jags,n.iter=10000,n.thin=10,variable.names=c("d"))
+ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
 
 #extract positions
-sv<-data.frame(str_match(ps$Var1,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
+sv<-data.frame(str_match(ps$Var2,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
 colnames(sv)<-c("par","step","xy")
 
 #format to combine
 ps<-data.frame(ps,sv)
 #relevel
 levels(ps$xy)<-c("x","y")
-levels(ps$Var2)<-c("mean","lower","median","upper","Rhat")
+
+#levels(ps$Var2)<-c("mean","lower","median","upper","Rhat")
 
 #Just keep mean, upper and lower
-toplot<-dcast(ps,step~xy+Var2,value.var = "value")
+toplot<-dcast(ps,Var1+step~xy,value.var = "value")
+sumplot<-group_by(toplot,step) %>% summarize(x_mean=mean(x),y_mean=mean(y))
 
 #arrange by step
-toplot$step<-as.numeric(as.character(toplot$step))
-toplot<-toplot %>% arrange(step)
+sumplot$step<-as.numeric(as.character(sumplot$step))
+sumplot<-sumplot %>% arrange(step)
 
-ggplot(toplot,aes(x=x_mean,y=y_mean)) + geom_path() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") + geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
+ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
+
+#+ geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + #geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
 ```
 
 Point Density
@@ -237,6 +244,10 @@ toplot<-toplot %>% arrange(step)
 ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
 ```
 
+##Assessing Fit
+
+```{r}
+```
 
 ```{r}
 save.image("HMM.RData")
