@@ -13,7 +13,7 @@
 
     ###Prediction First Step#####
     #First movement - random walk.
-    y[2,1:2] ~ dmnorm(y[1,1:2],Sigma)
+    y[2,1:2] ~ dmnorm(y[1,1:2],iSigma)
     
     #First displacement
     d[1,1] <- y[2,1] - y[1,1]
@@ -29,20 +29,21 @@
       yt[x,1:2]<-y[x,1:2] + d[x,1:2]
       
       #Gaussian Displacement
-      y[x+1,1:2] ~ dmnorm(yt[x,1:2],Sigma)
+      y[x+1,1:2] ~ dmnorm(yt[x,1:2],iSigma)
   
       ####Generate prediction####
       #RWnew[x,1:2]~dmnorm(b,Sigma)
       
       #Correlation in movement change
-      #dnew[x,1:2] <- gamma * T %*% dnew[x-1,1:2] + RWnew[x,1:2]
+      #dnew[x,1:2] <- gamma * T * dnew[x-1,1:2] + RWnew[x,1:2]
       
       #Predicted location
       #ynew[x+1,1:2] <- ynew[x,1:2] + dnew[x,1:2]
     }
 
     #Priors
-    Sigma~dwish(R,3)
-    gamma ~ dunif(0,1)
+    iSigma~dwish(R,2)
+    Sigma<-inverse(iSigma)
+    gamma ~ dbeta(1,1)
     theta ~ dunif(-1*pi,pi)
     }

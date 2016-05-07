@@ -26,25 +26,31 @@ library(stringr)
 library(rjags)
 ```
 
-#Simulation
+```{r,eval=F}
+#Load in data
+load("HMM.RData")
+jags$recompile()
+```
 
-##Correlated random walk
+#Abstract
+I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
+#Correlated random walk
 
 *Process Model*
 
-$$ d_{t} \sim T*d_{t-1} + Normal(0,\sigma)$$
-$$ x+t = x_{t-1} + d_{t} $$
+$$ d_{t} \sim T*d_{t-1} + Normal(0,\Sigma)$$
+$$ x_t = x_{t-1} + d_{t} $$
 
 ## Parameters
 
-$$\theta = Mean turning angle$$
-$$\gamma = Move persistance $$
-$$\rho = Correlation in movement process $$
+$$\theta = \text{Mean turning angle}$$
+$$\gamma = \text{Move persistence} $$
+$$\rho = \text{Correlation in movement process}$$
 
-I will then expand to include
+I will then increase complexity to include:
 
-* Multiple behavioral states, each with theiir own distances and turning angles
+* Multiple behavioral states, each with their own distances and turning angles
 * Environmental features that predict behavioral states.
 * Hierarchical variance among individuals
 * Observation Error
@@ -95,19 +101,17 @@ traj<-function(gamma,theta,rho=0){
   
   ####Process Model
   ## Random walk to estimate subsequent displacements
-  rw<-function(Sigma){
-    mvrnorm(n=1,mu=c(0,0),Sigma=Sigma)
+  rw<-function(mu,Sigma){
+    mvrnorm(n=1,mu,Sigma=Sigma)
   }
 
   #Draw random walk locations
   for (x in 2:steps){
     #Displacement
-    d[x,]<-gamma*T %*% d[x-1,]+rw(Sigma)
-
-## matrix multiplication
+    d[x,]<-gamma*T %*% d[x-1,] ## matrix multiplication
 
     #next position
-    xy[x,]<-xy[x-1,] + d[x,]
+    xy[x,]<-rw(mu=(xy[x-1,] + d[x,]),Sigma)
   }
   
   #Format to data frame
@@ -121,11 +125,11 @@ traj<-function(gamma,theta,rho=0){
 #Single Trajectory
 
 Start with reasonable defaults
-$$\gamma = 1 = \text{Strong Movement Persistance}$$
+$$\gamma = 1 = \text{Strong Movement Persistence}$$
 $$\theta = 0 = \text{No preference in turns}$$
 $$ \rho = 0 = \text{No correlation between heading northwest or southeast}$$
-$$ \sigma_lat = 0.1$$
-$$ \sigma_lon = 0.1$$
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
 
 Values come from Jonsen (2005) fit for foraging seals.
 
@@ -138,7 +142,7 @@ ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=St
 
 ### Plot many trajectories.
 ```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=1,theta=0,rho=0))
+mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta))
 mxy<-melt(mxy,id.vars=c("x","y","Step"))
 ggplot(mxy,aes(x=x,y=y)) + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
 ```
@@ -155,16 +159,16 @@ source("Bayesian/RW.R")
 print.noquote(readLines("Bayesian/RW.R"))
 
 #prior shape
-R <- diag(c(1,2))
+R <- diag(c(1,1))
 data=list(y=dxy[,1:2],steps=nrow(dxy),R=R)
 
-jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=1000 )
-update(jags,20000)
-p<-coda.samples(model=jags,n.iter=1000,n.thin=1,variable.names=c("theta","gamma"))
+jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=2000 )
+system.time(update(jags,20000))
+p<-coda.samples(model=jags,n.iter=3000,n.thin=5,variable.names=c("Sigma","theta","gamma"))
 ```
 
 ##Chains
-```{r}
+```{r,fig.height=5}
 potrace(p)
 ```
 
@@ -172,7 +176,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list(theta=theta,gamma=gamma))
+tv<-melt(list(theta=theta,gamma=gamma,Sigma=0.1))
 colnames(tv)<-c("value","par")
 
 #bind chains
@@ -234,3 +238,6 @@ ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
 ```
 
 
+```{r}
+save.image("HMM.RData")
+```
