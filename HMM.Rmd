@@ -118,29 +118,29 @@ traj<-function(gamma,theta,rho=0){
 }
 ```
 
-#Plot Trajectory
+#Single Trajectory
 
 Start with reasonable defaults
-$$\gamma = 1 = Strong Movement Persistance$$
-$$\theta = 0 = No preference in turns$$
-$$ \rho = 0 = no correlation between heading northwest or southeast$$
+$$\gamma = 1 = \text{Strong Movement Persistance}$$
+$$\theta = 0 = \text{No preference in turns}$$
+$$ \rho = 0 = \text{No correlation between heading northwest or southeast}$$
 $$ \sigma_lat = 0.1$$
 $$ \sigma_lon = 0.1$$
 
-These are mimicing values Jonsen 2005 fit for foraging seals.
+Values come from Jonsen (2005) fit for foraging seals.
 
 ```{r}
-gamma=1
+gamma=0.7
 theta=0
-dxy<-traj(gamma=1,theta=0)
-ggplot(dxy,aes(x=x,y=y)) + geom_point(size=5,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
+dxy<-traj(gamma=gamma,theta=theta)
+ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
 ```
 
 ### Plot many trajectories.
 ```{r}
 mxy<-lapply(1:10,function(x) traj(gamma=1,theta=0,rho=0))
 mxy<-melt(mxy,id.vars=c("x","y","Step"))
-ggplot(mxy,aes(x=x,y=y)) + geom_point(size=5,col='black') + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
+ggplot(mxy,aes(x=x,y=y)) + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
 ```
 
 #Model Fitting
@@ -159,7 +159,7 @@ R <- diag(c(1,2))
 data=list(y=dxy[,1:2],steps=nrow(dxy),R=R)
 
 jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2,n.adapt=1000 )
-update(jags,10000)
+update(jags,20000)
 p<-coda.samples(model=jags,n.iter=1000,n.thin=1,variable.names=c("theta","gamma"))
 ```
 
@@ -186,7 +186,7 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 
 ##Prediction
 ```{r,eval=F}
-pr<-coda.samples(model=jags,n.iter=5000,n.thin=1,variable.names=c("ynew"))
+pr<-coda.samples(model=jags,n.iter=2000,n.thin=1,variable.names=c("ynew"))
 ps<-posummary(pr)
 ps<-melt(ps)
 
