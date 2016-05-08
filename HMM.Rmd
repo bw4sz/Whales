@@ -48,9 +48,12 @@ $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 $$\rho = \text{Correlation in movement process}$$
 
+###Behavioral States
+$$ 1 = \text{foraging}$$
+$$ 2 = \text{traveling}$$
+
 I will then increase complexity to include:
 
-* Multiple behavioral states, each with their own distances and turning angles
 * Environmental features that predict behavioral states.
 * Hierarchical variance among individuals
 * Observation Error
@@ -59,13 +62,22 @@ I will then increase complexity to include:
 traj<-function(gamma,theta,rho=0){
   
   #Total number of steps
-  steps=200
+  steps=100
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
 
   #Displacement Vector
   d<-matrix(nrow=steps,ncol=2)
+  
+  #Behavioral States (at time t)
+  state<-c()
+  
+  #Probability of staying in behavior
+  alpha<-c()
+  phi<-matrix(nrow=steps,ncol=2)
+  alpha[1]<-0.8
+  alpha[2]<-1-alpha[1] 
 
   #Mean turning angle
   theta=theta
@@ -101,12 +113,24 @@ traj<-function(gamma,theta,rho=0){
   #Initial position
   xy[1,]<-c(0,0)
   
+  #First behavioral state is a random draw from two probabilities
+  lambda<-c()
+  lambda[1]<-0.5
+  lambda[2]<-1-lambda[1]
+  state[1] <- sample(c(1,2),size=1,prob=lambda)
+  
   #First step is random walk
   xy[2,]<-mvrnorm(mu=xy[1,],Sigma = Sigma)
   
+
   #Draw random walk locations
   for (x in 2:(steps-1)){
 
+    #Behavior
+    phi[x,1] <- alpha[state[x-1]]
+    phi[x,2] <- 1 - alpha[state[x-1]]
+    state[x] <- sample(c(1,2),size=1,prob=phi[x,])
+    
     # Add Correlated Displacement
     d[x,]<-xy[x,] + gamma * T %*% (xy[x,]  - xy[x-1,])
     
@@ -135,7 +159,7 @@ $$ \sigma_{longitude} = 0.1$$
 Values come from Jonsen (2005) fit for foraging seals.
 
 ```{r}
-gamma=1
+gamma=0.5
 theta=0
 
 dxy<-traj(gamma=gamma,theta=theta)

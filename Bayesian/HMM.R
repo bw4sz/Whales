@@ -63,6 +63,7 @@ cat("
     alpha[1] ~ dunif(0,1)	## prob of being in state 1 at t, given in state 1 at t-1
     alpha[2] ~ dunif(0,1)	## prob of being in state 1 at t, given in state 2 at t-1
     
+    #Probability of behavior switching
     lambda[1] ~ dunif(0,1)
     lambda[2] <- 1 - lambda[1]
     state[1] ~ dcat(lambda[]) ## assign state for first obs

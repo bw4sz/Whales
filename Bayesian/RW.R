@@ -6,20 +6,29 @@ cat("
     pi <- 3.141592653589
 
     #Transition Matrix for turning angles
-    T[1,1] <- cos(theta)
-    T[1,2] <- (-sin(theta))
-    T[2,1] <- sin(theta)
-    T[2,2] <- cos(theta)
+    T[t,1,1] <- cos(theta[state[t]])
+    T[t,1,2] <- (-sin(theta[state[t]]))
+    T[t,2,1] <- sin(theta[state[t]])
+    T[t,2,2] <- cos(theta[state[t]])
 
-    ###Prediction First Step#####
+    ###First Step####
     #First movement - random walk.
     y[2,1:2] ~ dmnorm(y[1,1:2],iSigma)
     
+    ###First Behavioral State###
+    state[1] ~ dcat(lambda[]) ## assign state for first obs
+    
+
     #Process Model for movement
     for(t in 2:(steps-1)){
       
+      #Behavioral State at time T
+      phi[t,1] <- alpha[state[t-1]]
+      phi[t,2] <- 1 - alpha[state[t-1]]
+      state[t] ~ dcat(phi[t,])
+      
       #Correlation in movement change
-      d[t,1:2] <- y[t,] + gamma * T %*% (y[t,1:2] - y[t-1,1:2])
+      d[t,1:2] <- y[t,] + gamma[state[t]] * T %*% (y[t,1:2] - y[t-1,1:2])
 
       #Gaussian Displacement
       y[t+1,1:2] ~ dmnorm(d[t,1:2],iSigma)
@@ -33,11 +42,22 @@ cat("
     iSigma ~ dwish(R,2)
     Sigma <- inverse(iSigma)
 
-    #Persistance
-    gamma ~ dbeta(1,1)
-  
-    #Mean angle
-    theta ~ dunif(-1*pi,pi)
+    #Mean Angle
+    theta[1] ~ dunif(npi,pi)	## prior for theta in 'foraging state'
+    theta[2] ~ dunif(npi,pi)	## prior for theta in 'traveling state'
+    
+    #Move persistance
+    gamma[1] ~ dbeta(1,1)	## prior for gamma (autocorrelation parameter) in state 1
+    gamma[2] ~ dbeta(1,1)	## prior for gamma in state 2 
+    
+    ##Behavioral States
+    alpha[1] ~ dbeta(1,1)	## prob of being in state 1 at t, given in state 1 at t-1
+    alpha[2] ~ dbeta(1,1)	## prob of being in state 1 at t, given in state 2 at t-1
+
+    #Probability of behavior switching 
+    lambda[1] ~ dbeta(1,1)
+    lambda[2] <- 1 - lambda[1]
+
     }"
     ,fill=TRUE)
 sink()
