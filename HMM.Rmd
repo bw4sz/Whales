@@ -59,10 +59,10 @@ I will then increase complexity to include:
 * Observation Error
 
 ```{r}
-traj<-function(gamma,theta,rho=0){
+traj<-function(gamma,theta,a1,rho=0){
   
   #Total number of steps
-  steps=100
+  steps=200
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -74,10 +74,11 @@ traj<-function(gamma,theta,rho=0){
   state<-c()
   
   #Probability of staying in behavior
-  alpha<-c()
+  alpha<-matrix(nrow=1,ncol=2)
   phi<-matrix(nrow=steps,ncol=2)
-  alpha[1]<-0.8
-  alpha[2]<-1-alpha[1] 
+  
+  alpha[1]<-a1[1]
+  alpha[2]<-a1[2]
 
   #Mean turning angle
   theta=theta
@@ -102,11 +103,7 @@ traj<-function(gamma,theta,rho=0){
   Sigma[2,2] <- sigma_lat^2
   
   #Transition matrix for correlated movement
-  T<-matrix(nrow=2,ncol=2)
-  T[1,1] <- cos(theta)
-  T[1,2] <- -sin(theta)
-  T[2,1] <- sin(theta)
-  T[2,2] <- cos(theta)
+  T<-array(dim=c(steps,2,2))
   
   ####Process Model
   
@@ -125,14 +122,20 @@ traj<-function(gamma,theta,rho=0){
 
   #Draw random walk locations
   for (x in 2:(steps-1)){
-
+    
     #Behavior
     phi[x,1] <- alpha[state[x-1]]
     phi[x,2] <- 1 - alpha[state[x-1]]
     state[x] <- sample(c(1,2),size=1,prob=phi[x,])
     
+    #Movement correlation matrix
+    T[x,1,1] <- cos(theta[state[x]])
+    T[x,1,2] <- -sin(theta[state[x]])
+    T[x,2,1] <- sin(theta[state[x]])
+    T[x,2,2] <- cos(theta[state[x]])
+    
     # Add Correlated Displacement
-    d[x,]<-xy[x,] + gamma * T %*% (xy[x,]  - xy[x-1,])
+    d[x,]<-xy[x,] + gamma[state[x]] * T[x,,] %*% (xy[x,]  - xy[x-1,])
     
     #next position
     ## Random walk
@@ -147,28 +150,44 @@ traj<-function(gamma,theta,rho=0){
 }
 ```
 
-#Single Trajectory
+#Simulation
+Generate travel paths for whales based on parameter values.
 
-Start with reasonable defaults
-$$\gamma = 1 = \text{Strong Movement Persistence}$$
-$$\theta = 0 = \text{No preference in turns}$$
-$$ \rho = 0 = \text{No correlation between heading northwest or southeast}$$
+##Behavioral States
+$$ \alpha_{1,1} = \text(Probability of remaining feeding when feeding) = 0.7$$
+$\alpha_{2,1} = \text(Probability of switching from feeding to traveling) = 0.4$
+
+$$\begin{matrix}
+  \alpha_{1,1} & 1-\alpha_{1,1} \\
+  \alpha_{2,1} & 1-\alpha_{2,1} \\
+\end{matrix}
+$$
+
+## Foraging
+$$\gamma_1 = 0.2 = \text{Weak Movement Persistence}$$
+$$\theta_1 = pi = \text{Many reversals in turns}$$
+
+## Traveling
+$$\gamma_2 = 0.8 = \text{Strong Movement Persistence}$$
+$$\theta_2 = 0 = \text{No preference in turns}$$
+
+For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
 
 Values come from Jonsen (2005) fit for foraging seals.
 
 ```{r}
-gamma=0.5
-theta=0
-
-dxy<-traj(gamma=gamma,theta=theta)
+gamma=c(0.7,0.4)
+theta=c(0,pi)
+a1=c(0.8,0.2)
+dxy<-traj(gamma=gamma,theta=theta,a1=a1)
 ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
 ```
 
 ### Plot many trajectories.
 ```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta))
+mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
 mxy<-melt(mxy,id.vars=c("x","y","Step"))
 ggplot(mxy,aes(x=x,y=y)) + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
 ```
@@ -189,8 +208,8 @@ R <- diag(c(1,1))
 data=list(y=as.matrix(dxy[,1:2]),steps=nrow(dxy),R=R)
 
 jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
-system.time(update(jags,20000))
-p<-coda.samples(model=jags,n.iter=5000,n.thin=2,variable.names=c("Sigma","theta","gamma"))
+system.time(update(jags,1000))
+p<-coda.samples(model=jags,n.iter=2000,n.thin=20,variable.names=c("Sigma","theta","gamma","alpha"))
 ```
 
 ##Chains
@@ -202,7 +221,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list(theta=theta,gamma=gamma,'Sigma[1,1]'=0.025,'Sigma[1,2]'=0,'Sigma[2,1]'=0,'Sigma[2,2]'=0.025))
+tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'Sigma[1,1]'=0.025,'Sigma[1,2]'=0,'Sigma[2,1]'=0,'Sigma[2,2]'=0.025))
 colnames(tv)<-c("value","par")
 
 #bind chains
@@ -217,7 +236,7 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 ##Prediction - no error
 
 ```{r,eval=T}
-pr<-coda.samples(model=jags,n.iter=10000,n.thin=10,variable.names=c("d"))
+pr<-coda.samples(model=jags,n.iter=1000,n.thin=4,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
 
@@ -266,11 +285,6 @@ toplot$step<-as.numeric(as.character(toplot$step))
 toplot<-toplot %>% arrange(step)
 
 ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
-```
-
-##Assessing Fit
-
-```{r}
 ```
 
 ```{r}

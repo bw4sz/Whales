@@ -30,6 +30,7 @@ cat("
     T[t,1,2] <- (-sin(theta[state[t]]))
     T[t,2,1] <- sin(theta[state[t]])
     T[t,2,2] <- cos(theta[state[t]])
+
     for(k in 1:2){
       Tdx[t,k] <- T[t,k,1] * (x[t,1] - x[t-1,1]) + T[t,k,2] * (x[t,2] - x[t-1,2])	## matrix multiplication
       x.mn[t,k] <- x[t,k] + gamma[state[t]] * Tdx[t,k]	## estimation next location (no error)
@@ -51,7 +52,7 @@ cat("
   
     ###Priors
     ## priors on process uncertainty
-  iSigma[1:2,1:2] ~ dwish(Omega[,],2)	
+    iSigma[1:2,1:2] ~ dwish(Omega[,],2)	
     Sigma[1:2,1:2] <- inverse(iSigma[,])
     
     theta[1] ~ dunif(npi,pi)	## prior for theta in state 1, should be the 'foraging state'
@@ -64,7 +65,7 @@ cat("
     alpha[2] ~ dunif(0,1)	## prob of being in state 1 at t, given in state 2 at t-1
     
     #Probability of behavior switching
-    lambda[1] ~ dunif(0,1)
+    lambda[1] ~ dbeta(1,1)
     lambda[2] <- 1 - lambda[1]
     state[1] ~ dcat(lambda[]) ## assign state for first obs
     
