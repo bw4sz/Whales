@@ -4,7 +4,7 @@
     #Constants
     pi <- 3.141592653589
 
-    ###First Step####
+    ###First Step###
     #First movement - random walk.
     y[2,1:2] ~ dmnorm(y[1,1:2],iSigma)
     
@@ -39,17 +39,26 @@
     iSigma ~ dwish(R,2)
     Sigma <- inverse(iSigma)
 
-    #Mean Angle
-    theta[1] ~ dunif(-1*pi,pi)	## prior for theta in 'foraging state'
-    theta[2] ~ dunif(-1*pi,pi)	## prior for theta in 'traveling state'
+    ##Mean Angle
+    # prior for theta in 'foraging state'
+    theta[1] ~ dunif(-1*pi,pi)
     
-    #Move persistance
-    gamma[1] ~ dbeta(1,1)	## prior for gamma (autocorrelation parameter) in state 1
-    gamma[2] ~ dbeta(1,1)	## prior for gamma in state 2 
+    # prior for theta in 'traveling state'
+    theta[2] ~ dunif(-1*pi,pi)
+    
+    ##Move persistance
+    # prior for gamma (autocorrelation parameter) in state 1
+    gamma[1] ~ dbeta(1,1)
+    
+    # prior for gamma in state 2
+    gamma[2] ~ dbeta(1,1)
     
     ##Behavioral States
-    alpha[1] ~ dbeta(1,1)	## prob of being in state 1 at t, given in state 1 at t-1
-    alpha[2] ~ dbeta(1,1)	## prob of being in state 1 at t, given in state 2 at t-1
+    # prob of being in state 1 at t, given in state 1 at t-1    
+    alpha[1] ~ dbeta(1,1)
+    
+    # prob of being in state 1 at t, given in state 2 at t-1    
+    alpha[2] ~ dbeta(1,1) 
 
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)

@@ -29,7 +29,7 @@ library(rjags)
 newModel<-T
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("HMM.RData")
 jags$recompile()
@@ -156,8 +156,8 @@ traj<-function(gamma,theta,a1,rho=0){
 #Simulation
 
 ##Behavioral States
-$$ \alpha_{1,1} = \text{Probability of remaining feeding when feeding)} = 0.8$$
-$$\alpha_{2,1} = \text{Probability of switching from traveling to feeding} = 0.25$$
+$$ \alpha_{1,1} = \text{Probability of remaining feeding when feeding)} = 0.9$$
+$$\alpha_{2,1} = \text{Probability of switching from traveling to feeding} = 0.2$$
 
 From these probabilities we can compute the full transition matrix.
 
@@ -168,18 +168,18 @@ $$\begin{matrix}
 $$
 
 ## Foraging
-$$\gamma_1 = 0.2 = \text{Weak Movement Persistence}$$
+$$\gamma_1 = 0.1 = \text{Weak Movement Persistence}$$
 $$\theta_1 = pi = \text{Many reversals in turns}$$
 
 ## Traveling
-$$\gamma_2 = 0.8 = \text{Strong Movement Persistence}$$
+$$\gamma_2 = 0.95 = \text{Strong Movement Persistence}$$
 $$\theta_2 = 0 = \text{No preference in turns}$$
 
 For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
 
-Values come from Jonsen (2005) fit for foraging seals.
+Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
 ```{r}
 gamma=c(0.95,0.1)
