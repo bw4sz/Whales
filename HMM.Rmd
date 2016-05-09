@@ -24,12 +24,16 @@ library(maps)
 library(gridExtra)
 library(stringr)
 library(rjags)
+
+#New model to be run, flag turned off if just updating.
+newModel<-T
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("HMM.RData")
 jags$recompile()
+newModel<-F
 ```
 
 #Abstract
@@ -46,7 +50,7 @@ $$ x_t = x_{t-1} + d_{t} $$
 
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
-$$\rho = \text{Correlation in movement process}$$
+
 
 ###Behavioral States
 $$ 1 = \text{foraging}$$
@@ -87,10 +91,10 @@ traj<-function(gamma,theta,a1,rho=0){
   gamma=gamma
   
   #Process variance in latitude
-  sigma_lat=0.1
+  sigma_lat=0.2
   
   #Process variance in longitude
-  sigma_lon=0.1
+  sigma_lon=0.2
   
   #Correlation in process variance
   rho=rho
@@ -118,7 +122,6 @@ traj<-function(gamma,theta,a1,rho=0){
   
   #First step is random walk
   xy[2,]<-mvrnorm(mu=xy[1,],Sigma = Sigma)
-  
 
   #Draw random walk locations
   for (x in 2:(steps-1)){
@@ -151,11 +154,12 @@ traj<-function(gamma,theta,a1,rho=0){
 ```
 
 #Simulation
-Generate travel paths for whales based on parameter values.
 
 ##Behavioral States
-$$ \alpha_{1,1} = \text(Probability of remaining feeding when feeding) = 0.7$$
-$\alpha_{2,1} = \text(Probability of switching from feeding to traveling) = 0.4$
+$$ \alpha_{1,1} = \text{Probability of remaining feeding when feeding)} = 0.8$$
+$$\alpha_{2,1} = \text{Probability of switching from traveling to feeding} = 0.25$$
+
+From these probabilities we can compute the full transition matrix.
 
 $$\begin{matrix}
   \alpha_{1,1} & 1-\alpha_{1,1} \\
@@ -178,14 +182,18 @@ $$ \sigma_{longitude} = 0.1$$
 Values come from Jonsen (2005) fit for foraging seals.
 
 ```{r}
-gamma=c(0.7,0.4)
+gamma=c(0.95,0.1)
 theta=c(0,pi)
-a1=c(0.8,0.2)
-dxy<-traj(gamma=gamma,theta=theta,a1=a1)
+a1=c(0.9,0.2)
+
+if(newModel){
+  dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
+}
+
 ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
 ```
 
-### Plot many trajectories.
+### Multiple trajectories.
 ```{r}
 mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
 mxy<-melt(mxy,id.vars=c("x","y","Step"))
@@ -207,9 +215,12 @@ print.noquote(readLines("Bayesian/RW.R"))
 R <- diag(c(1,1))
 data=list(y=as.matrix(dxy[,1:2]),steps=nrow(dxy),R=R)
 
-jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
-system.time(update(jags,1000))
-p<-coda.samples(model=jags,n.iter=2000,n.thin=20,variable.names=c("Sigma","theta","gamma","alpha"))
+if(newModel){
+  jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
+  }
+
+system.time(update(jags,40000))
+p<-coda.samples(model=jags,n.iter=20000,thin=20,variable.names=c("theta","gamma","alpha"))
 ```
 
 ##Chains
@@ -221,7 +232,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'Sigma[1,1]'=0.025,'Sigma[1,2]'=0,'Sigma[2,1]'=0,'Sigma[2,2]'=0.025))
+tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2]))
 colnames(tv)<-c("value","par")
 
 #bind chains
@@ -236,7 +247,7 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 ##Prediction - no error
 
 ```{r,eval=T}
-pr<-coda.samples(model=jags,n.iter=1000,n.thin=4,variable.names=c("d"))
+pr<-coda.samples(model=jags,n.iter=1000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
 
