@@ -1,7 +1,7 @@
 ---
-title: "Antarctic Whale Project: Simulation"
+title: "Priors for Dynamic Correlated Random Walk (Jonsen 2016)"
 author: "Ben Weinstein"
-date: "May 5th, 2016"
+date: "May 9th, 2016"
 output: 
   html_document:
     keep_md: True
@@ -32,17 +32,17 @@ library(rjags)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
+
+#Source Jonsen 2016
+source("Jonsen2016.R")
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("HMM.RData")
 jags$recompile()
 newModel<-F
 ```
-
-#Abstract
-I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
 #Correlated random walk
 
@@ -60,103 +60,6 @@ $$\gamma = \text{Move persistence} $$
 ###Behavioral States
 $$ 1 = \text{traveling}$$
 $$ 2 = \text{foraging}$$
-
-I will then increase complexity to include:
-
-* Environmental features that predict behavioral states.
-* Hierarchical variance among individuals
-* Observation Error
-
-```{r}
-traj<-function(gamma,theta,a1,rho=0){
-  
-  #Total number of steps
-  steps=200
-
-  #Position Vector
-  xy<-matrix(nrow=steps,ncol=2)
-
-  #Displacement Vector
-  d<-matrix(nrow=steps,ncol=2)
-  
-  #Behavioral States (at time t)
-  state<-c()
-  
-  #Probability of staying in behavior
-  alpha<-matrix(nrow=1,ncol=2)
-  phi<-matrix(nrow=steps,ncol=2)
-  
-  a1[1]<-a1[1]
-  a1[2]<-a1[2]
-
-  #Mean turning angle
-  theta=theta
-  
-  #Degree of autocorrelation
-  gamma=gamma
-  
-  #Process variance in latitude
-  sigma_lat=0.2
-  
-  #Process variance in longitude
-  sigma_lon=0.2
-  
-  #Correlation in process variance
-  rho=rho
-  
-  #Multivariate Normal Variance in random walk
-  Sigma<-matrix(nrow=2,ncol=2)
-  Sigma[1,1] <- sigma_lon^2
-  Sigma[1,2] <- rho * sigma_lon * sigma_lat
-  Sigma[2,1] <- rho * sigma_lon * sigma_lat
-  Sigma[2,2] <- sigma_lat^2
-  
-  #Transition matrix for correlated movement
-  T<-array(dim=c(steps,2,2))
-  
-  ####Process Model
-  
-  #Initial position
-  xy[1,]<-c(0,0)
-  
-  #First behavioral state is a random draw from two probabilities
-  lambda<-c()
-  lambda[1]<-0.5
-  lambda[2]<-1-lambda[1]
-  state[1] <- sample(c(1,2),size=1,prob=lambda)
-  
-  #First step is random walk
-  xy[2,]<-mvrnorm(mu=xy[1,],Sigma = Sigma)
-
-  #Draw random walk locations
-  for (x in 2:(steps-1)){
-    
-    #Behavior
-    phi[x,1] <- a1[state[x-1]]
-    phi[x,2] <- 1 - a1[state[x-1]]
-    state[x] <- sample(c(1,2),size=1,prob=phi[x,])
-    
-    #Movement correlation matrix
-    T[x,1,1] <- cos(theta[state[x]])
-    T[x,1,2] <- -sin(theta[state[x]])
-    T[x,2,1] <- sin(theta[state[x]])
-    T[x,2,2] <- cos(theta[state[x]])
-    
-    # Add Correlated Displacement
-    d[x,]<-xy[x,] + gamma[state[x]] * T[x,,] %*% (xy[x,]  - xy[x-1,])
-    
-    #next position
-    ## Random walk
-    xy[x+1,]<-mvrnorm(n=1,mu=d[x,],Sigma=Sigma)
-  }
-  
-  #Format to data frame
-  dxy<-data.frame(xy)
-  colnames(dxy)<-c("x","y")
-  dxy$Step<-1:nrow(dxy)
-  return(dxy)
-}
-```
 
 #Simulation
 
@@ -195,7 +98,9 @@ a1=c(0.9,0.2)
 
 #Use Jonsen 2016 function to simulate
 if(newModel){
-  dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
+  #dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
+  dxy<-simTrack(gamma=gamma,theta = theta,alpha=a1)
+  dxy$Step<-1:nrow(dxy)
 }
 
 ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
@@ -203,32 +108,33 @@ ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=St
 
 ### Multiple trajectories.
 ```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
+mxy<-lapply(1:10,function(x) simTrack(gamma=gamma,theta=theta,alpha=a1))
 mxy<-melt(mxy,id.vars=c("x","y","Step"))
 ggplot(mxy,aes(x=x,y=y)) + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
 ```
 
-#Model Fitting
+#Uninformative Priors
 
-The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
-
+```{r}
+hist(rbeta(1e5,1,1),main='gamma')
+hist(rbeta(1e5,1,1),main='theta')
 ```{r,eval=T}
 #source model
-source("Bayesian/RW.R")
+source("Bayesian/HMMvague.R")
 
 #print model
-print.noquote(readLines("Bayesian/RW.R"))
+print.noquote(readLines("Bayesian/HMMvague.R"))
 
 #prior shape
 R <- diag(c(1,1))
-data=list(y=cbind(dxy$x,dxy$y),steps=nrow(dxy),R=R)
+#data=list(y=cbind(dxy$x,dxy$y),steps=nrow(dxy),R=R)
 
 if(newModel){
-  jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
+  jags<-jags.model(file = "Bayesian/HMMvague.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,5000))
-p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha"))
+system.time(update(jags,15000))
+p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha"))
 ```
 
 ##Chains
@@ -254,8 +160,8 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 
 ##Prediction - no error
 
-```{r,eval=T}
-pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
+```{r,eval=F}
+pr<-coda.samples(model=jags,n.iter=1000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
 
@@ -267,6 +173,8 @@ colnames(sv)<-c("par","step","xy")
 ps<-data.frame(ps,sv)
 #relevel
 levels(ps$xy)<-c("x","y")
+
+#levels(ps$Var2)<-c("mean","lower","median","upper","Rhat")
 
 #Just keep mean, upper and lower
 toplot<-dcast(ps,Var1+step~xy,value.var = "value")

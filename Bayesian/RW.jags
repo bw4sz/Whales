@@ -40,12 +40,16 @@
     Sigma <- inverse(iSigma)
 
     ##Mean Angle
-    # prior for theta in 'foraging state'
-    theta[1] ~ dunif(-1*pi,pi)
+    
+    tmp[1] ~ dbeta(10, 10)
+    tmp[2] ~ dbeta(10, 10)
     
     # prior for theta in 'traveling state'
-    theta[2] ~ dunif(-1*pi,pi)
+    theta[1] <- (2 * tmp[1] - 1) * pi
     
+    # prior for theta in 'foraging state'    
+    theta[2] <- (tmp[2] * pi * 2)
+
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
     gamma[1] ~ dbeta(1,1)

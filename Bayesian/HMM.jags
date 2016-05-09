@@ -1,6 +1,4 @@
 
-sink("Bayesian/HMM.jags")
-cat("
     model {
     pi <- 3.141592653589
     Omega[1,1] <- 1
@@ -59,6 +57,4 @@ cat("
     zeta[2] <- 1 - zeta[1]
     b[steps] ~ dcat(zeta[])
     }
-    ",fill=TRUE)
-
-sink()
+    
