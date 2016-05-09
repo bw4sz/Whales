@@ -34,7 +34,7 @@ library(rjags)
 newModel<-T
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("HMM.RData")
 jags$recompile()
@@ -43,6 +43,11 @@ newModel<-F
 
 #Abstract
 I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
+
+## To add
+* Environmental features that predict behavioral states.
+* Hierarchical variance among individuals
+* Observation Error
 
 #Correlated random walk
 
@@ -56,16 +61,32 @@ $$ x_t = x_{t-1} + d_{t} $$
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
-
 ###Behavioral States
-$$ 1 = \text{traveling}$$
-$$ 2 = \text{foraging}$$
 
-I will then increase complexity to include:
+$$ Behavior_1 = \text{traveling}$$
+$$ Behavior_2 = \text{foraging}$$
 
-* Environmental features that predict behavioral states.
-* Hierarchical variance among individuals
-* Observation Error
+$$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}$$
+
+$$\begin{matrix}
+  \alpha_{1,1} & 1-\alpha_{1,1} \\
+  \alpha_{2,1} & 1-\alpha_{2,1} \\
+\end{matrix}
+$$
+
+$$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
+
+###Environment
+
+Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
+
+$$Pr(Behavior_t = Traveling \sim Bernoulli(p)$$
+$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]})$$
+
+and
+
+$$Pr(Behavior_t = Foraging \sim Bernoulli(p)$$
+$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_2 * Depth_{y[t-1,]})$$
 
 ```{r}
 traj<-function(gamma,theta,a1,rho=0){
@@ -154,6 +175,8 @@ traj<-function(gamma,theta,a1,rho=0){
   dxy<-data.frame(xy)
   colnames(dxy)<-c("x","y")
   dxy$Step<-1:nrow(dxy)
+  dxy$State<-as.factor(c(state,NA))
+  levels(dxy$State)<-c("Traveling","Feeding")
   return(dxy)
 }
 ```
@@ -165,6 +188,15 @@ $$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}
 $$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
 
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
+
+### Environment
+Whales tend to travel in deep habitats
+
+$$\beta_1=0.8$$
+
+Whales tend to forage in shallow habitats
+
+$$\beta_2=-0.8$$
 
 From these probabilities we can compute the full transition matrix.
 
@@ -186,6 +218,7 @@ For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
 
+
 Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
 ```{r}
@@ -198,14 +231,14 @@ if(newModel){
   dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
 }
 
-ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=Step),size=2) + scale_color_continuous(low='blue',high='red') + theme_bw()
+ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=2)  + theme_bw() 
 ```
 
 ### Multiple trajectories.
 ```{r}
 mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
-mxy<-melt(mxy,id.vars=c("x","y","Step"))
-ggplot(mxy,aes(x=x,y=y)) + geom_path(aes(col=as.factor(L1)),size=2) + theme_bw() + scale_color_discrete(guide=F) + ggtitle("Multiple trajectories")
+mxy<-melt(mxy,id.vars=c("x","y","Step","State"))
+ggplot(mxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=L1),size=2)  + theme_bw()  + ggtitle("Multiple trajectories")
 ```
 
 #Model Fitting
@@ -227,8 +260,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,5000))
-p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha"))
+system.time(update(jags,30000))
+p<-coda.samples(model=jags,n.iter=20000,thin=20,variable.names=c("theta","gamma","alpha"))
 ```
 
 ##Chains
