@@ -23,8 +23,8 @@ cat("
       T[t,2,2] <- cos(theta[state[t]])
       
       #Behavioral State at time T
-      phi[t,1] <- alpha[state[t-1]]
-      phi[t,2] <- 1 - alpha[state[t-1]]
+      phi[t,1] <- inv.logit(alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1])
+      phi[t,2] <- inv.logit(1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1])
       state[t] ~ dcat(phi[t,])
       
       #Correlation in movement change

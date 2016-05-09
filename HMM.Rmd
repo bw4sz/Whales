@@ -48,6 +48,7 @@ I simulated correlated random walks with similar properties to previous marine p
   * Add coastline?
 * Hierarchical variance among individuals
 * Observation Error
+* Posterior Model Checks
 
 #Correlated random walk
 
@@ -89,7 +90,7 @@ $$Pr(Behavior_t = Foraging) \sim Multinomial([phi_traveling,phi_foraging]$$
 $$logit(\phi) = \alpha_{Behavior_{t-1},} + \beta_2 * Depth_{y[t-1,]})$$
 
 ```{r}
-traj<-function(gamma,theta,a1,rho=0){
+traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
   steps=200
@@ -102,6 +103,12 @@ traj<-function(gamma,theta,a1,rho=0){
   
   #Behavioral States (at time t)
   state<-c()
+  
+  #Environment
+  ocean<-c()
+  
+  #Effect of env
+  beta<-beta
   
   #Probability of staying in behavior
   alpha<-matrix(nrow=1,ncol=2)
@@ -123,7 +130,7 @@ traj<-function(gamma,theta,a1,rho=0){
   sigma_lon=0.2
   
   #Correlation in process variance
-  rho=rho
+  rho=0
   
   #Multivariate Normal Variance in random walk
   Sigma<-matrix(nrow=2,ncol=2)
@@ -137,9 +144,11 @@ traj<-function(gamma,theta,a1,rho=0){
   
 ####Process Model
   
-  #Initial position
+  ##Initial position##
   xy[1,]<-c(0,0)
   
+  #First env
+  ocean[1]<-extract(habitat,SpatialPoints(data.frame(t(xy[1,]))))
   
   #First behavioral state is a random draw from two probabilities
   lambda<-c()
@@ -153,9 +162,12 @@ traj<-function(gamma,theta,a1,rho=0){
   #Draw random walk locations
   for (x in 2:(steps-1)){
     
+    #Extract env
+    ocean[x]<-extract(habitat,SpatialPoints(data.frame(t(xy[x,]))))
+    
     #Behavior
-    phi[x,1] <- a1[state[x-1]]
-    phi[x,2] <- 1 - a1[state[x-1]]
+    phi[x,1] <- inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
+    phi[x,2] <- inv.logit(1-a1[state[x-1]]+beta[state[x-1]]*ocean[x])
     state[x] <- sample(c(1,2),size=1,prob=phi[x,])
     
     #Movement correlation matrix
@@ -176,7 +188,12 @@ traj<-function(gamma,theta,a1,rho=0){
   dxy<-data.frame(xy)
   colnames(dxy)<-c("x","y")
   dxy$Step<-1:nrow(dxy)
+  
+  #Behavior
   dxy$State<-as.factor(c(state,NA))
+  
+  #Ocean
+  dxy$ocean<-c(ocean,NA)
   levels(dxy$State)<-c("Traveling","Feeding")
   return(dxy)
 }
@@ -222,36 +239,48 @@ $$ \sigma_{longitude} = 0.1$$
 Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
 ```{r}
+#Simulate Data
+#Move persistance
 gamma=c(0.9,0.1)
+
+#Turning angle
 theta=c(0,pi)
-a1=c(0.9,0.2)
+
+#Transitions
+a1=c(logit(0.9),logit(0.2))
+
+#Effect of ocean depth
+beta=c(-1,-1)
 
 #Simulate environment
-  #Create environment
+#Create environment
 m<-raster(mountains(7,0.5))
-r<-(m-max(m[]))*100
-ras2<-raster(xmn=-40,xmx=40,ymn=-40,ymx=40,resolution=1,crs=NA)
+r<-(m-max(m[]))*-100
+ras2<-raster(xmn=-50,xmx=50,ymn=-50,ymx=50,resolution=1,crs=NA)
 r2<-setExtent(r,ras2)
 habitat<-resample(r2,ras2)
-#color ramp
-co<-colorRampPalette(c('midnight blue', 'blue', 'skyblue'))
+
+#Habitat dataframe for modeling
 habitatdf<-as.data.frame(habitat,xy=TRUE)
 
 #Use Jonsen 2016 function to simulate
 if(newModel){
-  dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
+  dxy<-traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)  
 }
 
 #habitat bbounding for visualization
 bb<-bbox(cbind(dxy$x,dxy$y))
 
 ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",low='black',high='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
+
+#Behavior plot
+ggplot(dxy[-nrow(dxy),],aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial")) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth")
 ```
 
 ### Multiple trajectories.
 ```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
-mxy<-melt(mxy,id.vars=c("x","y","Step","State"))
+mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
+mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
 
 #bounding box
 bb<-bbox(cbind(mxy$x,mxy$y))
