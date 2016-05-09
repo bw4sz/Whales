@@ -12,9 +12,9 @@ output:
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
+library(secr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
-library(sp)
-library(dismo)
+library(boot)
 library(potools)
 library(raster)
 library(reshape2)
@@ -22,16 +22,15 @@ library(ggplot2)
 library(MASS)
 library(dplyr)
 library(chron)
-library(moveHMM)
-library(move)
-library(ggmap)
-library(maps)
 library(gridExtra)
 library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
+
+#Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
+source("Mountains.R")
 ```
 
 ```{r,eval=F}
@@ -46,6 +45,7 @@ I simulated correlated random walks with similar properties to previous marine p
 
 ## To add
 * Environmental features that predict behavioral states.
+  * Add coastline?
 * Hierarchical variance among individuals
 * Observation Error
 
@@ -80,13 +80,13 @@ $$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} =
 
 Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
 
-$$Pr(Behavior_t = Traveling \sim Bernoulli(p)$$
+$$Pr(Behavior_t = Traveling) \sim Bernoulli(p)$$
 $$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]})$$
 
 and
 
-$$Pr(Behavior_t = Foraging \sim Bernoulli(p)$$
-$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_2 * Depth_{y[t-1,]})$$
+$$Pr(Behavior_t = Foraging) \sim Multinomial([phi_traveling,phi_foraging]$$
+$$logit(\phi) = \alpha_{Behavior_{t-1},} + \beta_2 * Depth_{y[t-1,]})$$
 
 ```{r}
 traj<-function(gamma,theta,a1,rho=0){
@@ -135,10 +135,11 @@ traj<-function(gamma,theta,a1,rho=0){
   #Transition matrix for correlated movement
   T<-array(dim=c(steps,2,2))
   
-  ####Process Model
+####Process Model
   
   #Initial position
   xy[1,]<-c(0,0)
+  
   
   #First behavioral state is a random draw from two probabilities
   lambda<-c()
@@ -218,7 +219,6 @@ For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
 
-
 Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
 ```{r}
@@ -226,19 +226,37 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 a1=c(0.9,0.2)
 
+#Simulate environment
+  #Create environment
+m<-raster(mountains(7,0.5))
+r<-(m-max(m[]))*100
+ras2<-raster(xmn=-40,xmx=40,ymn=-40,ymx=40,resolution=1,crs=NA)
+r2<-setExtent(r,ras2)
+habitat<-resample(r2,ras2)
+#color ramp
+co<-colorRampPalette(c('midnight blue', 'blue', 'skyblue'))
+habitatdf<-as.data.frame(habitat,xy=TRUE)
+
 #Use Jonsen 2016 function to simulate
 if(newModel){
   dxy<-traj(gamma=gamma,theta=theta,a1=a1)  
 }
 
-ggplot(dxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=2)  + theme_bw() 
+#habitat bbounding for visualization
+bb<-bbox(cbind(dxy$x,dxy$y))
+
+ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",low='black',high='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
 ```
 
 ### Multiple trajectories.
 ```{r}
 mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1))
 mxy<-melt(mxy,id.vars=c("x","y","Step","State"))
-ggplot(mxy,aes(x=x,y=y)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=L1),size=2)  + theme_bw()  + ggtitle("Multiple trajectories")
+
+#bounding box
+bb<-bbox(cbind(mxy$x,mxy$y))
+
+ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='black',high='grey90')    + geom_path(aes(col=State,group=L1),size=1) 
 ```
 
 #Model Fitting

@@ -5,22 +5,14 @@ May 5th, 2016
 
 
 
-```
-## Compiling model graph
-##    Resolving undeclared variables
-##    Allocating nodes
-## Graph information:
-##    Observed stochastic nodes: 199
-##    Unobserved stochastic nodes: 207
-##    Total graph size: 23117
-## 
-## Initializing model
-## 
-## Adapting
-```
 
 #Abstract
 I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
+
+## To add
+* Environmental features that predict behavioral states.
+* Hierarchical variance among individuals
+* Observation Error
 
 #Correlated random walk
 
@@ -34,16 +26,32 @@ $$ x_t = x_{t-1} + d_{t} $$
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
-
 ###Behavioral States
-$$ 1 = \text{traveling}$$
-$$ 2 = \text{foraging}$$
 
-I will then increase complexity to include:
+$$ Behavior_1 = \text{traveling}$$
+$$ Behavior_2 = \text{foraging}$$
 
-* Environmental features that predict behavioral states.
-* Hierarchical variance among individuals
-* Observation Error
+$$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}$$
+
+$$\begin{matrix}
+  \alpha_{1,1} & 1-\alpha_{1,1} \\
+  \alpha_{2,1} & 1-\alpha_{2,1} \\
+\end{matrix}
+$$
+
+$$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
+
+###Environment
+
+Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
+
+$$Pr(Behavior_t = Traveling \sim Bernoulli(p)$$
+$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]})$$
+
+and
+
+$$Pr(Behavior_t = Foraging \sim Bernoulli(p)$$
+$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_2 * Depth_{y[t-1,]})$$
 
 
 
@@ -54,6 +62,15 @@ $$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}
 $$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
 
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
+
+### Environment
+Whales tend to travel in deep habitats
+
+$$\beta_1=0.8$$
+
+Whales tend to forage in shallow habitats
+
+$$\beta_2=-0.8$$
 
 From these probabilities we can compute the full transition matrix.
 
@@ -74,6 +91,7 @@ $$\theta_2 = pi = \text{Many reversals in turns}$$
 For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
+
 
 Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
@@ -165,12 +183,20 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ```
 
 ```
-##    user  system elapsed 
-##  348.17    0.08  351.38
+## Compiling model graph
+##    Resolving undeclared variables
+##    Allocating nodes
+## Graph information:
+##    Observed stochastic nodes: 199
+##    Unobserved stochastic nodes: 207
+##    Total graph size: 23117
+## 
+## Initializing model
 ```
 
 ```
-## NOTE: Stopping adaptation
+##    user  system elapsed 
+## 1965.65    0.14 1972.72
 ```
 
 ##Chains
