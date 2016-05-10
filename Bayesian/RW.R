@@ -23,8 +23,8 @@ cat("
       T[t,2,2] <- cos(theta[state[t]])
       
       #Behavioral State at time T
-      phi[t,1] <- inv.logit(alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1])
-      phi[t,2] <- inv.logit(1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1])
+      logit(phi[t,1]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
+      logit(phi[t,2]) <- 1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
       state[t] ~ dcat(phi[t,])
       
       #Correlation in movement change
@@ -60,11 +60,13 @@ cat("
     
     ##Behavioral States
     # prob of being in state 1 at t, given in state 1 at t-1    
-    alpha[1] ~ dbeta(1,1)
-    
-    # prob of being in state 1 at t, given in state 2 at t-1    
-    alpha[2] ~ dbeta(1,1) 
+    alpha[1] ~ dnorm(0,0.0001)
+    beta[1] ~dnorm(0,0.0001)
 
+    # prob of being in state 1 at t, given in state 2 at t-1    
+    alpha[2] ~ dnorm(0,0.0001)
+    beta[2] ~dnorm(0,0.0001)
+    
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
     lambda[2] <- 1 - lambda[1]

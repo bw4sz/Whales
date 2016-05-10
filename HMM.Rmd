@@ -5,9 +5,9 @@ date: "May 5th, 2016"
 output: 
   html_document:
     keep_md: True
-  numbered_sections: True
-  toc: true
-  theme: spacelab
+    numbered_sections: True
+    toc: true
+    theme: spacelab
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
@@ -44,8 +44,7 @@ newModel<-F
 I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
 ## To add
-* Environmental features that predict behavioral states.
-  * Add coastline?
+* Add coastline?
 * Hierarchical variance among individuals
 * Observation Error
 * Posterior Model Checks
@@ -62,12 +61,18 @@ $$ x_t = x_{t-1} + d_{t} $$
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
+For both behaviors process variance is:
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
+
+
 ###Behavioral States
 
 $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
-$$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}$$
+$$ \alpha_{1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{2,1} = \text{Probability of switching from feeding to traveling}$$
 
 $$\begin{matrix}
   \alpha_{1,1} & 1-\alpha_{1,1} \\
@@ -75,19 +80,15 @@ $$\begin{matrix}
 \end{matrix}
 $$
 
-$$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
-
 ###Environment
 
 Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
+It generally follows the form, conditional on behavior at t -1:
 
-$$Pr(Behavior_t = Traveling) \sim Bernoulli(p)$$
-$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]})$$
+$$Behavior_t \sim Multinomial([\phi_traveling,\phi_foraging])$$
+$$logit(\phi_traveling) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
+$$logit(\phi_foraging) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
-and
-
-$$Pr(Behavior_t = Foraging) \sim Multinomial([phi_traveling,phi_foraging]$$
-$$logit(\phi) = \alpha_{Behavior_{t-1},} + \beta_2 * Depth_{y[t-1,]})$$
 
 ```{r}
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
@@ -145,7 +146,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
 ####Process Model
   
   ##Initial position##
-  xy[1,]<-c(0,0)
+  xy[1,]<-mvrnorm(mu=c(0,0),Sigma=Sigma)
   
   #First env
   ocean[1]<-extract(habitat,SpatialPoints(data.frame(t(xy[1,]))))
@@ -193,7 +194,10 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   dxy$State<-as.factor(c(state,NA))
   
   #Ocean
-  dxy$ocean<-c(ocean,NA)
+  #grab last point
+  ocean[steps]<-extract(habitat,SpatialPoints(data.frame(t(xy[steps,]))))
+
+  dxy$ocean<-ocean
   levels(dxy$State)<-c("Traveling","Feeding")
   return(dxy)
 }
@@ -201,7 +205,17 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
 
 #Simulation
 
+Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
+
 ##Behavioral States
+### Traveling
+$$\gamma_1 = 0.9 = \text{Strong Movement Persistence}$$
+$$\theta_1 = 0 = \text{No preference in turns}$$
+
+### Foraging
+$$\gamma_2 = 0.1 = \text{Weak Movement Persistence}$$
+$$\theta_2 = pi = \text{Many reversals in turns}$$
+
 $$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)} = 0.9$$
 $$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
 
@@ -210,33 +224,34 @@ Essentially, whales travel long straight distances to find food sources, but the
 ### Environment
 Whales tend to travel in deep habitats
 
-$$\beta_1=0.8$$
+$$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
 
-$$\beta_2=-0.8$$
+$$\beta_2=-10$$
 
-From these probabilities we can compute the full transition matrix.
+[Dive profile based on Stimpert (2012)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
+This is easiest to understand graphically.
 
-$$\begin{matrix}
-  \alpha_{1,1} & 1-\alpha_{1,1} \\
-  \alpha_{2,1} & 1-\alpha_{2,1} \\
-\end{matrix}
-$$
-
-## Traveling
-$$\gamma_1 = 0.9 = \text{Strong Movement Persistence}$$
-$$\theta_1 = 0 = \text{No preference in turns}$$
-
-## Foraging
-$$\gamma_2 = 0.1 = \text{Weak Movement Persistence}$$
-$$\theta_2 = pi = \text{Many reversals in turns}$$
-
-For both behaviors process variance is:
-$$ \sigma_{latitude} = 0.1$$
-$$ \sigma_{longitude} = 0.1$$
-
-Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
+```{r,fig.height=3,fig.width=3.5}
+dplot<-function(a1,beta){
+  x<-seq(0,0.4,0.01)
+  y<-inv.logit(a1[1]*beta[1]*x)
+  d11<-data.frame(x,y,State='Traveling',k='Traveling')
+  
+  y<-inv.logit(1-a1[1]*beta[1]*x)
+  d12<-data.frame(x,y,State='Traveling',k='Feeding')
+  
+  y<-inv.logit(a1[2]*beta[2]*x)
+  d21<-data.frame(x,y,State='Feeding',k='Traveling')
+  
+  y<-inv.logit(1-a1[2]*beta[2]*x)
+  d22<-data.frame(x,y,State='Feeding',k='Feeding')
+  
+  d<-rbind_all(list(d11,d12,d21,d22))
+  ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth",y="Probability of State",col="Transition") + theme_bw() 
+}
+```
 
 ```{r}
 #Simulate Data
@@ -247,18 +262,23 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(logit(0.9),logit(0.2))
+a1=c(logit(0.9),logit(0.1))
 
 #Effect of ocean depth
-beta=c(-1,-1)
+beta=c(50,-5)
+
+#Visualize
+dplot(a1,beta)
 
 #Simulate environment
 #Create environment
 m<-raster(mountains(7,0.5))
-r<-(m-max(m[]))*-100
-ras2<-raster(xmn=-50,xmx=50,ymn=-50,ymx=50,resolution=1,crs=NA)
+r<-(m-max(m[]))*-200/1000
+ras2<-raster(xmn=-50,xmx=50,ymn=-50,ymx=50,resolution=0.5,crs=NA)
 r2<-setExtent(r,ras2)
 habitat<-resample(r2,ras2)
+cr<-colorRampPalette(c("white","black"))
+plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
 #Habitat dataframe for modeling
 habitatdf<-as.data.frame(habitat,xy=TRUE)
@@ -274,7 +294,7 @@ bb<-bbox(cbind(dxy$x,dxy$y))
 ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",low='black',high='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
 
 #Behavior plot
-ggplot(dxy[-nrow(dxy),],aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial")) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth")
+ggplot(dxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial")) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth")
 ```
 
 ### Multiple trajectories.
@@ -286,6 +306,9 @@ mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
 bb<-bbox(cbind(mxy$x,mxy$y))
 
 ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='black',high='grey90')    + geom_path(aes(col=State,group=L1),size=1) 
+
+ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),aes(group=L1),alpha=0.1) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw()
+
 ```
 
 #Model Fitting
@@ -301,14 +324,14 @@ print.noquote(readLines("Bayesian/RW.R"))
 
 #prior shape
 R <- diag(c(1,1))
-data=list(y=cbind(dxy$x,dxy$y),steps=nrow(dxy),R=R)
+data=list(y=cbind(dxy$x,dxy$y),steps=nrow(dxy),R=R,ocean=dxy$ocean)
 
 if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,30000))
-p<-coda.samples(model=jags,n.iter=20000,thin=20,variable.names=c("theta","gamma","alpha"))
+system.time(update(jags,20000))
+p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -320,7 +343,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2]))
+tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=beta[1],'beta[2]'=beta[2]))
 colnames(tv)<-c("value","par")
 
 #bind chains
@@ -334,7 +357,7 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',
 
 ##Prediction - no error
 
-```{r,eval=T}
+```{r,eval=F}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)

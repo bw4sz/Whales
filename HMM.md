@@ -10,9 +10,10 @@ May 5th, 2016
 I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
 ## To add
-* Environmental features that predict behavioral states.
+* Add coastline?
 * Hierarchical variance among individuals
 * Observation Error
+* Posterior Model Checks
 
 #Correlated random walk
 
@@ -26,12 +27,18 @@ $$ x_t = x_{t-1} + d_{t} $$
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
+For both behaviors process variance is:
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
+
+
 ###Behavioral States
 
 $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
-$$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)}$$
+$$ \alpha_{1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{2,1} = \text{Probability of switching from feeding to traveling}$$
 
 $$\begin{matrix}
   \alpha_{1,1} & 1-\alpha_{1,1} \\
@@ -39,25 +46,33 @@ $$\begin{matrix}
 \end{matrix}
 $$
 
-$$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
-
 ###Environment
 
 Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
 
-$$Pr(Behavior_t = Traveling \sim Bernoulli(p)$$
-$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]})$$
+$$Pr(Behavior_t = Traveling) \sim Bernoulli(p)$$
+$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]}$$
 
 and
 
-$$Pr(Behavior_t = Foraging \sim Bernoulli(p)$$
-$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_2 * Depth_{y[t-1,]})$$
+$$Pr(Behavior_t = Foraging) \sim Multinomial([\phi_traveling,\phi_foraging]$$
+$$logit(\phi) = \alpha_{Behavior_{t-1},} + \beta_2 * Depth_{y[t-1,]}$$
 
 
 
 #Simulation
 
+Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
+
 ##Behavioral States
+### Traveling
+$$\gamma_1 = 0.9 = \text{Strong Movement Persistence}$$
+$$\theta_1 = 0 = \text{No preference in turns}$$
+
+### Foraging
+$$\gamma_2 = 0.1 = \text{Weak Movement Persistence}$$
+$$\theta_2 = pi = \text{Many reversals in turns}$$
+
 $$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)} = 0.9$$
 $$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
 
@@ -66,39 +81,21 @@ Essentially, whales travel long straight distances to find food sources, but the
 ### Environment
 Whales tend to travel in deep habitats
 
-$$\beta_1=0.8$$
+$$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
 
-$$\beta_2=-0.8$$
+$$\beta_2=-10$$
 
-From these probabilities we can compute the full transition matrix.
-
-$$\begin{matrix}
-  \alpha_{1,1} & 1-\alpha_{1,1} \\
-  \alpha_{2,1} & 1-\alpha_{2,1} \\
-\end{matrix}
-$$
-
-## Traveling
-$$\gamma_1 = 0.9 = \text{Strong Movement Persistence}$$
-$$\theta_1 = 0 = \text{No preference in turns}$$
-
-## Foraging
-$$\gamma_2 = 0.1 = \text{Weak Movement Persistence}$$
-$$\theta_2 = pi = \text{Many reversals in turns}$$
-
-For both behaviors process variance is:
-$$ \sigma_{latitude} = 0.1$$
-$$ \sigma_{longitude} = 0.1$$
+[Dive profile based on Stimpert (2012)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
+This is easist to undertand graphically.
 
 
-Values come from Jonsen (2005) and Jonsen (2016) fit for foraging seals.
 
-![](HMM_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-5-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-5-2.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-5-3.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-5-4.png)<!-- -->
 
 ### Multiple trajectories.
-![](HMM_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 #Model Fitting
 
@@ -131,8 +128,8 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [23]       T[t,2,2] <- cos(theta[state[t]])                                        
 ## [24]                                                                               
 ## [25]       #Behavioral State at time T                                             
-## [26]       phi[t,1] <- alpha[state[t-1]]                                           
-## [27]       phi[t,2] <- 1 - alpha[state[t-1]]                                       
+## [26]       logit(phi[t,1]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]    
+## [27]       logit(phi[t,2]) <- 1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]  
 ## [28]       state[t] ~ dcat(phi[t,])                                                
 ## [29]                                                                               
 ## [30]       #Correlation in movement change                                         
@@ -168,18 +165,20 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [60]                                                                               
 ## [61]     ##Behavioral States                                                       
 ## [62]     # prob of being in state 1 at t, given in state 1 at t-1                  
-## [63]     alpha[1] ~ dbeta(1,1)                                                     
-## [64]                                                                               
-## [65]     # prob of being in state 1 at t, given in state 2 at t-1                  
-## [66]     alpha[2] ~ dbeta(1,1)                                                     
-## [67]                                                                               
-## [68]     #Probability of behavior switching                                        
-## [69]     lambda[1] ~ dbeta(1,1)                                                    
-## [70]     lambda[2] <- 1 - lambda[1]                                                
-## [71]                                                                               
-## [72]     }"                                                                        
-## [73]     ,fill=TRUE)                                                               
-## [74] sink()
+## [63]     alpha[1] ~ dnorm(0,0.0001)                                                
+## [64]     beta[1] ~dnorm(0,0.0001)                                                  
+## [65]                                                                               
+## [66]     # prob of being in state 1 at t, given in state 2 at t-1                  
+## [67]     alpha[2] ~ dnorm(0,0.0001)                                                
+## [68]     beta[2] ~dnorm(0,0.0001)                                                  
+## [69]                                                                               
+## [70]     #Probability of behavior switching                                        
+## [71]     lambda[1] ~ dbeta(1,1)                                                    
+## [72]     lambda[2] <- 1 - lambda[1]                                                
+## [73]                                                                               
+## [74]     }"                                                                        
+## [75]     ,fill=TRUE)                                                               
+## [76] sink()
 ```
 
 ```
@@ -188,27 +187,27 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##    Allocating nodes
 ## Graph information:
 ##    Observed stochastic nodes: 199
-##    Unobserved stochastic nodes: 207
-##    Total graph size: 23117
+##    Unobserved stochastic nodes: 209
+##    Total graph size: 24511
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-## 1965.65    0.14 1972.72
+## 1645.29    1.46 1688.13
 ```
 
 ##Chains
-![](HMM_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ##Posteriors
 
-![](HMM_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ##Prediction - no error
 
-![](HMM_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 
 Point Density
 
