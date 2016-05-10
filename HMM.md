@@ -49,14 +49,12 @@ $$
 ###Environment
 
 Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
+It generally follows the form, conditional on behavior at t -1:
 
-$$Pr(Behavior_t = Traveling) \sim Bernoulli(p)$$
-$$logit(p) = \alpha_{Behavior_{t-1}} + \beta_1 * Depth_{y[t-1,]}$$
+$$Behavior_t \sim Multinomial([\phi_traveling,\phi_foraging])$$
+$$logit(\phi_traveling) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
+$$logit(\phi_foraging) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
-and
-
-$$Pr(Behavior_t = Foraging) \sim Multinomial([\phi_traveling,\phi_foraging]$$
-$$logit(\phi) = \alpha_{Behavior_{t-1},} + \beta_2 * Depth_{y[t-1,]}$$
 
 
 
@@ -88,7 +86,7 @@ Whales tend to forage in shallow habitats
 $$\beta_2=-10$$
 
 [Dive profile based on Stimpert (2012)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
-This is easist to undertand graphically.
+This is easiest to understand graphically.
 
 
 
@@ -129,7 +127,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [24]                                                                               
 ## [25]       #Behavioral State at time T                                             
 ## [26]       logit(phi[t,1]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]    
-## [27]       logit(phi[t,2]) <- 1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]  
+## [27]       phi[t,2] <- 1-phi[t,1]                                                  
 ## [28]       state[t] ~ dcat(phi[t,])                                                
 ## [29]                                                                               
 ## [30]       #Correlation in movement change                                         
@@ -170,7 +168,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [65]                                                                               
 ## [66]     # prob of being in state 1 at t, given in state 2 at t-1                  
 ## [67]     alpha[2] ~ dnorm(0,0.0001)                                                
-## [68]     beta[2] ~dnorm(0,0.0001)                                                  
+## [68]     beta[2] ~ dnorm(0,0.0001)                                                 
 ## [69]                                                                               
 ## [70]     #Probability of behavior switching                                        
 ## [71]     lambda[1] ~ dbeta(1,1)                                                    
@@ -186,16 +184,16 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##    Resolving undeclared variables
 ##    Allocating nodes
 ## Graph information:
-##    Observed stochastic nodes: 199
-##    Unobserved stochastic nodes: 209
-##    Total graph size: 24511
+##    Observed stochastic nodes: 299
+##    Unobserved stochastic nodes: 309
+##    Total graph size: 95716
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-## 1645.29    1.46 1688.13
+## 3013.50    1.54 3062.57
 ```
 
 ##Chains

@@ -1,14 +1,4 @@
 
-> cat("
-+     model{
-+ 
-+     #Constants
-+     pi <- 3.141592653589
-+ 
-+     ###First Step###
-+     #First movement - random walk.
-+     y[2,1:2] ~ dm ..." ... [TRUNCATED] 
-
     model{
 
     #Constants
@@ -33,7 +23,7 @@
       
       #Behavioral State at time T
       logit(phi[t,1]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
-      1-logit(phi[t,2]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
+      phi[t,2] <- 1-phi[t,1]
       state[t] ~ dcat(phi[t,])
       
       #Correlation in movement change
@@ -69,17 +59,15 @@
     
     ##Behavioral States
     # prob of being in state 1 at t, given in state 1 at t-1    
-    alpha[1] ~ dnorm(0,0.0001)
+    alpha[1] ~ dunif(-5,5)
     beta[1] ~dnorm(0,0.0001)
 
     # prob of being in state 1 at t, given in state 2 at t-1    
-    alpha[2] ~ dnorm(0,0.0001)
-    beta[2] ~dnorm(0,0.0001)
+    alpha[2] ~ dunif(-5,5)
+    beta[2] ~ dnorm(0,0.0001)
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
     lambda[2] <- 1 - lambda[1]
 
     }
-
-> sink()

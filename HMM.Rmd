@@ -94,7 +94,7 @@ $$logit(\phi_foraging) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=200
+  steps=300
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -262,7 +262,7 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(logit(0.7),logit(0.1))
+a1=c(-2,-2)
 
 #Effect of ocean depth
 beta=c(10,10)
@@ -272,9 +272,9 @@ dplot(a1,beta)
 
 #Simulate environment
 #Create environment
-m<-raster(mountains(7,0.5))
-r<-(m-max(m[]))*-200/1000
-ras2<-raster(xmn=-50,xmx=50,ymn=-50,ymx=50,resolution=0.5,crs=NA)
+m<-raster(mountains(7,1.2))
+r<-(m-max(m[]))*-20/1000
+ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.5,crs=NA)
 r2<-setExtent(r,ras2)
 habitat<-resample(r2,ras2)
 cr<-colorRampPalette(c("white","black"))
@@ -283,7 +283,6 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 #Habitat dataframe for modeling
 habitatdf<-as.data.frame(habitat,xy=TRUE)
 
-#Use Jonsen 2016 function to simulate
 if(newModel){
   dxy<-traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)  
 }
@@ -291,7 +290,7 @@ if(newModel){
 #habitat bbounding for visualization
 bb<-bbox(cbind(dxy$x,dxy$y))
 
-ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",low='black',high='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
+ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",high='black',low='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
 
 #Behavior plot
 ggplot(dxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial")) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth")
@@ -330,8 +329,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,15000))
-p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,60000))
+p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains

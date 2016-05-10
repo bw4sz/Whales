@@ -60,12 +60,12 @@ cat("
     
     ##Behavioral States
     # prob of being in state 1 at t, given in state 1 at t-1    
-    alpha[1] ~ dnorm(0,0.0001)
+    alpha[1] ~ dunif(-5,5)
     beta[1] ~dnorm(0,0.0001)
 
     # prob of being in state 1 at t, given in state 2 at t-1    
-    alpha[2] ~ dnorm(0,0.0001)
-    beta[2] ~dnorm(0,0.0001)
+    alpha[2] ~ dunif(-5,5)
+    beta[2] ~ dnorm(0,0.0001)
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
