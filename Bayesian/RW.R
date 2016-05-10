@@ -24,7 +24,7 @@ cat("
       
       #Behavioral State at time T
       logit(phi[t,1]) <- alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
-      logit(phi[t,2]) <- 1-alpha[state[t-1]] + beta[state[t-1]] * ocean[t-1]
+      phi[t,2] <- 1-phi[t,1]
       state[t] ~ dcat(phi[t,])
       
       #Correlation in movement change

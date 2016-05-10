@@ -168,7 +168,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
     
     #Behavior
     phi[x,1] <- inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
-    phi[x,2] <- inv.logit(1-a1[state[x-1]]+beta[state[x-1]]*ocean[x])
+    phi[x,2] <- 1-inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
     state[x] <- sample(c(1,2),size=1,prob=phi[x,])
     
     #Movement correlation matrix
@@ -236,20 +236,20 @@ This is easiest to understand graphically.
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta){
   x<-seq(0,0.4,0.01)
-  y<-inv.logit(a1[1]*beta[1]*x)
+  y<-inv.logit(a1[1]+beta[1]*x)
   d11<-data.frame(x,y,State='Traveling',k='Traveling')
   
-  y<-inv.logit(1-a1[1]*beta[1]*x)
+  y<-1-inv.logit((a1[1])+beta[1]*x)
   d12<-data.frame(x,y,State='Traveling',k='Feeding')
   
-  y<-inv.logit(a1[2]*beta[2]*x)
+  y<-inv.logit(a1[2]+beta[2]*x)
   d21<-data.frame(x,y,State='Feeding',k='Traveling')
   
-  y<-inv.logit(1-a1[2]*beta[2]*x)
+  y<-1-inv.logit((a1[2])+beta[2]*x)
   d22<-data.frame(x,y,State='Feeding',k='Feeding')
   
   d<-rbind_all(list(d11,d12,d21,d22))
-  ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth",y="Probability of State",col="Transition") + theme_bw() 
+  ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth (km)",y="Probability of State",col="Transition") + theme_bw() 
 }
 ```
 
@@ -262,10 +262,10 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(logit(0.9),logit(0.1))
+a1=c(logit(0.7),logit(0.1))
 
 #Effect of ocean depth
-beta=c(50,-5)
+beta=c(10,10)
 
 #Visualize
 dplot(a1,beta)
@@ -305,9 +305,9 @@ mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
 #bounding box
 bb<-bbox(cbind(mxy$x,mxy$y))
 
-ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='black',high='grey90')    + geom_path(aes(col=State,group=L1),size=1) 
+ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=L1),size=1) 
 
-ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),aes(group=L1),alpha=0.1) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw()
+ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),alpha=0.1) + scale_y_continuous(breaks=c(0,0.5,1),labels=c("Traveling","0.5","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw()
 
 ```
 
@@ -330,8 +330,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,20000))
-p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,15000))
+p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
