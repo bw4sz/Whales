@@ -40,7 +40,6 @@
     Sigma <- inverse(iSigma)
 
     ##Mean Angle
-    
     tmp[1] ~ dbeta(10, 10)
     tmp[2] ~ dbeta(10, 10)
     
@@ -52,10 +51,10 @@
 
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(1,1)
+    gamma[1] ~ dbeta(5,2)
     
     # prior for gamma in state 2
-    gamma[2] ~ dbeta(1,1)
+    gamma[2] ~ dbeta(2,5)
     
     ##Behavioral States
     # prob of being in state 1 at t, given in state 1 at t-1    

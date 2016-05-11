@@ -1,0 +1,275 @@
+---
+title: "Antarctic Whale Project: Single Species"
+author: "Ben Weinstein"
+date: "May 5th, 2016"
+output: 
+  html_document:
+    keep_md: True
+    numbered_sections: True
+    toc: true
+    theme: spacelab
+---
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
+library(boot)
+library(potools)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(MASS)
+library(ggmap)
+library(dplyr)
+library(chron)
+library(gridExtra)
+library(stringr)
+library(rjags)
+library(move)
+
+#New model to be run, flag turned off if just updating.
+newModel<-T
+
+#Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
+source("Mountains.R")
+```
+
+```{r,eval=F}
+#Load in data
+load("HMM.RData")
+jags$recompile()
+newModel<-F
+```
+
+#Abstract
+
+```{r}
+mdat<-move(x="C:/Users/Ben/Dropbox/Whales/Data/Annotated/Antarctic Humpback overlap with krill fisheries -2376078525850487209.csv")
+
+#Create a oceandepth in km 
+mdat$OceanDepth<-mdat$ETOPO1.Elevation*-1 / 1000
+tm<-melt(timeLag(mdat,units="mins"))
+paste("Mean time lag is:",round(mean(tm$value),2)/60,"hours")
+
+#Plot
+mdat_df <- as(mdat, "data.frame")
+pp<-c(mean(mdat_df$location.long),mean(mdat_df$location.lat))
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
+ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat),col='red') + scale_color_discrete(guide=F)
+```
+
+#Correlated random walk
+
+*Process Model*
+
+$$ d_{t} \sim T*d_{t-1} + Normal(0,\Sigma)$$
+$$ x_t = x_{t-1} + d_{t} $$
+
+## Parameters
+
+$$\theta = \text{Mean turning angle}$$
+$$\gamma = \text{Move persistence} $$
+
+For both behaviors process variance is:
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
+
+
+###Behavioral States
+
+$$ Behavior_1 = \text{traveling}$$
+$$ Behavior_2 = \text{foraging}$$
+
+$$ \alpha_{1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{2,1} = \text{Probability of switching from feeding to traveling}$$
+
+$$\begin{matrix}
+  \alpha_{1,1} & 1-\alpha_{1,1} \\
+  \alpha_{2,1} & 1-\alpha_{2,1} \\
+\end{matrix}
+$$
+
+###Environment
+
+Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
+
+It generally follows the form, conditional on behavior at t -1:
+
+$$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
+
+
+#Model Fitting
+
+```{r,eval=T}
+#source model
+source("Bayesian/RW.R")
+
+#print model
+print.noquote(readLines("Bayesian/RW.R"))
+
+#prior shape
+R <- diag(c(1,1))
+data=list(y=cbind(mdat_df$location.long,mdat_df$location.lat),steps=nrow(mdat_df),R=R,ocean=mdat_df$OceanDepth)
+
+if(newModel){
+  jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
+  }
+
+system.time(update(jags,10000))
+p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+```
+
+##Chains
+```{r,fig.height=5}
+potrace(p)
+```
+
+##Posteriors
+
+```{r}
+#bind chains
+out<-rbind(p[[1]],p[[2]])
+pc<-melt(out)
+colnames(pc)<-c("Draw","par","value")
+
+#Plot
+ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters, true values in red")
+
+#As matrices
+sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
+colnames(sv)<-c("parname","index")
+
+#format to combine
+pc<-data.frame(pc,sv)
+ggplot(pc,aes(x=index,y=value)) + geom_violin() + facet_wrap(~parname,scales="free")
+```
+
+Compare to priors
+
+```{r}
+#add comparison to priors
+todraw<-table(pc$par)[1]
+
+pc$Estimate<-"Posterior"
+
+#add priors
+#alpha
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=runif(todraw,-5,5),parname='alpha',index=1,Estimate="Prior")
+
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=runif(todraw,-5,5),parname='alpha',index=2,Estimate="Prior")
+
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,0.0001),parname='beta',index=1,Estimate="Prior")
+
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,0.0001),parname='beta',index=2,Estimate="Prior")
+
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parname='gamma',index=1,Estimate="Prior")
+
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parname='gamma',index=2,Estimate="Prior")
+
+prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,gamma1prior,gamma2prior))
+
+prs$index<-as.factor(prs$index)
+
+allp<-rbind_all(list(pc,prs))
+
+ggplot(allp,aes(x=index,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parname,scale="free")
+
+```
+
+##Prediction - environmental function
+
+```{r,fig.height=3,fig.width=3.5}
+dplot<-function(x,a1,beta){
+
+  y<-inv.logit(a1+beta*x)
+  d11<-data.frame(x,y,State='Traveling',k='Traveling')
+  
+  y<-1-inv.logit((a1)+beta*x)
+  d12<-data.frame(x,y,State='Traveling',k='Feeding')
+  
+  y<-inv.logit(a1+beta*x)
+  d21<-data.frame(x,y,State='Feeding',k='Traveling')
+  
+  y<-1-inv.logit((a1)+beta*x)
+  d22<-data.frame(x,y,State='Feeding',k='Feeding')
+  
+  d<-rbind_all(list(d11,d12,d21,d22))
+  return(d)
+  }
+```
+
+```{r}
+alphap<-cbind(pc %>% filter(par=='alpha[1]') %>% .$value,pc %>% filter(par=='alpha[2]') %>% .$value)
+
+betap<-cbind(pc %>% filter(par=='beta[1]') %>% .$value,pc %>% filter(par=='beta[2]') %>% .$value)
+
+postplot<-list()
+
+for(j in 1:nrow(alphap)){
+  postplot[[j]]<-dplot(x=mdat$OceanDepth,a1=alphap[j,],beta=betap[j,])
+}
+
+postplot<-rbind_all(postplot)
+
+dsum<-postplot %>% group_by(x,State,k) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=k)) + geom_point()+ facet_wrap(~State) + geom_ribbon()
+
+```
+
+##Prediction - no error
+
+```{r,eval=F}
+pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
+ps<-rbind(pr[[1]],pr[[2]])
+ps<-melt(ps)
+
+#extract positions
+sv<-data.frame(str_match(ps$Var2,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
+colnames(sv)<-c("par","step","xy")
+
+#format to combine
+ps<-data.frame(ps,sv)
+#relevel
+levels(ps$xy)<-c("x","y")
+
+#Just keep mean, upper and lower
+toplot<-dcast(ps,Var1+step~xy,value.var = "value")
+sumplot<-group_by(toplot,step) %>% summarize(x_mean=mean(x),y_mean=mean(y))
+
+#arrange by step
+sumplot$step<-as.numeric(as.character(sumplot$step))
+sumplot<-sumplot %>% arrange(step)
+
+ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
+```
+
+Point Density
+
+```{r,eval=T}
+out<-rbind(pr[[1]],pr[[2]])
+pc<-melt(out)
+colnames(pc)<-c("Draw","param","value")
+
+sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
+colnames(sv)<-c("par","step","xy")
+
+#format to combine
+pc<-data.frame(pc,sv)
+#relevel
+levels(pc$xy)<-c("x","y")
+toplot<-dcast(pc,Draw+step~xy,value.var = "value")
+
+#arrange by step
+toplot$step<-as.numeric(as.character(toplot$step))
+toplot<-toplot %>% arrange(step)
+
+ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red')
+```
+
+
+```{r}
+save.image("HMM.RData")
+```
