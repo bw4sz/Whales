@@ -28,7 +28,7 @@ library(rjags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
@@ -36,7 +36,7 @@ source("Mountains.R")
 
 ```{r,eval=F}
 #Load in data
-load("HMM.RData")
+load("SingleSpecies.RData")
 jags$recompile()
 newModel<-F
 ```
@@ -70,11 +70,6 @@ $$ x_t = x_{t-1} + d_{t} $$
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
-For both behaviors process variance is:
-$$ \sigma_{latitude} = 0.1$$
-$$ \sigma_{longitude} = 0.1$$
-
-
 ###Behavioral States
 
 $$ Behavior_1 = \text{traveling}$$
@@ -99,7 +94,6 @@ $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 $$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
-
 #Model Fitting
 
 ```{r,eval=T}
@@ -117,7 +111,7 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,10000))
+system.time(update(jags,20000))
 p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
@@ -215,11 +209,10 @@ postplot<-rbind_all(postplot)
 
 dsum<-postplot %>% group_by(x,State,k) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
-ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=k)) + geom_point()+ facet_wrap(~State) + geom_ribbon()
-
+ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_point()  + geom_ribbon() + facet_wrap(~State) + theme_bw()
 ```
 
-##Prediction - no error
+##Spatial Predicion
 
 ```{r,eval=F}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
@@ -271,5 +264,5 @@ ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_pat
 
 
 ```{r}
-save.image("HMM.RData")
+save.image("SingleSpecies.RData")
 ```
