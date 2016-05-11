@@ -163,11 +163,11 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [60]                                                                               
 ## [61]     ##Behavioral States                                                       
 ## [62]     # prob of being in state 1 at t, given in state 1 at t-1                  
-## [63]     alpha[1] ~ dnorm(0,0.0001)                                                
+## [63]     alpha[1] ~ dunif(-5,5)                                                    
 ## [64]     beta[1] ~dnorm(0,0.0001)                                                  
 ## [65]                                                                               
 ## [66]     # prob of being in state 1 at t, given in state 2 at t-1                  
-## [67]     alpha[2] ~ dnorm(0,0.0001)                                                
+## [67]     alpha[2] ~ dunif(-5,5)                                                    
 ## [68]     beta[2] ~ dnorm(0,0.0001)                                                 
 ## [69]                                                                               
 ## [70]     #Probability of behavior switching                                        
@@ -186,14 +186,14 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## Graph information:
 ##    Observed stochastic nodes: 299
 ##    Unobserved stochastic nodes: 309
-##    Total graph size: 95716
+##    Total graph size: 95717
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-## 3013.50    1.54 3062.57
+## 7635.58    3.11 7758.67
 ```
 
 ##Chains

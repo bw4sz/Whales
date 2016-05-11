@@ -12,7 +12,6 @@ output:
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
-library(secr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
 library(boot)
 library(potools)
@@ -28,6 +27,8 @@ library(rjags)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
+
+set.seed(1)
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
@@ -82,12 +83,13 @@ $$
 
 ###Environment
 
-Behavioral states are a function of local environmental conditions. Here I build in a simple function for preferential foraging in shallow waters.
+Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
+
 It generally follows the form, conditional on behavior at t -1:
 
-$$Behavior_t \sim Multinomial([\phi_traveling,\phi_foraging])$$
-$$logit(\phi_traveling) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
-$$logit(\phi_foraging) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
+$$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
 
 ```{r}
@@ -216,9 +218,6 @@ $$\theta_1 = 0 = \text{No preference in turns}$$
 $$\gamma_2 = 0.1 = \text{Weak Movement Persistence}$$
 $$\theta_2 = pi = \text{Many reversals in turns}$$
 
-$$ \alpha_{1,1} = \text{High probability of remaining traveling when traveling)} = 0.9$$
-$$\alpha_{2,1} = \text{Low probability of switching from feeding to traveling} = 0.2$$
-
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
 
 ### Environment
@@ -228,9 +227,11 @@ $$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
 
-$$\beta_2=-10$$
+$$\beta_2=10$$
 
-[Dive profile based on Stimpert (2012)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
+The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
+[dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
+
 This is easiest to understand graphically.
 
 ```{r,fig.height=3,fig.width=3.5}
@@ -329,7 +330,7 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,60000))
+system.time(update(jags,40000))
 p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
