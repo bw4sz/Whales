@@ -76,12 +76,12 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-
-$$\beta_1=10$$
+$$\alpha_1 = -1$$
+$$\beta_1=1$$
 
 Whales tend to forage in shallow habitats
-
-$$\beta_2=10$$
+$$\alpha_1 = -1$$
+$$\beta_2=1$$
 
 The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
@@ -205,7 +205,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 
 ```
 ##    user  system elapsed 
-##  7158.6     3.0  7248.4
+## 4354.43    3.23 4461.55
 ```
 
 ##Chains

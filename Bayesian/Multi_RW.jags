@@ -1,11 +1,10 @@
-sink("Bayesian/Multi_RW.jags")
-cat("
+
     model{
     
     #Constants
     pi <- 3.141592653589
     
-    for(i in 1:ind){
+    for(i in ind){
 
     ###First Step###
     #First movement - random walk.
@@ -81,6 +80,4 @@ cat("
     lambda[1] ~ dbeta(1,1)
     lambda[2] <- 1 - lambda[1]
     
-    }"
-    ,fill=TRUE)
-sink()
+    }
