@@ -111,7 +111,7 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,30000))
+system.time(update(jags,50000))
 p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
@@ -214,7 +214,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_point()
 
 ##Spatial Predicion
 
-```{r,eval=T}
+```{r,eval=F}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
@@ -241,7 +241,7 @@ ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw(
 
 Point Density
 
-```{r,eval=T}
+```{r,eval=F}
 out<-rbind(pr[[1]],pr[[2]])
 pc<-melt(out)
 colnames(pc)<-c("Draw","param","value")
@@ -263,6 +263,6 @@ ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_pat
 ```
 
 
-```{r}
+```{r,eval=F}
 save.image("SingleSpecies.RData")
 ```
