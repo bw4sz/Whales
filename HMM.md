@@ -166,21 +166,29 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [58]     gamma[2] ~ dbeta(2,5)                                                     
 ## [59]                                                                               
 ## [60]     ##Behavioral States                                                       
-## [61]     # prob of being in state 1 at t, given in state 1 at t-1                  
-## [62]     alpha[1] ~ dunif(-5,5)                                                    
-## [63]     beta[1] ~dnorm(0,0.0001)                                                  
-## [64]                                                                               
-## [65]     # prob of being in state 1 at t, given in state 2 at t-1                  
-## [66]     alpha[2] ~ dunif(-5,5)                                                    
-## [67]     beta[2] ~ dnorm(0,0.0001)                                                 
-## [68]                                                                               
-## [69]     #Probability of behavior switching                                        
-## [70]     lambda[1] ~ dbeta(1,1)                                                    
-## [71]     lambda[2] <- 1 - lambda[1]                                                
-## [72]                                                                               
-## [73]     }"                                                                        
-## [74]     ,fill=TRUE)                                                               
-## [75] sink()
+## [61]     # Following lunn 2012 p85                                                 
+## [62]                                                                               
+## [63]     # prob of being in state 1 at t, given in state 1 at t-1                  
+## [64]     lalpha[1] ~ dnorm(0,0.386)                                                
+## [65]     logit(alpha[1]) <- lalpha[1]                                              
+## [66]                                                                               
+## [67]     lbeta[1] ~ dnorm(0,0.386)                                                 
+## [68]     logit(beta[1]) <- lbeta[1]                                                
+## [69]                                                                               
+## [70]     # prob of being in state 1 at t, given in state 2 at t-1                  
+## [71]     lalpha[2] ~ dnorm(0,0.386)                                                
+## [72]     logit(alpha[2]) <- lalpha[2]                                              
+## [73]                                                                               
+## [74]     lbeta[2] ~ dnorm(0,0.386)                                                 
+## [75]     logit(beta[2]) <- lbeta[2]                                                
+## [76]                                                                               
+## [77]     #Probability of behavior switching                                        
+## [78]     lambda[1] ~ dbeta(1,1)                                                    
+## [79]     lambda[2] <- 1 - lambda[1]                                                
+## [80]                                                                               
+## [81]     }"                                                                        
+## [82]     ,fill=TRUE)                                                               
+## [83] sink()
 ```
 
 ```
@@ -190,14 +198,14 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## Graph information:
 ##    Observed stochastic nodes: 249
 ##    Unobserved stochastic nodes: 259
-##    Total graph size: 67267
+##    Total graph size: 67270
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-## 4165.84    0.43 4180.47
+##  7158.6     3.0  7248.4
 ```
 
 ##Chains
