@@ -28,7 +28,7 @@ library(rjags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-T
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
@@ -44,7 +44,7 @@ newModel<-F
 #Abstract
 
 ```{r}
-mdat<-move(x="C:/Users/Ben/Dropbox/Whales/Data/Annotated/Antarctic Humpback overlap with krill fisheries -2376078525850487209.csv")
+mdat<-move(x="InputData/Antarctic Humpback overlap with krill fisheries -2376078525850487209.csv")
 
 #Create a oceandepth in km 
 mdat$OceanDepth<-mdat$ETOPO1.Elevation*-1 / 1000
@@ -111,8 +111,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,20000))
-p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,30000))
+p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -214,7 +214,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_point()
 
 ##Spatial Predicion
 
-```{r,eval=F}
+```{r,eval=T}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)

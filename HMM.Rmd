@@ -26,7 +26,7 @@ library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-TRUE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
@@ -168,7 +168,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
     
     #Behavior
     phi[x,1] <- inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
-    phi[x,2] <- 1-inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
+    phi[x,2]<- 1 - phi[x,1]
     state[x] <- sample(c(1,2),size=1,prob=phi[x,])
     
     #Movement correlation matrix
@@ -220,12 +220,12 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-
-$$\beta_1=10$$
+$$\alpha_1 = -1$$
+$$\beta_1=1$$
 
 Whales tend to forage in shallow habitats
-
-$$\beta_2=10$$
+$$\alpha_1 = -1$$
+$$\beta_2=1$$
 
 The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
@@ -259,16 +259,16 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(-3,-3)
+a1=c(0.5,-2)
 
 #Effect of ocean depth
-beta=c(20,20)
+beta=c(10,10)
 
 #Simulate environment
 #Create environment
 m<-raster(mountains(7,1.2))
-r<-(m-max(m[]))*-20/1000
-ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.5,crs=NA)
+r<-(m-max(m[]))*-5/1000
+ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA)
 r2<-setExtent(r,ras2)
 habitat<-resample(r2,ras2)
 
@@ -276,7 +276,6 @@ habitat<-resample(r2,ras2)
 d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.01),a1=a1,beta=beta)
 
 ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth (km)",y="Probability of State",col="Transition") + theme_bw() 
-
 
 cr<-colorRampPalette(c("white","black"))
 dev.off()
@@ -330,8 +329,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,70000))
-p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,40000))
+p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -343,7 +342,7 @@ potrace(p)
 
 ```{r}
 #true values
-tv<-melt(list('alpha[1]'=a1[1],'alpha[2]'=a1[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=beta[1],'beta[2]'=beta[2]))
+tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
 colnames(tv)<-c("value","par")
 
 #bind chains
