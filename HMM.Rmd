@@ -28,8 +28,6 @@ library(rjags)
 #New model to be run, flag turned off if just updating.
 newModel<-T
 
-set.seed(1)
-
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
 ```
@@ -96,7 +94,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=200
+  steps=250
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -266,11 +264,6 @@ a1=c(-3,-3)
 #Effect of ocean depth
 beta=c(20,20)
 
-#Visualize
-d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.01),a1=a1,beta=beta)
-
-ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth (km)",y="Probability of State",col="Transition") + theme_bw() 
-
 #Simulate environment
 #Create environment
 m<-raster(mountains(7,1.2))
@@ -278,8 +271,14 @@ r<-(m-max(m[]))*-20/1000
 ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.5,crs=NA)
 r2<-setExtent(r,ras2)
 habitat<-resample(r2,ras2)
-cr<-colorRampPalette(c("white","black"))
 
+#Visualize
+d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.01),a1=a1,beta=beta)
+
+ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth (km)",y="Probability of State",col="Transition") + theme_bw() 
+
+
+cr<-colorRampPalette(c("white","black"))
 dev.off()
 plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
@@ -331,8 +330,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,100))
-p<-coda.samples(model=jags,n.iter=100,thin=2,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,70000))
+p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains

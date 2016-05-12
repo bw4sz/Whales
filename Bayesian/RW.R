@@ -58,13 +58,21 @@ cat("
     gamma[2] ~ dbeta(2,5)
     
     ##Behavioral States
+    # Following lunn 2012 p85
+
     # prob of being in state 1 at t, given in state 1 at t-1    
-    alpha[1] ~ dunif(-5,5)
-    beta[1] ~dnorm(0,0.0001)
+    lalpha[1] ~ dnorm(0,0.386)
+    logit(alpha[1]) <- lalpha[1]
+    
+    lbeta[1] ~ dnorm(0,0.386)
+    logit(beta[1]) <- lbeta[1]
 
     # prob of being in state 1 at t, given in state 2 at t-1    
-    alpha[2] ~ dunif(-5,5)
-    beta[2] ~ dnorm(0,0.0001)
+    lalpha[2] ~ dnorm(0,0.386)
+    logit(alpha[2]) <- lalpha[2]
+    
+    lbeta[2] ~ dnorm(0,0.386)
+    logit(beta[2]) <- lbeta[2]
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
