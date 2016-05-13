@@ -113,7 +113,7 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,60000))
+system.time(update(jags,40000))
 p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
@@ -308,16 +308,14 @@ tb$LFeeding<-tb$Feeding/(tb$Traveling + tb$Feeding)
 mdat_df$step<-1:nrow(mdat_df)
 mdat_df<-merge(mdat_df,tb,by="step")
 
-m <- get_map(location=pp,source="stamen",maptype = )
-
-m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
-ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat),col='red') + scale_color_discrete(guide=F)
+m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="terrain")
+ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat,col=LFeeding),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding State")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=spp_b,aes(x=as.factor(step),y=Behavior)) + geom_bar()
+ggplot(data=mdat_df,aes(x=as.numeric(step),y=LFeeding,col=OceanDepth)) + geom_line(aes(group=1),size=2.5) + labs("Liklihood Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
 ```{r,eval=T}

@@ -459,7 +459,7 @@ ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw(
 #+ geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + #geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
 ```
 
-Point Density
+###Point Density
 
 ```{r,eval=F}
 out<-rbind(pr[[1]],pr[[2]])
@@ -480,6 +480,59 @@ toplot$step<-as.numeric(as.character(toplot$step))
 toplot<-toplot %>% arrange(step)
 
 ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
+```
+
+#Behavioral Prediction
+
+```{r}
+#needs to be same number of draws as spatial above
+behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("state"))
+
+#bind chains
+behav_chains<-rbind(behav[[1]],behav[[2]])
+behav_chains<-melt(behav_chains)
+colnames(behav_chains)<-c("Draw","par","value")
+
+
+#As matrices
+sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+)]"))[,-1]
+colnames(sv)<-c("parname","index")
+
+#format to combine
+behav_chains<-data.frame(behav_chains,sv)
+colnames(behav_chains)[3]<-"Behavior"
+colnames(behav_chains)[5]<-"step"
+
+#combine with spatial prediction
+spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
+
+#arrange by step
+spp_b$step<-as.numeric(as.character(spp_b$step))
+spp_b<-spp_b %>% arrange(step)
+
+#Label Behaviors
+spp_b$Behavior<-as.factor(spp_b$Behavior)
+levels(spp_b$Behavior)<-c("Traveling","Feeding")
+
+ggplot(data=spp_b,aes(x=x,y=y,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red')
+
+#Consensus behavior
+tb<-as.data.frame(table(spp_b$step,spp_b$Behavior))
+tb<-dcast(tb,Var1~Var2)
+colnames(tb)[1]<-c("step")
+tb$LFeeding<-tb$Feeding/(tb$Traveling + tb$Feeding)
+
+#merge with input
+dxy$step<-1:nrow(dxy)
+dxy<-merge(dxy,tb,by="step")
+
+ggplot()+geom_path(data=dxy, aes(x=x, y=y,col=LFeeding),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding State")
+```
+
+##Autocorrelation in behavior
+
+```{r}
+ggplot(data=dxy,aes(x=as.numeric(step),y=LFeeding,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Liklihood Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
 ```{r}

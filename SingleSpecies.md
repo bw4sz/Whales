@@ -8,6 +8,8 @@ May 5th, 2016
 
 #Abstract
 
+We are currently ignoring any observation process or time regularization.
+
 
 ```
 ## [1] "Mean time lag is: 4.065 hours"
@@ -154,7 +156,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
 ```
 ##    user  system elapsed 
-## 348.572   0.000 348.909
+##  932.00    0.79  961.10
 ```
 
 ##Chains
@@ -176,11 +178,18 @@ Compare to priors
 
 ##Spatial Predicion
 
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 Point Density
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
+#Behavioral Prediction
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
+
+##Autocorrelation in behavior
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 
