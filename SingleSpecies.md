@@ -156,7 +156,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 
 ```
 ##    user  system elapsed 
-##  932.00    0.79  961.10
+##   20.06    0.00   20.11
 ```
 
 ##Chains
@@ -186,10 +186,15 @@ Point Density
 
 #Behavioral Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
+## Point Cloud
+![](SingleSpecies_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+
+## Input data
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 

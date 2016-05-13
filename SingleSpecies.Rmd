@@ -117,7 +117,7 @@ p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma",
 ```
 
 ##Chains
-```{r,fig.height=5}
+```{r,fig.height=10}
 plot(p)
 ```
 
