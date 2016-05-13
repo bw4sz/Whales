@@ -432,7 +432,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon(
 
 ##Prediction - spatial location
 
-```{r,eval=F}
+```{r,eval=T}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
@@ -455,13 +455,11 @@ sumplot$step<-as.numeric(as.character(sumplot$step))
 sumplot<-sumplot %>% arrange(step)
 
 ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
-
-#+ geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + #geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
 ```
 
 ### Point Density
 
-```{r,eval=F}
+```{r,eval=T}
 out<-rbind(pr[[1]],pr[[2]])
 pc<-melt(out)
 colnames(pc)<-c("Draw","param","value")
@@ -501,33 +499,36 @@ colnames(sv)<-c("parname","index")
 behav_chains<-data.frame(behav_chains,sv)
 colnames(behav_chains)<-c("Draw","par","Probability","parname","step","Behavior")
 
+#We just need Feeding behavior
+behav_chains<-behav_chains[behav_chains$Behavior == 2,]
+
+#arrange by step
+behav_chains$step<-as.numeric(as.character(behav_chains$step))
+behav_chains<-behav_chains %>% arrange(step)
+
+#Label Behaviors
+behav_chains$Behavior<-as.factor(behav_chains$Behavior)
+levels(behav_chains$Behavior)<-c("Traveling","Feeding")
+
 #combine with spatial prediction
 spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
 
-#We just need Feeding behavior
-spp_b<-spp_b[spp_b$Behavior == 2,]
-
-#arrange by step
-spp_b$step<-as.numeric(as.character(spp_b$step))
-spp_b<-spp_b %>% arrange(step)
-
-#Label Behaviors
-spp_b$Behavior<-as.factor(spp_b$Behavior)
-levels(spp_b$Behavior)<-c("Traveling","Feeding")
-
+#plot spatial
 ggplot(data=spp_b,aes(x=x,y=y,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red')
 
-#merge with input
-dxy$step<-1:nrow(dxy)
-dxy<-merge(dxy,tb,by="step")
+#get mean value
+mean_phi<-behav_chains %>% group_by(step) %>% summarize(phi=mean(Probability))
 
-ggplot()+geom_path(data=dxy, aes(x=x, y=y,col=Probability),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
+#merge with input
+dxy<-merge(dxy,mean_phi,by.x="Step",by.y="step")
+
+ggplot()+geom_path(data=dxy, aes(x=x, y=y,col=phi),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=dxy,aes(x=as.numeric(step),y=Probability,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
+ggplot(data=dxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
 ```{r}
