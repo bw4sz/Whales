@@ -43,6 +43,8 @@ newModel<-F
 
 #Abstract
 
+We are currently ignoring any observation process or time regularization.
+
 ```{r}
 mdat<-move(x="InputData/Antarctic Humpback overlap with krill fisheries -2376078525850487209.csv")
 
@@ -111,8 +113,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,50000))
-p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,60000))
+p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -214,7 +216,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_point()
 
 ##Spatial Predicion
 
-```{r,eval=F}
+```{r,eval=T}
 pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
@@ -241,7 +243,7 @@ ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw(
 
 Point Density
 
-```{r,eval=F}
+```{r,eval=T}
 out<-rbind(pr[[1]],pr[[2]])
 pc<-melt(out)
 colnames(pc)<-c("Draw","param","value")
@@ -262,7 +264,62 @@ toplot<-toplot %>% arrange(step)
 ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red')
 ```
 
+#Behavioral Prediction
 
-```{r,eval=F}
+```{r}
+#needs to be same number of draws as spatial above
+behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("state"))
+
+#bind chains
+behav_chains<-rbind(behav[[1]],behav[[2]])
+behav_chains<-melt(behav_chains)
+colnames(behav_chains)<-c("Draw","par","value")
+
+
+#As matrices
+sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+)]"))[,-1]
+colnames(sv)<-c("parname","index")
+
+#format to combine
+behav_chains<-data.frame(behav_chains,sv)
+colnames(behav_chains)[3]<-"Behavior"
+colnames(behav_chains)[5]<-"step"
+
+#combine with spatial prediction
+spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
+
+#arrange by step
+spp_b$step<-as.numeric(as.character(spp_b$step))
+spp_b<-spp_b %>% arrange(step)
+
+#Label Behaviors
+spp_b$Behavior<-as.factor(spp_b$Behavior)
+levels(spp_b$Behavior)<-c("Traveling","Feeding")
+
+ggplot(data=spp_b,aes(x=x,y=y,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red')
+
+#Consensus behavior
+tb<-as.data.frame(table(spp_b$step,spp_b$Behavior))
+tb<-dcast(tb,Var1~Var2)
+colnames(tb)[1]<-c("step")
+tb$LFeeding<-tb$Feeding/(tb$Traveling + tb$Feeding)
+
+#merge with input
+mdat_df$step<-1:nrow(mdat_df)
+mdat_df<-merge(mdat_df,tb,by="step")
+
+m <- get_map(location=pp,source="stamen",maptype = )
+
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
+ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat),col='red') + scale_color_discrete(guide=F)
+```
+
+##Autocorrelation in behavior
+
+```{r}
+ggplot(data=spp_b,aes(x=as.factor(step),y=Behavior)) + geom_bar()
+```
+
+```{r,eval=T}
 save.image("SingleSpecies.RData")
 ```
