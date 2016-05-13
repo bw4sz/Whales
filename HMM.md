@@ -205,7 +205,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 
 ```
 ##    user  system elapsed 
-## 4354.43    3.23 4461.55
+## 1018.59    0.34 1022.86
 ```
 
 ##Chains
@@ -227,10 +227,18 @@ Compare to priors
 
 ##Prediction - spatial location
 
+![](HMM_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
+### Point Density
 
-Point Density
+![](HMM_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
+#Behavioral Prediction
 
+![](HMM_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+
+##Autocorrelation in behavior
+
+![](HMM_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
 

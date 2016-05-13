@@ -26,13 +26,13 @@ library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-FALSE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("HMM.RData")
 jags$recompile()
@@ -220,12 +220,12 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-$$\alpha_1 = -1$$
-$$\beta_1=1$$
+$$\alpha_1 = -2$$
+$$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
-$$\alpha_1 = -1$$
-$$\beta_2=1$$
+$$\alpha_1 = -2$$
+$$\beta_2=10$$
 
 The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
@@ -259,7 +259,7 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(0.5,-2)
+a1=c(-2,-2)
 
 #Effect of ocean depth
 beta=c(10,10)
@@ -330,7 +330,7 @@ if(newModel){
 }
 
 system.time(update(jags,10000))
-p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -512,9 +512,6 @@ levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
 #combine with spatial prediction
 spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
-
-#plot spatial
-ggplot(data=spp_b,aes(x=x,y=y,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red')
 
 #get mean value
 mean_phi<-behav_chains %>% group_by(step) %>% summarize(phi=mean(Probability))
