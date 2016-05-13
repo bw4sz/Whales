@@ -268,25 +268,26 @@ ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_pat
 
 ```{r}
 #needs to be same number of draws as spatial above
-behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("state"))
+behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("phi"))
 
 #bind chains
 behav_chains<-rbind(behav[[1]],behav[[2]])
 behav_chains<-melt(behav_chains)
 colnames(behav_chains)<-c("Draw","par","value")
 
-
 #As matrices
-sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+)]"))[,-1]
+sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
 colnames(sv)<-c("parname","index")
 
 #format to combine
 behav_chains<-data.frame(behav_chains,sv)
-colnames(behav_chains)[3]<-"Behavior"
-colnames(behav_chains)[5]<-"step"
+colnames(behav_chains)<-c("Draw","par","Probability","parname","step","Behavior")
 
 #combine with spatial prediction
 spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
+
+#We just need Feeding behavior
+spp_b<-spp_b[spp_b$Behavior == 2,]
 
 #arrange by step
 spp_b$step<-as.numeric(as.character(spp_b$step))
@@ -296,26 +297,19 @@ spp_b<-spp_b %>% arrange(step)
 spp_b$Behavior<-as.factor(spp_b$Behavior)
 levels(spp_b$Behavior)<-c("Traveling","Feeding")
 
-ggplot(data=spp_b,aes(x=x,y=y,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red')
-
-#Consensus behavior
-tb<-as.data.frame(table(spp_b$step,spp_b$Behavior))
-tb<-dcast(tb,Var1~Var2)
-colnames(tb)[1]<-c("step")
-tb$LFeeding<-tb$Feeding/(tb$Traveling + tb$Feeding)
+ggplot(data=spp_b,aes(x=location.long,y=location.lat,col=Behavior)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=x,y=y),col='red')
 
 #merge with input
 mdat_df$step<-1:nrow(mdat_df)
 mdat_df<-merge(mdat_df,tb,by="step")
 
-m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="terrain")
-ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat,col=LFeeding),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding State")
+ggplot()+geom_path(data=mdat_df, aes(x=location.long, y=location.lat,col=Probability),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=mdat_df,aes(x=as.numeric(step),y=LFeeding,col=OceanDepth)) + geom_line(aes(group=1),size=2.5) + labs("Liklihood Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
+ggplot(data=mdat_df,aes(x=as.numeric(step),y=Probability,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
 ```{r,eval=T}
