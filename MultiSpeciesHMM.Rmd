@@ -14,7 +14,6 @@ output:
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
 library(boot)
-library(potools)
 library(raster)
 library(reshape2)
 library(ggplot2)
@@ -341,7 +340,7 @@ p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma"
 
 ##Chains
 ```{r,fig.height=5}
-potrace(p)
+plot(p)
 ```
 
 ##Posteriors

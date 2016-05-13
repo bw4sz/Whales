@@ -335,7 +335,7 @@ p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma",
 
 ##Chains
 ```{r,fig.height=5}
-potrace(p)
+plot(p)
 ```
 
 ##Posteriors
@@ -344,11 +344,6 @@ potrace(p)
 #true values
 tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
 colnames(tv)<-c("value","par")
-
-#bind chains
-out<-rbind(p[[1]],p[[2]])
-pc<-melt(out)
-colnames(pc)<-c("Draw","par","value")
 
 #As matrices
 sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
