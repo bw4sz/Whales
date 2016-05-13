@@ -94,7 +94,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=250
+  steps=20
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -280,14 +280,11 @@ ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) +
 cr<-colorRampPalette(c("white","black"))
 dev.off()
 plot(habitat,main='Ocean Depth (km)',col=cr(10))
-
-#Habitat dataframe for modeling
-habitatdf<-as.data.frame(habitat,xy=TRUE)
 ```
 
 ### Multiple trajectories.
 ```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
+mxy<-lapply(1:2,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
 mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
 
 #Label Individual
@@ -295,6 +292,10 @@ colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
 
 #bounding box
 bb<-bbox(cbind(mxy$x,mxy$y))
+
+#Habitat dataframe for modeling
+crop_habitat<-crop(habitat,bb*2)
+habitatdf<-as.data.frame(crop_habitat,xy=TRUE)
 
 ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=Animal),size=1) 
 
@@ -334,8 +335,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,50000))
-p<-coda.samples(model=jags,n.iter=20000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,100))
+p<-coda.samples(model=jags,n.iter=100,thin=1,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -439,7 +440,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon(
 
 ```{r}
 #needs to be same number of draws as spatial above
-behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("phi"))
+behav<-coda.samples(model=jags,n.iter=100,n.thin=1,variable.names=c("phi"))
 
 #bind chains
 behav_chains<-rbind(behav[[1]],behav[[2]])
@@ -447,38 +448,44 @@ behav_chains<-melt(behav_chains)
 colnames(behav_chains)<-c("Draw","par","value")
 
 #As matrices
-sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
-colnames(sv)<-c("parname","index")
+sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,-1]
+colnames(sv)<-c("Animal","parname","step")
 
 #format to combine
 behav_chains<-data.frame(behav_chains,sv)
-colnames(behav_chains)<-c("Draw","par","Probability","parname","step","Behavior")
+colnames(behav_chains)<-c("Draw","par","Probability","parname","Animal","Step","Behavior")
 
 #We just need Feeding behavior
-spp_b<-spp_b[spp_b$Behavior == 2,]
+behav_chains<-behav_chains[behav_chains$Behavior == 2,]
 
 #arrange by step
-spp_b$step<-as.numeric(as.character(spp_b$step))
-spp_b<-spp_b %>% arrange(step)
+behav_chains$Step<-as.numeric(as.character(behav_chains$Step))
+behav_chains<-behav_chains %>% arrange(Step)
 
 #Label Behaviors
-spp_b$Behavior<-as.factor(spp_b$Behavior)
-levels(spp_b$Behavior)<-c("Traveling","Feeding")
+behav_chains$Behavior<-as.factor(behav_chains$Behavior)
+levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
+#average phi
+mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(Probability))
+  
 #merge with input
 sxy<-split(mxy,mxy$Animal)
 sxy<-lapply(sxy,function(x){
-  x$step<-1:nrow(x)
+  x$Step<-1:nrow(x)
+  return(x)
 })
 mxy<-rbind_all(sxy)
 
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=Probability,aes(group=Animal)),size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
+mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
+
+ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=2,aes(group=Animal)) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=mxy,aes(x=as.numeric(step),y=Probability,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
+ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
 ```{r}

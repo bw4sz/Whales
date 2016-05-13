@@ -76,12 +76,12 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-$$\alpha_1 = -1$$
-$$\beta_1=1$$
+$$\alpha_1 = -2$$
+$$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
-$$\alpha_1 = -1$$
-$$\beta_2=1$$
+$$\alpha_1 = -2$$
+$$\beta_2=10$$
 
 The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
@@ -96,9 +96,6 @@ This is easiest to understand graphically.
 ## null device 
 ##           1
 ```
-
-### Multiple trajectories.
-![](HMM_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 #Model Fitting
 
@@ -196,49 +193,49 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##    Resolving undeclared variables
 ##    Allocating nodes
 ## Graph information:
-##    Observed stochastic nodes: 249
-##    Unobserved stochastic nodes: 259
-##    Total graph size: 67270
+##    Observed stochastic nodes: 19
+##    Unobserved stochastic nodes: 29
+##    Total graph size: 800
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-## 1018.59    0.34 1022.86
+##    0.69    0.00    0.69
 ```
 
 ##Chains
-![](HMM_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-7-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 ##Posteriors
 
-![](HMM_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 Compare to priors
 
-![](HMM_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ##Prediction - environmental function
 
 
 
-![](HMM_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 ##Prediction - spatial location
 
-![](HMM_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ### Point Density
 
-![](HMM_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 #Behavioral Prediction
 
-![](HMM_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](HMM_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](HMM_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+![](HMM_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 
