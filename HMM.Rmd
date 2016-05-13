@@ -280,8 +280,6 @@ cr<-colorRampPalette(c("white","black"))
 dev.off()
 plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
-#Habitat dataframe for modeling
-habitatdf<-as.data.frame(habitat,xy=TRUE)
 
 if(newModel){
   dxy<-traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)  
@@ -290,23 +288,14 @@ if(newModel){
 #habitat bbounding for visualization
 bb<-bbox(cbind(dxy$x,dxy$y))
 
+#Habitat dataframe for modeling
+crop_habitat<-crop(habitat,bb*10)
+habitatdf<-as.data.frame(crop_habitat,xy=TRUE)
+
 ggplot(dxy,aes(x=x,y=y)) + geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + geom_point(size=2,col='black') + geom_path(aes(col=State,group=1),size=1.5)  + theme_bw() + scale_fill_continuous("Ocean Depth",high='black',low='grey90') + coord_cartesian(xlim=bb[1,],ylim=bb[2,])
 
 #Behavior plot
 ggplot(dxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial")) + scale_y_continuous(breaks=c(0,1),labels=c("Traveling","Feeding")) + ylab("Probability") + xlab("Ocean Depth")
-```
-
-### Multiple trajectories.
-```{r}
-mxy<-lapply(1:10,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
-mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
-
-#bounding box
-bb<-bbox(cbind(mxy$x,mxy$y))
-
-ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=L1),size=1) 
-
-ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),alpha=0.1) + scale_y_continuous(breaks=c(0,0.5,1),labels=c("Traveling","0.5","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw()
 ```
 
 #Model Fitting
@@ -333,7 +322,7 @@ p<-coda.samples(model=jags,n.iter=100,thin=10,variable.names=c("theta","gamma","
 ```
 
 ##Chains
-```{r,fig.height=5}
+```{r,fig.height=10}
 plot(p)
 ```
 
@@ -343,6 +332,11 @@ plot(p)
 #true values
 tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
 colnames(tv)<-c("value","par")
+
+#bind chains
+out<-rbind(p[[1]],p[[2]])
+pc<-melt(out)
+colnames(pc)<-c("Draw","par","value")
 
 #As matrices
 sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
