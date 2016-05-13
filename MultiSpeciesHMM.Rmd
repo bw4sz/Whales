@@ -427,7 +427,7 @@ betap<-cbind(pc %>% filter(par=='beta[1]') %>% .$value,pc %>% filter(par=='beta[
 postplot<-list()
 
 for(j in 1:nrow(alphap)){
-  postplot[[j]]<-data.frame(dplot(x=dxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
+  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
 }
 
 postplot<-rbind_all(postplot)
@@ -461,7 +461,7 @@ sumplot<-group_by(toplot,step) %>% summarize(x_mean=mean(x),y_mean=mean(y))
 sumplot$step<-as.numeric(as.character(sumplot$step))
 sumplot<-sumplot %>% arrange(step)
 
-ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=dxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
+ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=mxy,aes(x=x,y=y),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
 
 #+ geom_path(aes(x=x_lower,y=y_lower),linetype='dashed') + #geom_path(aes(x=x_upper,y=y_upper),linetype='dashed')
 ```
