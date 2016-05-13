@@ -24,7 +24,6 @@ library(chron)
 library(gridExtra)
 library(stringr)
 library(rjags)
-library(doSNOW)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE

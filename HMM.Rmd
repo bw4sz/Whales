@@ -329,19 +329,6 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
 }
 
-#update in parallel
-jinits <- function() {
-   ### all the other params ###
-  .Rng.seed=randomNumbers(n = 1, min = 1, max = 1e+06,col=1)
-}
-jags.parsamples <- foreach(i=1:getDoParWorkers()) %dopar% {
-  model.jags <- jags.model(model, forJAGS,
-                           inits=jinits,
-                           n.chain=1, n.adapt=1000)
-  result <- coda.samples(model.jags,params,1000)
-  return(result)
-}
-
 system.time(update(jags,40000))
 p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
