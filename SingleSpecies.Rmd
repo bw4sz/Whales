@@ -27,7 +27,7 @@ library(rjags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-TRUE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")

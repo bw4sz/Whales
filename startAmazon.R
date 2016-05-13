@@ -1,5 +1,5 @@
 #Source script for Amazon 
-install.packages(c("chron","raster","dplyr"))
+install.packages(c("chron","raster","dplyr","ggmap","move"))
 
 
 

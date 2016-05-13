@@ -14,7 +14,6 @@ output:
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 5)
 library(boot)
-library(potools)
 library(raster)
 library(reshape2)
 library(ggplot2)
@@ -26,13 +25,13 @@ library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
-newModel<-FALSE
+newModel<-TRUE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("HMM.RData")
 jags$recompile()
@@ -94,7 +93,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=250
+  steps=20
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -329,8 +328,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
 }
 
-system.time(update(jags,10000))
-p<-coda.samples(model=jags,n.iter=5000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,100))
+p<-coda.samples(model=jags,n.iter=100,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains
@@ -428,7 +427,7 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon(
 ##Prediction - spatial location
 
 ```{r,eval=T}
-pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
+pr<-coda.samples(model=jags,n.iter=100,n.thin=5,variable.names=c("d"))
 ps<-rbind(pr[[1]],pr[[2]])
 ps<-melt(ps)
 
@@ -479,7 +478,7 @@ ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw()
 
 ```{r}
 #needs to be same number of draws as spatial above
-behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("phi"))
+behav<-coda.samples(model=jags,n.iter=100,n.thin=5,variable.names=c("phi"))
 
 #bind chains
 behav_chains<-rbind(behav[[1]],behav[[2]])
