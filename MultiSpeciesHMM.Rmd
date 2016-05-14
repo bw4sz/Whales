@@ -25,15 +25,15 @@ library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-FALSE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
-load("HMM.RData")
+load("MultiSpecies.RData")
 jags$recompile()
 newModel<-F
 ```
@@ -94,7 +94,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=200
+  steps=150
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -220,7 +220,7 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-$$\alpha_1 = -2$$
+$$\alpha_1 = -1$$
 $$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
@@ -259,18 +259,22 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(-3,-3)
+a1=c(-1,-2)
 
 #Effect of ocean depth
 beta=c(10,10)
 
 #Simulate environment
 #Create environment
-m<-raster(mountains(7,1.3))
-r<-(m-max(m[]))*-20/1000
-ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA)
-r2<-setExtent(r,ras2)
-habitat<-resample(r2,ras2)
+#m<-raster(mountains(7,0.2))
+#r<-(m-max(m[]))*-30/1000
+#ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA)
+#r2<-setExtent(r,ras2)
+#habitat<-resample(r2,ras2)
+
+if(newModel){
+  habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,1))
+}
 
 #Visualize
 d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.01),a1=a1,beta=beta)
@@ -284,11 +288,16 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
 ### Multiple trajectories.
 ```{r}
-mxy<-lapply(1:3,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
-mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
+if(newModel){
+    mxy<-lapply(1:4,function(x){
+      traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)
+    }) 
+  mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
+  #Label Individual
+  colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
 
-#Label Individual
-colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
+}
+
 
 #bounding box
 bb<-bbox(cbind(mxy$x,mxy$y))
@@ -335,8 +344,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,15000))
-p<-coda.samples(model=jags,n.iter=500,thin=2,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,30000))
+p<-coda.samples(model=jags,n.iter=5000,thin=5,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains

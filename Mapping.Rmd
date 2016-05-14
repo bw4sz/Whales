@@ -53,7 +53,9 @@ ddat<-dat %>% group_by(Animal,TimeStamp) %>% distinct() %>% arrange(Animal,TimeS
 
 #remove empty and impossible geo location
 ddat<-ddat[!is.na(ddat$Latitude),]
-ddat<-ddat[!ddat$Latitude < -90,]
+ddat<-ddat[!is.na(ddat$Longitude),]
+
+ddat<-dat[!ddat$Latitude < -90,]
 
 #sort time objects
 mdat<-move(y=ddat$Latitude,x=ddat$Longitude,time=ddat$TimeStamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=ddat$Animal)
