@@ -284,7 +284,7 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
 ### Multiple trajectories.
 ```{r}
-mxy<-lapply(1:2,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
+mxy<-lapply(1:3,function(x) traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta))
 mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
 
 #Label Individual
@@ -335,8 +335,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,1000))
-p<-coda.samples(model=jags,n.iter=500,thin=1,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,15000))
+p<-coda.samples(model=jags,n.iter=500,thin=2,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains

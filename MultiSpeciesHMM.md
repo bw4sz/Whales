@@ -200,16 +200,16 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##    Resolving undeclared variables
 ##    Allocating nodes
 ## Graph information:
-##    Observed stochastic nodes: 398
-##    Unobserved stochastic nodes: 408
-##    Total graph size: 87586
+##    Observed stochastic nodes: 597
+##    Unobserved stochastic nodes: 607
+##    Total graph size: 131351
 ## 
 ## Initializing model
 ```
 
 ```
 ##    user  system elapsed 
-##  193.12    0.10  198.42
+## 4471.65    0.09 4476.34
 ```
 
 ##Chains
