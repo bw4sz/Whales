@@ -345,7 +345,7 @@ if(newModel){
   }
 
 system.time(update(jags,2000))
-p<-coda.samples(model=jags,n.iter=100,thin=2,variable.names=c("theta","gamma","alpha","beta","phi"))
+p<-coda.samples(model=jags,n.iter=1000,thin=1,variable.names=c("theta","gamma","alpha","beta","phi"))
 ```
 
 ##Chains
@@ -362,18 +362,18 @@ splitpc<-split(pc,pc$parameter)
 
 #single index
 splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gamma","theta")],function(x){
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,-2]
-    colnames(sv)<-c("parname","Behavior")
-    pc<-data.frame(x,sv)
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
+    pc<-data.frame(x,Behavior=sv)
+    return(pc)
 })
 
 #Double index
 #none
 
 #Triple Index 
-splitpc[c("phi")]<-lapply(splitpc[c("d","phi")],function(x){
+splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 #As matrices
-    sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,-1]
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
     colnames(sv)<-c("Animal","step","Behavior")
     pc<-data.frame(x,sv)
 })
@@ -382,10 +382,8 @@ splitpc[c("phi")]<-lapply(splitpc[c("d","phi")],function(x){
 pc<-rbind_all(splitpc)
 rm(splitpc)
 
-colnames(pc)<-c("Draw","par","value","chain","paramater","parname","Animal","step","Behavior")
-
 #plot all but d
-ggplot(pc[!pc$parameter %in% c("d","phi"),],aes())
+ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free") + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
 
 ```{r}
@@ -393,14 +391,8 @@ ggplot(pc[!pc$parameter %in% c("d","phi"),],aes())
 tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
 colnames(tv)<-c("value","par")
 
-#As matrices
-sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
-colnames(sv)<-c("parname","index")
-
-pc<-data.frame(pc,sv)
-
 #Plot
-ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
+ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 ```
 
 Compare to priors
@@ -412,25 +404,25 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parname='alpha',index=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parname='alpha',index=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parname='beta',index=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parname='beta',index=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parname='gamma',index=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parname='gamma',index=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,gamma1prior,gamma2prior))
 
-prs$index<-as.factor(prs$index)
+prs$Behavior<-as.factor(prs$Behavior)
 
-allp<-rbind_all(list(pc,prs))
+allp<-rbind_all(list(pc[!pc$parameter %in% c("phi"),],prs))
 
-ggplot(allp,aes(x=index,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parname,scale="free")
+ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parameter,scale="free")
 ```
 
 ##Prediction - environmental function
@@ -476,12 +468,11 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon(
 #Behavioral Prediction
 
 ```{r}
-
 #We just need Feeding behavior
-behav_chains<-behav_chains[behav_chains$Behavior == 2,]
+behav_chains<-pc[pc$Behavior == 2 & pc$parameter %in% "phi",]
 
-#arrange by step
-behav_chains$Step<-as.numeric(as.character(behav_chains$Step))
+#arrange by step - capitalize
+behav_chains$Step<-as.numeric(as.character(behav_chains$step))
 behav_chains<-behav_chains %>% arrange(Step)
 
 #Label Behaviors
@@ -489,7 +480,7 @@ behav_chains$Behavior<-as.factor(behav_chains$Behavior)
 levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
 #average phi
-mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(Probability))
+mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(value))
   
 #merge with input
 sxy<-split(mxy,mxy$Animal)
@@ -511,5 +502,5 @@ ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=A
 ```
 
 ```{r}
-save.image("MultiSpecies.RData")
+#save.image("MultiSpecies.RData")
 ```
