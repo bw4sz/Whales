@@ -344,26 +344,54 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,30000))
-p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+system.time(update(jags,2000))
+p<-coda.samples(model=jags,n.iter=100,thin=2,variable.names=c("theta","gamma","alpha","beta","phi"))
 ```
 
 ##Chains
 ```{r,fig.height=10}
-plot(p)
-```
+#bind chains
+pc<-melt(list(as.matrix(p[[1]]),as.matrix(p[[2]])))
+colnames(pc)<-c("Draw","par","value","chain")
 
-##Posteriors
+#extract parameter name
+pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
+
+#Extract index
+splitpc<-split(pc,pc$parameter)
+
+#single index
+splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gamma","theta")],function(x){
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,-2]
+    colnames(sv)<-c("parname","Behavior")
+    pc<-data.frame(x,sv)
+})
+
+#Double index
+#none
+
+#Triple Index 
+splitpc[c("phi")]<-lapply(splitpc[c("d","phi")],function(x){
+#As matrices
+    sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,-1]
+    colnames(sv)<-c("Animal","step","Behavior")
+    pc<-data.frame(x,sv)
+})
+
+#bind all matrices back together
+pc<-rbind_all(splitpc)
+rm(splitpc)
+
+colnames(pc)<-c("Draw","par","value","chain","paramater","parname","Animal","step","Behavior")
+
+#plot all but d
+ggplot(pc[!pc$parameter %in% c("d","phi"),],aes())
+```
 
 ```{r}
 #true values
 tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
 colnames(tv)<-c("value","par")
-
-#bind chains
-out<-rbind(p[[1]],p[[2]])
-pc<-melt(out)
-colnames(pc)<-c("Draw","par","value")
 
 #As matrices
 sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
@@ -384,13 +412,13 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=runif(todraw,-5,5),parname='alpha',index=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parname='alpha',index=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=runif(todraw,-5,5),parname='alpha',index=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parname='alpha',index=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,0.0001),parname='beta',index=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parname='beta',index=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,0.0001),parname='beta',index=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parname='beta',index=2,Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parname='gamma',index=1,Estimate="Prior")
 
@@ -448,21 +476,6 @@ ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon(
 #Behavioral Prediction
 
 ```{r}
-#needs to be same number of draws as spatial above
-behav<-coda.samples(model=jags,n.iter=100,n.thin=1,variable.names=c("phi"))
-
-#bind chains
-behav_chains<-rbind(behav[[1]],behav[[2]])
-behav_chains<-melt(behav_chains)
-colnames(behav_chains)<-c("Draw","par","value")
-
-#As matrices
-sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,-1]
-colnames(sv)<-c("Animal","parname","step")
-
-#format to combine
-behav_chains<-data.frame(behav_chains,sv)
-colnames(behav_chains)<-c("Draw","par","Probability","parname","Animal","Step","Behavior")
 
 #We just need Feeding behavior
 behav_chains<-behav_chains[behav_chains$Behavior == 2,]
@@ -488,7 +501,7 @@ mxy<-rbind_all(sxy)
 
 mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 
-ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=2) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal)
+ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=1.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal,scales="free")
 ```
 
 ##Autocorrelation in behavior
