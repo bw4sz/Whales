@@ -25,13 +25,13 @@ library(stringr)
 library(rjags)
 
 #New model to be run, flag turned off if just updating.
-newModel<-FALSE
+newModel<-TRUE
 
 #Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
 source("Mountains.R")
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("MultiSpecies.RData")
 jags$recompile()
@@ -259,7 +259,7 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(-1,-2)
+a1=c(-2,-2)
 
 #Effect of ocean depth
 beta=c(10,10)
@@ -273,7 +273,7 @@ beta=c(10,10)
 #habitat<-resample(r2,ras2)
 
 if(newModel){
-  habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,1))
+  habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,0.45))
 }
 
 #Visualize
@@ -345,7 +345,7 @@ if(newModel){
   }
 
 system.time(update(jags,30000))
-p<-coda.samples(model=jags,n.iter=5000,thin=5,variable.names=c("theta","gamma","alpha","beta"))
+p<-coda.samples(model=jags,n.iter=10000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
 ```
 
 ##Chains

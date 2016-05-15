@@ -77,7 +77,7 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-$$\alpha_1 = -2$$
+$$\alpha_1 = -1$$
 $$\beta_1=10$$
 
 Whales tend to forage in shallow habitats
@@ -208,8 +208,8 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ```
 
 ```
-##    user  system elapsed 
-## 4678.86    0.55 4695.01
+##     user   system  elapsed 
+## 11219.12    14.86 11884.52
 ```
 
 ##Chains
