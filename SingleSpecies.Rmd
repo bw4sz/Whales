@@ -28,9 +28,6 @@ library(move)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE
-
-#Source Mountains function, thanks to Sam Urmy http://www.oceanographerschoice.com/2010/10/fractal-landscapes-in-r-part-two/
-source("Mountains.R")
 ```
 
 ```{r,eval=F}
@@ -45,21 +42,52 @@ newModel<-F
 We are currently ignoring any observation process or time regularization.
 
 ```{r}
-mdat<-move(x="InputData/Antarctic Humpback overlap with krill fisheries -2376078525850487209.csv")
+mdat<-read.csv("InputData/FullData-550793189439001813.csv")
+
+##need to look into making into a movebank object.
 
 #Create a oceandepth in km 
-mdat$OceanDepth<-mdat$ETOPO1.Elevation*-1 / 1000
-tm<-melt(timeLag(mdat,units="mins"))
-paste("Mean time lag is:",round(mean(tm$value),2)/60,"hours")
+mdat$ocean<-mdat$ETOPO1.Elevation*-1 / 1000
 
+#standardize column names to match the simulation
+#Create an animal tag.
+mxy <- as(mdat, "data.frame")
+mxy$Animal<-mxy$individual.local.identifier
+mxy$x<-mxy$location.long
+mxy$y<-mxy$location.lat
+
+#give steps, this will need to be discretized.
+#merge with input
+sxy<-split(mxy,mxy$Animal)
+sxy<-lapply(sxy,function(x){
+  x$Step<-1:nrow(x)
+  return(x)
+})
+mxy<-rbind_all(sxy)
+
+#grab two individuals
+mxy<-mxy[mxy$Animal %in% c('131133','131120','131118'),]
+
+mxy$Animal<-as.factor(mxy$Animal)
 #Plot
-mdat_df <- as(mdat, "data.frame")
-pp<-c(mean(mdat_df$location.long),mean(mdat_df$location.lat))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
-ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat),col='red') + scale_color_discrete(guide=F)
+pp<-c(mean(mxy$x),mean(mxy$y))
+m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=Animal),size=.5)
 ```
 
-#Correlated random walk
+```{r,eval=F}
+#Load in data
+load("MultiSpecies.RData")
+jags$recompile()
+newModel<-F
+```
+
+#Abstract
+
+
+#Movement model
+
+Dynamic correlation random walk following Jonsen (2005) and Jonsen (2016).
 
 *Process Model*
 
@@ -87,242 +115,207 @@ $$
 
 ###Environment
 
-Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
+Behavioral states are a function of local environmental conditions. Here I use ocean depth as a first covariate.
 
 It generally follows the form, conditional on behavior at t -1:
 
 $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t-1,]}$$
-$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
+
+
+
+```{r,fig.height=3,fig.width=3.5}
+dplot<-function(a1,beta,x){
+  y<-inv.logit(a1[1]+beta[1]*x)
+  d11<-data.frame(x,y,State="Traveling",Begin="Traveling")
+  
+  y<-1-inv.logit(a1[1]+beta[1]*x)
+  d12<-data.frame(x,y,State="Feeding",Begin="Traveling")
+
+  y<-inv.logit(a1[2]+beta[2]*x)
+  d21<-data.frame(x,y,State="Traveling",Begin="Feeding")
+  
+  y<-1-inv.logit(a1[2]+beta[2]*x)
+  d22<-data.frame(x,y,State="Feeding",Begin="Feeding")
+  
+  d<-rbind_all(list(d11,d12,d21,d22))
+}
+```
 
 #Model Fitting
 
+The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
+
 ```{r,eval=T}
 #source model
-source("Bayesian/RW.R")
+source("Bayesian/MultiSpecies.R")
 
 #print model
-print.noquote(readLines("Bayesian/RW.R"))
+print.noquote(readLines("Bayesian/MultiSpecies.R"))
 
 #prior shape
 R <- diag(c(1,1))
-data=list(y=cbind(mdat_df$location.long,mdat_df$location.lat),steps=nrow(mdat_df),R=R,ocean=mdat_df$OceanDepth)
+
+#steps 
+steps<-as.numeric(table(mxy$Animal)[1])
+
+#make ocean a matrix
+oc<-acast(mxy,Animal~Step,value.var="ocean")
+
+#Individuals
+ind=max(mxy$Animal)
+
+#obs array
+obs<-melt(mxy,measure.vars=c("x","y"))
+obs<-acast(obs,Animal~Step~variable)
+
+data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 
 if(newModel){
-  jags<-jags.model(file = "Bayesian/RW.jags",data=data,n.chains=2)
+  jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
 system.time(update(jags,1000))
-p<-coda.samples(model=jags,n.iter=1000,thin=10,variable.names=c("theta","gamma","alpha","beta"))
+p<-coda.samples(model=jags,n.iter=1000,thin=5,variable.names=c("theta","gamma","alpha","beta","phi","lalpha","lbeta"))
 ```
 
 ##Chains
-```{r,fig.height=15}
-plot(p)
-```
+```{r,fig.height=10}
+#bind chains
+pc<-melt(list(as.matrix(p[[1]]),as.matrix(p[[2]])))
+colnames(pc)<-c("Draw","par","value","chain")
 
-##Posteriors
+#extract parameter name
+pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
+
+#Extract index
+splitpc<-split(pc,pc$parameter)
+
+#single index
+splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gamma","theta")],function(x){
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
+    pc<-data.frame(x,Behavior=sv)
+    return(pc)
+})
+
+#Double index
+#none
+
+#Triple Index 
+splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
+#As matrices
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
+    colnames(sv)<-c("Animal","step","Behavior")
+    pc<-data.frame(x,sv)
+})
+
+#bind all matrices back together
+pc<-rbind_all(splitpc)
+rm(splitpc)
+
+#plot all but d
+ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+```
 
 ```{r}
-#bind chains
-out<-rbind(p[[1]],p[[2]])
-pc<-melt(out)
-colnames(pc)<-c("Draw","par","value")
+#true values
+tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
+colnames(tv)<-c("value","par")
 
 #Plot
-ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters, true values in red")
+ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 
-#As matrices
-sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+)]"))[,-1]
-colnames(sv)<-c("parname","index")
-
-#format to combine
-pc<-data.frame(pc,sv)
-ggplot(pc,aes(x=index,y=value)) + geom_violin() + facet_wrap(~parname,scales="free")
+#plot phi
+ggplot(pc[pc$parameter %in% "phi",]) + geom_histogram(aes(x=value,fill=Behavior),alpha=0.7) + theme_bw()
 ```
 
-Compare to priors
+###Compare to priors
 
 ```{r}
 #add comparison to priors
 todraw<-table(pc$par)[1]
-
 pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=runif(todraw,-5,5),parname='alpha',index=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=runif(todraw,-5,5),parname='alpha',index=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,0.0001),parname='beta',index=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,0.0001),parname='beta',index=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parname='gamma',index=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parname='gamma',index=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,gamma1prior,gamma2prior))
 
-prs$index<-as.factor(prs$index)
+prs$Behavior<-as.factor(prs$Behavior)
 
-allp<-rbind_all(list(pc,prs))
+allp<-rbind_all(list(pc[!pc$parameter %in% c("phi"),],prs))
 
-ggplot(allp,aes(x=index,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parname,scale="free")
-
+ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parameter,scale="free")
 ```
 
 ##Prediction - environmental function
-
-```{r,fig.height=3,fig.width=3.5}
-dplot<-function(x,a1,beta){
-
-  y<-inv.logit(a1+beta*x)
-  d11<-data.frame(x,y,State='Traveling',k='Traveling')
-  
-  y<-1-inv.logit((a1)+beta*x)
-  d12<-data.frame(x,y,State='Traveling',k='Feeding')
-  
-  y<-inv.logit(a1+beta*x)
-  d21<-data.frame(x,y,State='Feeding',k='Traveling')
-  
-  y<-1-inv.logit((a1)+beta*x)
-  d22<-data.frame(x,y,State='Feeding',k='Feeding')
-  
-  d<-rbind_all(list(d11,d12,d21,d22))
-  return(d)
-  }
-```
 
 ```{r}
 alphap<-cbind(pc %>% filter(par=='alpha[1]') %>% .$value,pc %>% filter(par=='alpha[2]') %>% .$value)
 
 betap<-cbind(pc %>% filter(par=='beta[1]') %>% .$value,pc %>% filter(par=='beta[2]') %>% .$value)
-
+ 
 postplot<-list()
 
 for(j in 1:nrow(alphap)){
-  postplot[[j]]<-dplot(x=mdat$OceanDepth,a1=alphap[j,],beta=betap[j,])
-}
+  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=logit(alphap[j,]),beta=logit(betap[j,])),Iteration=j)
+  }
 
 postplot<-rbind_all(postplot)
 
-dsum<-postplot %>% group_by(x,State,k) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+dsum<-postplot %>% group_by(x,Begin,State) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
-ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_point()  + geom_ribbon() + facet_wrap(~State) + theme_bw()
-```
+#overlay true value
+trued<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1,beta=beta)
 
-##Spatial Predicion
+ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + geom_line(data=trued,aes(x=x,y=y,col=State),linetype='dashed')
 
-```{r,eval=T}
-pr<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("d"))
-ps<-rbind(pr[[1]],pr[[2]])
-ps<-melt(ps)
-
-#extract positions
-sv<-data.frame(str_match(ps$Var2,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
-colnames(sv)<-c("par","step","xy")
-
-#format to combine
-ps<-data.frame(ps,sv)
-#relevel
-levels(ps$xy)<-c("x","y")
-
-#Just keep mean, upper and lower
-toplot<-dcast(ps,Var1+step~xy,value.var = "value")
-sumplot<-group_by(toplot,step) %>% summarize(x_mean=mean(x),y_mean=mean(y))
-
-#arrange by step
-sumplot$step<-as.numeric(as.character(sumplot$step))
-sumplot<-sumplot %>% arrange(step)
-
-ggplot(sumplot,aes(x=x_mean,y=y_mean)) + geom_path(size=2,alpha=0.5) + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red') + ggtitle("Predicted path (black) compared to true path (red)") 
-```
-
-Point Density
-
-```{r,eval=T}
-out<-rbind(pr[[1]],pr[[2]])
-pc<-melt(out)
-colnames(pc)<-c("Draw","param","value")
-
-sv<-data.frame(str_match(pc$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
-colnames(sv)<-c("par","step","xy")
-
-#format to combine
-pc<-data.frame(pc,sv)
-#relevel
-levels(pc$xy)<-c("x","y")
-toplot<-dcast(pc,Draw+step~xy,value.var = "value")
-
-#arrange by step
-toplot$step<-as.numeric(as.character(toplot$step))
-toplot<-toplot %>% arrange(step)
-
-ggplot(data=toplot,aes(x=x,y=y,col=step)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red')
+#overla
 ```
 
 #Behavioral Prediction
 
-## Point Cloud
 ```{r}
-#needs to be same number of draws as spatial above
-behav<-coda.samples(model=jags,n.iter=2000,n.thin=5,variable.names=c("phi"))
-
-#bind chains
-behav_chains<-rbind(behav[[1]],behav[[2]])
-behav_chains<-melt(behav_chains)
-colnames(behav_chains)<-c("Draw","par","value")
-
-#As matrices
-sv<-data.frame(str_match(behav_chains$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,-1]
-colnames(sv)<-c("parname","index")
-
-#format to combine
-behav_chains<-data.frame(behav_chains,sv)
-colnames(behav_chains)<-c("Draw","par","Probability","parname","step","Behavior")
-
 #We just need Feeding behavior
-behav_chains<-behav_chains[behav_chains$Behavior == 2,]
+behav_chains<-pc[pc$Behavior == 2 & pc$parameter %in% "phi",]
 
-#arrange by step
-behav_chains$step<-as.numeric(as.character(behav_chains$step))
-behav_chains<-behav_chains %>% arrange(step)
+#arrange by step - capitalize
+behav_chains$Step<-as.numeric(as.character(behav_chains$step))
+behav_chains<-behav_chains %>% arrange(Step)
 
 #Label Behaviors
 behav_chains$Behavior<-as.factor(behav_chains$Behavior)
 levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
-#combine with spatial prediction
-spp_b<-merge(toplot,behav_chains,by=c("Draw","step"))
+#average phi
+mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(value))
 
-#plot spatial
-ggplot(data=spp_b,aes(x=x,y=y,col=Probability)) + geom_point() + theme_bw() + geom_path(data=mdat_df,aes(x=location.long,y=location.lat),col='red') + scale_color_continuous("Probability of Feeding",low='blue',high='red')
-```
+mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 
-## Input data
+ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=1.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal,scales="free")
 
-```{r}
-#get mean value
-mean_phi<-behav_chains %>% group_by(step) %>% summarize(phi=mean(Probability))
-
-#give mdat a step, column, this needs to be regularized.
-mdat_df$Step<-1:nrow(mdat_df)
-
-#merge with input
-mdat_df<-merge(mdat_df,mean_phi,by.x="Step",by.y="step")
-
-m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
-ggmap(m)+geom_path(data=mdat_df, aes(x=location.long, y=location.lat,col=phi),size=2.5) + scale_color_continuous("Probability of Feeding",low='blue',high='red')
+#phi and ocean plot
+ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=mdat_df,aes(x=as.numeric(Step),y=phi,col=OceanDepth)) + geom_line(aes(group=1),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous("Ocean Depth (km)",low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
+ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
 
-```{r,eval=T}
+```{r}
 save.image("SingleSpecies.RData")
 ```

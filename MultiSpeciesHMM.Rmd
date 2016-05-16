@@ -337,8 +337,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,2000))
-p<-coda.samples(model=jags,n.iter=2000,thin=2,variable.names=c("theta","gamma","alpha","beta","phi","lalpha","lbeta"))
+system.time(update(jags,10000))
+p<-coda.samples(model=jags,n.iter=3000,thin=5,variable.names=c("theta","gamma","alpha","beta","phi","lalpha","lbeta"))
 ```
 
 ##Chains

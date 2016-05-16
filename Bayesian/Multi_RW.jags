@@ -17,7 +17,7 @@
     for(t in 2:(steps-1)){
     
     #Behavioral State at time T
-    logit(phi[i,t,1]) <- alpha[state[i,t-1]] + beta[state[i,t-1]] * ocean[i,t]
+    logit(phi[i,t,1]) <- lalpha[state[i,t-1]] + lbeta[state[i,t-1]] * ocean[i,t]
     phi[i,t,2] <- 1-phi[i,t,1]
     state[i,t] ~ dcat(phi[i,t,])
         
