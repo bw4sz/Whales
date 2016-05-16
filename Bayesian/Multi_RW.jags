@@ -16,6 +16,11 @@
     #Process Model for movement
     for(t in 2:(steps-1)){
     
+    #Behavioral State at time T
+    logit(phi[i,t,1]) <- alpha[state[i,t-1]] + beta[state[i,t-1]] * ocean[i,t]
+    phi[i,t,2] <- 1-phi[i,t,1]
+    state[i,t] ~ dcat(phi[i,t,])
+        
     #Turning covariate
     #Transition Matrix for turning angles
     T[i,t,1,1] <- cos(theta[state[i,t]])
@@ -23,18 +28,16 @@
     T[i,t,2,1] <- sin(theta[state[i,t]])
     T[i,t,2,2] <- cos(theta[state[i,t]])
     
-    #Behavioral State at time T
-    logit(phi[i,t,1]) <- alpha + beta * ocean[i,t]
-    phi[i,t,2] <- 1-phi[i,t,1]
-    state[i,t] ~ dcat(phi[i,t,])
-    
     #Correlation in movement change
     d[i,t,1:2] <- y[i,t,] + gamma[state[i,t]] * T[i,t,,] %*% (y[i,t,1:2] - y[i,t-1,1:2])
     
     #Gaussian Displacement
     y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)
-    
     }
+    #Final behavior state
+    logit(phi[i,steps,1]) <- lalpha[state[i,steps-1]] + lbeta[state[i,steps-1]] * ocean[i,steps]
+    phi[i,steps,2] <- 1-phi[i,steps,1]
+    state[i,steps] ~ dcat(phi[i,steps,])
     }
     
     #Priors
@@ -68,6 +71,13 @@
     
     lbeta[1] ~ dnorm(0,0.386)
     logit(beta[1]) <- lbeta[1]
+
+    #Prob of transition to state 1 given state 2 at t-1
+    lalpha[2] ~ dnorm(0,0.386)
+    logit(alpha[2]) <- lalpha[2]
+    
+    lbeta[2] ~ dnorm(0,0.386)
+    logit(beta[2]) <- lbeta[2]
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
