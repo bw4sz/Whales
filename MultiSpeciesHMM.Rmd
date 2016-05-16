@@ -4,8 +4,8 @@ author: "Ben Weinstein"
 date: "May 5th, 2016"
 output: 
   html_document:
-    keep_md: True
-    numbered_sections: True
+    keep_md: true
+    number_sections: true
     toc: true
     theme: spacelab
 ---
