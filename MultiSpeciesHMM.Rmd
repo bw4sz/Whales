@@ -94,7 +94,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t-1,]}$$
 traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   
   #Total number of steps
-  steps=150
+  steps=200
 
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -114,9 +114,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
   #Probability of staying in behavior
   alpha<-matrix(nrow=1,ncol=2)
   phi<-matrix(nrow=steps,ncol=2)
-  
-  a1[1]<-a1[1]
-  a1[2]<-a1[2]
+
 
   #Mean turning angle
   theta=theta
@@ -167,7 +165,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
     ocean[x]<-extract(habitat,SpatialPoints(data.frame(t(xy[x,]))))
     
     #Behavior
-    phi[x,1] <- inv.logit(a1[state[x-1]]+beta[state[x-1]]*ocean[x])
+    phi[x,1] <- inv.logit(a1+beta*ocean[x])
     phi[x,2]<- 1 - phi[x,1]
     state[x] <- sample(c(1,2),size=1,prob=phi[x,])
     
@@ -220,12 +218,8 @@ Essentially, whales travel long straight distances to find food sources, but the
 
 ### Environment
 Whales tend to travel in deep habitats
-$$\alpha_1 = -1$$
-$$\beta_1=10$$
-
-Whales tend to forage in shallow habitats
-$$\alpha_1 = -2$$
-$$\beta_2=10$$
+$$\alpha = -2$$
+$$\beta_1=1$$
 
 The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
@@ -234,19 +228,13 @@ This is easiest to understand graphically.
 
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta,x){
-  y<-inv.logit(a1[1]+beta[1]*x)
-  d11<-data.frame(x,y,State='Traveling',k='Traveling')
+  y<-inv.logit(a1+beta*x)
+  d11<-data.frame(x,y,State="Traveling")
   
-  y<-1-inv.logit((a1[1])+beta[1]*x)
-  d12<-data.frame(x,y,State='Traveling',k='Feeding')
+  y<-1-inv.logit(a1+beta*x)
+  d12<-data.frame(x,y,State="Feeding")
   
-  y<-inv.logit(a1[2]+beta[2]*x)
-  d21<-data.frame(x,y,State='Feeding',k='Traveling')
-  
-  y<-1-inv.logit((a1[2])+beta[2]*x)
-  d22<-data.frame(x,y,State='Feeding',k='Feeding')
-  
-  d<-rbind_all(list(d11,d12,d21,d22))
+  d<-rbind_all(list(d11,d12))
 }
 ```
 
@@ -259,10 +247,10 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(-2,-2)
+a1=-2
 
 #Effect of ocean depth
-beta=c(10,10)
+beta=1
 
 #Simulate environment
 #Create environment
@@ -273,13 +261,13 @@ beta=c(10,10)
 #habitat<-resample(r2,ras2)
 
 if(newModel){
-  habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,0.45))
+  habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,4))
 }
 
 #Visualize
-d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.01),a1=a1,beta=beta)
+d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1,beta=logit(0.1))
 
-ggplot(d,aes(x=x,y=y,col=k)) + geom_line() + geom_point() + facet_wrap(~State) + labs(x="Ocean Depth (km)",y="Probability of State",col="Transition") + theme_bw() 
+ggplot(d,aes(x=x,y=y,col=State)) + geom_line() + geom_point() +  labs(x="Ocean Depth (km)",y="Probability of State") + theme_bw() 
 
 cr<-colorRampPalette(c("white","black"))
 dev.off()
@@ -289,7 +277,7 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 ### Multiple trajectories.
 ```{r}
 if(newModel){
-    mxy<-lapply(1:4,function(x){
+    mxy<-lapply(1:3,function(x){
       traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)
     }) 
   mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
@@ -298,7 +286,6 @@ if(newModel){
 
 }
 
-
 #bounding box
 bb<-bbox(cbind(mxy$x,mxy$y))
 
@@ -306,7 +293,7 @@ bb<-bbox(cbind(mxy$x,mxy$y))
 crop_habitat<-crop(habitat,bb*2)
 habitatdf<-as.data.frame(crop_habitat,xy=TRUE)
 
-ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=Animal),size=1) 
+ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=Animal),size=1) + facet_wrap(~Animal)
 
 ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),alpha=0.1) + scale_y_continuous(breaks=c(0,0.5,1),labels=c("Traveling","0.5","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw() + stat_bin_2d() + scale_fill_continuous(low='blue',high='red')
 ```
@@ -344,8 +331,8 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,2000))
-p<-coda.samples(model=jags,n.iter=1000,thin=1,variable.names=c("theta","gamma","alpha","beta","phi"))
+system.time(update(jags,6000))
+p<-coda.samples(model=jags,n.iter=2000,thin=5,variable.names=c("theta","gamma","alpha","beta","phi"))
 ```
 
 ##Chains
@@ -361,7 +348,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gamma","theta")],function(x){
+splitpc[c("gamma","theta")]<-lapply(splitpc[c("gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -388,7 +375,7 @@ ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,s
 
 ```{r}
 #true values
-tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
+tv<-melt(list('alpha'=inv.logit(a1),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta'=inv.logit(beta)))
 colnames(tv)<-c("value","par")
 
 #Plot
@@ -404,19 +391,15 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=2,Estimate="Prior")
-
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=1,Estimate="Prior")
-
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=2,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
 gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parameter='gamma',Behavior=2,Estimate="Prior")
 
-prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,gamma1prior,gamma2prior))
+prs<-rbind_all(list(a1prior,beta1prior,gamma1prior,gamma2prior))
 
 prs$Behavior<-as.factor(prs$Behavior)
 
@@ -427,42 +410,22 @@ ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(
 
 ##Prediction - environmental function
 
-```{r,fig.height=3,fig.width=3.5}
-dplot<-function(x,a1,beta){
-
-  y<-inv.logit(a1+beta*x)
-  d11<-data.frame(x,y,State='Traveling',k='Traveling')
-  
-  y<-1-inv.logit((a1)+beta*x)
-  d12<-data.frame(x,y,State='Traveling',k='Feeding')
-  
-  y<-inv.logit(a1+beta*x)
-  d21<-data.frame(x,y,State='Feeding',k='Traveling')
-  
-  y<-1-inv.logit((a1)+beta*x)
-  d22<-data.frame(x,y,State='Feeding',k='Feeding')
-  
-  d<-rbind_all(list(d11,d12,d21,d22))
-  return(d)
-  }
-```
-
 ```{r}
-alphap<-cbind(pc %>% filter(par=='alpha[1]') %>% .$value,pc %>% filter(par=='alpha[2]') %>% .$value)
+alphap<-pc %>% filter(parameter=='alpha') %>% .$value
 
-betap<-cbind(pc %>% filter(par=='beta[1]') %>% .$value,pc %>% filter(par=='beta[2]') %>% .$value)
-
+betap<-pc %>% filter(par=='beta') %>% .$value
+ 
 postplot<-list()
 
-for(j in 1:nrow(alphap)){
-  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
-}
+for(j in 1:length(alphap)){
+  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=logit(alphap[j]),beta=logit(betap[j])),Iteration=j)
+  }
 
 postplot<-rbind_all(postplot)
 
-dsum<-postplot %>% group_by(x,State,k) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+dsum<-postplot %>% group_by(x,State) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
-ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,col=k,fill=k)) + geom_ribbon() + facet_wrap(~State) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition")
+ggplot(dsum,aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State)) + geom_ribbon() + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition")
 ```
 
 #Behavioral Prediction
@@ -502,5 +465,5 @@ ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=A
 ```
 
 ```{r}
-#save.image("MultiSpecies.RData")
+save.image("MultiSpecies.RData")
 ```
