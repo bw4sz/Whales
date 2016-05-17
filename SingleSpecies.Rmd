@@ -27,10 +27,10 @@ library(rjags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-F
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 jags$recompile()
@@ -76,7 +76,7 @@ m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("MultiSpecies.RData")
 jags$recompile()
@@ -177,7 +177,7 @@ if(newModel){
   jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
   }
 
-system.time(update(jags,1000))
+system.time(update(jags,2000))
 p<-coda.samples(model=jags,n.iter=1000,thin=5,variable.names=c("theta","gamma","alpha","beta","phi","lalpha","lbeta"))
 ```
 
@@ -296,9 +296,24 @@ levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 #average phi
 mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(value))
 
+#drop phi incase its already there from previous run
+mxy$phi<-NULL
+
+#merge
 mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Animal),size=.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
+#for each individual
+sxy<-split(mxy,mxy$Animal)
+
+sfeed<-lapply(sxy,function(j){
+  #Plot
+  pp<-c(mean(j$x),mean(j$y))
+  m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
+  pl<-ggmap(m)+geom_path(data=j, aes(x=x, y=y,col=phi,group=Animal),size=.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding")
+  return(pl)
+})
+
+sfeed
 
 #phi and ocean plot
 ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding")
