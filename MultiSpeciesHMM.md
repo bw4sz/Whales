@@ -124,7 +124,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [18]     for(t in 2:(steps-1)){                                                                      
 ## [19]                                                                                                 
 ## [20]     #Behavioral State at time T                                                                 
-## [21]     logit(phi[i,t,1]) <- alpha[state[i,t-1]] + beta[state[i,t-1]] * ocean[i,t]                  
+## [21]     logit(phi[i,t,1]) <- lalpha[state[i,t-1]] + lbeta[state[i,t-1]] * ocean[i,t]                
 ## [22]     phi[i,t,2] <- 1-phi[i,t,1]                                                                  
 ## [23]     state[i,t] ~ dcat(phi[i,t,])                                                                
 ## [24]                                                                                                 
@@ -205,11 +205,6 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##    Total graph size: 176752
 ## 
 ## Initializing model
-```
-
-```
-##    user  system elapsed 
-##  984.61    0.67 1003.56
 ```
 
 ##Chains

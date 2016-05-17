@@ -22,7 +22,7 @@ library(dplyr)
 library(chron)
 library(gridExtra)
 library(stringr)
-library(rjags)
+library(R2jags)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE
@@ -337,7 +337,7 @@ data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 pt<-c("theta","gamma","alpha","beta","phi","lalpha","lbeta")
 
 if(newModel){
-  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=2)
+  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=20000,n.thin=5)
 }
 
 ```
