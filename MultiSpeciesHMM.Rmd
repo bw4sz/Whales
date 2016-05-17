@@ -336,10 +336,10 @@ obs<-acast(obs,Animal~Step~variable)
 data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 
 #paramters to track
-pt<-c("theta","gamma","alpha","beta","phi","lalpha","lbeta")
+pt<-c("theta","gamma","alpha","beta","phi")
 
 if(newModel){
-  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1)
+  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1,DIC=FALSE)
 }
 
 ```
@@ -348,8 +348,6 @@ if(newModel){
 ```{r,fig.height=10}
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
-
-#pc<-melt(list(as.matrix(p[[1]]),as.matrix(p[[2]])))
 colnames(pc)<-c("Draw","chain","par","value")
 
 #extract parameter name

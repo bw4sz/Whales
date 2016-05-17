@@ -23,14 +23,14 @@ library(dplyr)
 library(chron)
 library(gridExtra)
 library(stringr)
-library(rjags)
+library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-TRUE
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 jags$recompile()
@@ -76,7 +76,7 @@ m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("MultiSpecies.RData")
 jags$recompile()
@@ -159,7 +159,7 @@ print.noquote(readLines("Bayesian/MultiSpecies.R"))
 R <- diag(c(1,1))
 
 #steps 
-steps<-as.numeric(table(mxy$Animal)[1])
+steps<-as.numeric(table(mxy$Animal))
 
 #make ocean a matrix
 oc<-acast(mxy,Animal~Step,value.var="ocean")
@@ -172,20 +172,19 @@ obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Step~variable)
 
 data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
+#paramters to track
+pt<-c("theta","gamma","alpha","beta","phi")
 
 if(newModel){
-  jags<-jags.model(file = "Bayesian/Multi_RW.jags",data=data,n.chains=2)
-  }
-
-system.time(update(jags,2000))
-p<-coda.samples(model=jags,n.iter=1000,thin=5,variable.names=c("theta","gamma","alpha","beta","phi","lalpha","lbeta"))
+  system.time(jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=800,n.thin=1,DIC=FALSE))
+}
 ```
 
 ##Chains
 ```{r,fig.height=10}
 #bind chains
-pc<-melt(list(as.matrix(p[[1]]),as.matrix(p[[2]])))
-colnames(pc)<-c("Draw","par","value","chain")
+pc<-melt(jagM$BUGSoutput$sims.array)
+colnames(pc)<-c("Draw","chain","par","value")
 
 #extract parameter name
 pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
