@@ -55,7 +55,7 @@ $$ x_t = x_{t-1} + d_{t} $$
 
 ## Parameters
 
-For 10 individuals:
+For each individual:
 
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
@@ -90,11 +90,8 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 
 ```{r}
-traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta){
+traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=steps){
   
-  #Total number of steps
-  steps=200
-
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
 
@@ -217,7 +214,7 @@ Essentially, whales travel long straight distances to find food sources, but the
 ### Environment
 Whales tend to travel in deep habitats, slighlty weaker effect of ocean depth
 $$\alpha = -2$$
-$$\beta_1=0.5$$
+$$\beta_1=1$$
 
 $$\alpha = -2$$
 $$\beta_1=1$$
@@ -282,10 +279,15 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 
 ### Multiple trajectories.
 ```{r}
+mxy<-list()
+
+#how many steps for each individual
+step.ind<-c(200,100,150,175)
+
 if(newModel){
-    mxy<-lapply(1:4,function(x){
-      traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta)
-    }) 
+    for(x in 1:4){
+      mxy[[x]]<-traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=step.ind[x])
+  } 
   mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
   #Label Individual
   colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
@@ -318,8 +320,8 @@ print.noquote(readLines("Bayesian/MultiSpecies.R"))
 #prior shape
 R <- diag(c(1,1))
 
-#steps 
-steps<-as.numeric(table(mxy$Animal)[1])
+#steps for each individual
+steps<-as.numeric(table(mxy$Animal))
 
 #make ocean a matrix
 oc<-acast(mxy,Animal~Step,value.var="ocean")
@@ -337,7 +339,7 @@ data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 pt<-c("theta","gamma","alpha","beta","phi","lalpha","lbeta")
 
 if(newModel){
-  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=20000,n.thin=5)
+  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1)
 }
 
 ```
@@ -389,9 +391,6 @@ colnames(tv)<-c("value","par")
 
 #Plot
 ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
-
-#plot phi
-ggplot(pc[pc$parameter %in% "phi",]) + geom_histogram(aes(x=value,fill=Behavior),alpha=0.7) + theme_bw()
 ```
 
 ###Compare to priors
