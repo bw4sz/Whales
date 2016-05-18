@@ -1,6 +1,6 @@
 # Antarctic Whale Project: MultiSpecies Simulation
 Ben Weinstein  
-May 5th, 2016  
+`r format(Sys.time(), '%d %B, %Y')`  
 
 
 
