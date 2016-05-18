@@ -195,18 +195,6 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [89] sink()
 ```
 
-```
-## Compiling model graph
-##    Resolving undeclared variables
-##    Allocating nodes
-## Graph information:
-##    Observed stochastic nodes: 621
-##    Unobserved stochastic nodes: 635
-##    Total graph size: 116205
-## 
-## Initializing model
-```
-
 ##Chains
 ![](MultiSpeciesHMM_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
