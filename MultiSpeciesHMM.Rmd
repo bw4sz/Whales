@@ -136,7 +136,7 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=ste
   #Transition matrix for correlated movement
   T<-array(dim=c(steps,2,2))
   
-####Process Model
+##Process Model
   
   ##Initial position##
   xy[1,]<-mvrnorm(mu=c(0,0),Sigma=Sigma)
