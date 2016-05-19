@@ -13,9 +13,12 @@ iid=$(ec2metadata --instance-id)
 git checkout -b $iid
 
 #render script
-Rscript -e "rmarkdown::render('MutliSpeciesHMM.Rmd')"
+Rscript -e "rmarkdown::render('MultiSpeciesHMM.Rmd')" > run.txt
 
 #push results
 git add --all
 git commit -m "ec2 run complete"
 git push -u origin $iid
+
+#kill instance
+sudo halt
