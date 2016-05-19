@@ -339,7 +339,7 @@ data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 pt<-c("theta","gamma","alpha","beta","phi")
 
 if(newModel){
-  jagM<-jags(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1,DIC=FALSE)
+  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1,DIC=FALSE)
 }
 
 ```
