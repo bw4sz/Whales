@@ -67,15 +67,16 @@ $$ \sigma_{longitude} = 0.1$$
 
 ###Behavioral States
 
+$$ \text{For each individual i}$$
 $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
-$$ \alpha_{1,1} = \text{Probability of remaining traveling when traveling}$$
-$$\alpha_{2,1} = \text{Probability of switching from feeding to traveling}$$
+$$ \alpha_{i,1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{i,2,1} = \text{Probability of switching from feeding to traveling}$$
 
 $$\begin{matrix}
-  \alpha_{1,1} & 1-\alpha_{1,1} \\
-  \alpha_{2,1} & 1-\alpha_{2,1} \\
+  \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
+  \alpha_{i,2,1} & 1-\alpha_{i,2,1} \\
 \end{matrix}
 $$
 
@@ -91,7 +92,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 
 ```{r}
-traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=steps){
+traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_sd,steps=steps){
   
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -104,12 +105,20 @@ traj<-function(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=ste
   
   #Environment
   ocean<-c()
+
+  #indivdual variation intercept
+  a1<-c()
+  for(x in 1:2){
+    a1[x]<-rnorm(1,a1_mu[x],a1_sd[x])  
+  }
   
-  #Effect of env
-  beta<-beta
+  #indivdual variation slope
+  beta<-c()
+  for(x in 1:2){
+    beta[x]<-rnorm(1,beta_mu[x],beta_sd[x])  
+  }
   
   #Probability of staying in behavior
-  alpha<-matrix(nrow=1,ncol=2)
   phi<-matrix(nrow=steps,ncol=2)
 
   #Mean turning angle
@@ -213,13 +222,14 @@ $$\theta_2 = pi = \text{Many reversals in turns}$$
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
 
 ### Environment
-Whales tend to travel in deep habitats, slighlty weaker effect of ocean depth
-$$\alpha = -2$$
-$$\beta_1=1$$
+Whales tend to travel in deep habitats, slighlty weaker effect of ocean depth. The importance of this effect varies by individual.
 
-$$\alpha = -2$$
-$$\beta_1=1$$
-The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 200m water following 
+$$\alpha_{i,1,1} \sim Normal(-2,0.2)$$
+$$\beta_1{i,1,1} \sim Normal(1,0.1)$$
+
+$$\alpha_{i,2,1} \sim Normal(-2,0.2)$$
+$$\beta_1_{i,2,1} \sim Normal(1,0.1)$$
+The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 2000m water following 
 [dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
 
 This is easiest to understand graphically.
@@ -251,10 +261,18 @@ gamma=c(0.9,0.1)
 theta=c(0,pi)
 
 #Transitions
-a1=c(-2,-2)
+#mean
+a1_mu=c(-2,-2)
+
+#sd
+a1_sd=c(0.2,0.2)
 
 #Effect of ocean depth
-beta=c(1,1)
+#mean
+beta_mu=c(1,1)
+
+#sd
+beta_sd=c(0.1,0.1)
 
 #Simulate environment
 #Create environment
@@ -269,9 +287,9 @@ if(newModel){
 }
 
 #Visualize
-d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1,beta=beta)
+d<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1_mu,beta=beta_mu)
 
-ggplot(d,aes(x=x,y=y,col=State)) + geom_line() + geom_point() +  labs(x="Ocean Depth (km)",y="Probability of State") + theme_bw() + facet_wrap(~Begin)
+ggplot(d,aes(x=x,y=y,col=State)) + geom_line() + geom_point() +  labs(x="Ocean Depth (km)",y="Probability of State") + theme_bw() + facet_wrap(~Begin) + ggtitle("Mean Environmental Relationship")
 
 cr<-colorRampPalette(c("white","black"))
 dev.off()
@@ -282,12 +300,15 @@ plot(habitat,main='Ocean Depth (km)',col=cr(10))
 ```{r}
 mxy<-list()
 
+#individuals
+ind<-4
+
 #how many steps for each individual
-step.ind<-c(200,100,150,175)
+step.ind<-rpois(ind,100)
 
 if(newModel){
-    for(x in 1:4){
-      mxy[[x]]<-traj(gamma=gamma,theta=theta,a1=a1,habitat=habitat,beta=beta,steps=step.ind[x])
+    for(x in 1:ind){
+      mxy[[x]]<-traj(gamma=gamma,theta=theta,habitat=habitat,a1_mu=a1_mu,a1_sd=a1_sd,beta_mu=beta_mu,beta_sd=beta_sd,steps=step.ind[x])
   } 
   mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
   #Label Individual
