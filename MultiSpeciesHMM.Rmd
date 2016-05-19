@@ -45,6 +45,7 @@ I simulated correlated random walks with similar properties to previous marine p
 * Hierarchical variance among individuals
 * Observation Error
 * Posterior Model Checks
+* Time Variation?
 
 #Correlated random walk
 
@@ -484,6 +485,26 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 ```{r}
 ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
 ```
+
+##Phase prediction
+```{r}
+ggplot(mxy[!is.na(mxy$State),],aes(x=phi,fill=State)) + geom_density(alpha=0.8) + labs("Probability of Feeding") + theme_bw() + labs(fill="True State",x="Estimate Probability of Feeding")
+
+#calculate runs
+state_shade<-lapply(sxy,function(x){
+  state_change<-rle(as.numeric(x$State))
+  state_shade<-data.frame(xmin=c(0,cumsum(state_change$lengths[-length(state_change$lengths)])),xmax=cumsum(state_change$lengths),Behavior=state_change$values)
+})
+names(state_shade)<-1:length(state_shade)
+state_shade<-melt(state_shade,c("xmin","xmax","Behavior"))
+colnames(state_shade)<-c("xmin","xmax","Behavior","Animal")
+
+state_shade$Behavior<-as.factor(state_shade$Behavior)
+levels(state_shade$Behavior)<-c("Traveling","Feeding")
+ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=Step,y=phi)) + ylim(0,1) + labs(y="Estimated Probability of Feeding")
+```
+
+##Behavioral description
 
 ```{r}
 save.image("MultiSpecies.RData")
