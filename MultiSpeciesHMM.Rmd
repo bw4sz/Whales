@@ -379,7 +379,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gamma","theta")],function(x){
+splitpc[c("gamma","theta")]<-lapply(splitpc[c("gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -388,8 +388,8 @@ splitpc[c("alpha","beta","gamma","theta")]<-lapply(splitpc[c("alpha","beta","gam
 #Double index
 #none
 
-#Triple Index 
-splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
+#PHI
+splitpc[c("alpha","beta","phi")]<-lapply(splitpc[c("alpha","beta","phi")],function(x){
 #As matrices
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
     colnames(sv)<-c("Animal","step","Behavior")

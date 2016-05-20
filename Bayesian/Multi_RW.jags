@@ -17,7 +17,7 @@
     for(t in 2:(steps[i]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,t,1]) <- lalpha[state[i,t-1]] + lbeta[state[i,t-1]] * ocean[i,t]
+    logit(phi[i,t,1]) <- lalpha[i,state[i,t-1]] + lbeta[i,state[i,t-1]] * ocean[i,t]
     phi[i,t,2] <- 1-phi[i,t,1]
     state[i,t] ~ dcat(phi[i,t,])
         
@@ -35,7 +35,7 @@
     y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)
     }
     #Final behavior state
-    logit(phi[i,steps[i],1]) <- lalpha[state[i,steps[i]-1]] + lbeta[state[i,steps[i]-1]] * ocean[i,steps[i]]
+    logit(phi[i,steps[i],1]) <- lalpha[i,state[i,steps[i]-1]] + lbeta[i,state[i,steps[i]-1]] * ocean[i,steps[i]]
     phi[i,steps[i],2] <- 1-phi[i,steps[i],1]
     state[i,steps[i]] ~ dcat(phi[i,steps[i],])
     }
@@ -65,19 +65,26 @@
     ##Behavioral States
     # Following lunn 2012 p85
     
+
+    #For each individual
+    for(i in 1:ind){
     # prob of being in state 1 at t, given in state 1 at t-1    
-    lalpha[1] ~ dnorm(0,0.386)
-    logit(alpha[1]) <- lalpha[1]
+    lalpha[i,1] ~ dnorm(0,0.386)
+    logit(alpha[i,1]) <- lalpha[i,1]
     
-    lbeta[1] ~ dnorm(0,0.386)
-    logit(beta[1]) <- lbeta[1]
+    #effect of ocean on traveling -> traveling
+    lbeta[i,1] ~ dnorm(0,0.386)
+    logit(beta[i,1]) <- lbeta[i,1]
 
     #Prob of transition to state 1 given state 2 at t-1
-    lalpha[2] ~ dnorm(0,0.386)
-    logit(alpha[2]) <- lalpha[2]
+    lalpha[i,2] ~ dnorm(0,0.386)
+    logit(alpha[i,2]) <- lalpha[i,2]
     
-    lbeta[2] ~ dnorm(0,0.386)
-    logit(beta[2]) <- lbeta[2]
+    #effect of ocean on feeding -> traveling
+    lbeta[i,2] ~ dnorm(0,0.386)
+    logit(beta[i,2]) <- lbeta[i,2]
+
+    }
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)

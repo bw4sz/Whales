@@ -78,15 +78,14 @@ cat("
     logit(beta[i,1]) <- lbeta[i,1]
 
     #Prob of transition to state 1 given state 2 at t-1
-    lalpha[2] ~ dnorm(0,0.386)
-    logit(alpha[2]) <- lalpha[2]
+    lalpha[i,2] ~ dnorm(0,0.386)
+    logit(alpha[i,2]) <- lalpha[i,2]
     
     #effect of ocean on feeding -> traveling
     lbeta[i,2] ~ dnorm(0,0.386)
     logit(beta[i,2]) <- lbeta[i,2]
 
     }
-    
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
