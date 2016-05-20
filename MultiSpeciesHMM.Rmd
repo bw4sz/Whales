@@ -358,7 +358,7 @@ obs<-acast(obs,Animal~Step~variable)
 data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 
 #paramters to track
-pt<-c("theta","gamma","alpha","beta","phi")
+pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau")
 
 if(newModel){
   jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=1,DIC=FALSE)
@@ -386,10 +386,15 @@ splitpc[c("gamma","theta")]<-lapply(splitpc[c("gamma","theta")],function(x){
 })
 
 #Double index
-#none
+#splitpc[c("alpha","beta")]<-lapply(splitpc[c("alpha","beta")],function(x){
+#As matrices
+ #   sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]
+  #  colnames(sv)<-c("Animal","Behavior")
+   # pc<-data.frame(x,sv)
+#})
 
-#PHI
-splitpc[c("alpha","beta","phi")]<-lapply(splitpc[c("alpha","beta","phi")],function(x){
+#Three index
+splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 #As matrices
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
     colnames(sv)<-c("Animal","step","Behavior")
@@ -401,7 +406,10 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 #plot all but d
-ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi","alpha","beta"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+
+ggplot(pc[pc$parameter %in% c("alpha","beta"),],aes(x=Draw,y=value)) + facet_grid(parameter~Animal,scales="free") + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+
 ```
 
 ```{r}
