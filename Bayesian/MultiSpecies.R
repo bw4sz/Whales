@@ -72,16 +72,16 @@ cat("
     lalpha_mu[2] ~ dnorm(0,0.386)
 
     #Variance
-    lalpha_tau[1] ~ dgamma(0.0001,0.0001)
-    lalpha_tau[2] ~ dgamma(0.0001,0.0001)
+    lalpha_tau[1] ~ dt(0,1,1)I(0,)
+    lalpha_tau[2] ~ dt(0,1,1)I(0,)
 
     #Slopes
     lbeta_mu[1] ~ dnorm(0,0.386)
     lbeta_mu[2] ~ dnorm(0,0.386)
 
     #Variance
-    lbeta_tau[1] ~ dgamma(0.0001,0.0001)
-    lbeta_tau[2] ~ dgamma(0.0001,0.0001)
+    lbeta_tau[1] ~ dt(0,1,1)I(0,)
+    lbeta_tau[2] ~ dt(0,1,1)I(0,)
     
     #For each individual
     for(i in 1:ind){

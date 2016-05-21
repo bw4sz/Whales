@@ -41,11 +41,16 @@ newModel<-F
 #Abstract
 I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
+## Current State
+
+A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean.
+
 ## To add
-* Hierarchical variance among individuals
 * Observation Error
 * Posterior Model Checks
-* Time Variation?
+* Seasonal Variation
+** Variation in process error (Breed 2012)
+** Variation in diel?
 
 #Correlated random walk
 
@@ -379,7 +384,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("gamma","theta")]<-lapply(splitpc[c("gamma","theta")],function(x){
+splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")]<-lapply(splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -405,16 +410,14 @@ splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 pc<-rbind_all(splitpc)
 rm(splitpc)
 
-#plot all but d
-ggplot(pc[!pc$parameter %in% c("phi","alpha","beta"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
-
-ggplot(pc[pc$parameter %in% c("alpha","beta"),],aes(x=Draw,y=value)) + facet_grid(parameter~Animal,scales="free") + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+#plot all but phi
+ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 
 ```
 
 ```{r}
 #true values
-tv<-melt(list('alpha[1]'=inv.logit(a1[1]),'alpha[2]'=inv.logit(a1[2]),'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'beta[1]'=inv.logit(beta[1]),'beta[2]'=inv.logit(beta[2])))
+tv<-melt(list('lalpha_mu[1]'=a1_mu[1],'lalpha_mu[2]'=a1_mu[2],'theta[2]'=theta[2],'theta[1]'=theta[1],'gamma[1]'=gamma[1],'gamma[2]'=gamma[2],'lbeta_mu[1]'=beta_mu[1],'lbeta_mu[2]'=beta_mu[2],'lalpha_tau[1]'=a1_sd[1],'lalpha_tau[2]'=a1_sd[2],'lbeta_tau[2]'=beta_sd[1],'lbeta_tau[2]'=beta_sd[2]))
 colnames(tv)<-c("value","par")
 
 #Plot
@@ -430,13 +433,13 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),parameter='lalpha_mu',Behavior=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='alpha',Behavior=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='lalpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='lbeta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=inv.logit(rnorm(todraw,0,1.6)),parameter='beta',Behavior=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='lbeta_mu',Behavior=2,Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
@@ -454,14 +457,17 @@ ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(
 ##Prediction - environmental function
 
 ```{r}
-alphap<-cbind(pc %>% filter(par=='alpha[1]') %>% .$value,pc %>% filter(par=='alpha[2]') %>% .$value)
 
-betap<-cbind(pc %>% filter(par=='beta[1]') %>% .$value,pc %>% filter(par=='beta[2]') %>% .$value)
+#get the posterior estimates of the env function
+
+alphap<-cbind(pc %>% filter(par=='lalpha_mu[1]') %>% .$value,pc %>% filter(par=='lalpha_mu[2]') %>% .$value)
+
+betap<-cbind(pc %>% filter(par=='lbeta_mu[1]') %>% .$value,pc %>% filter(par=='lbeta_mu[2]') %>% .$value)
  
 postplot<-list()
 
 for(j in 1:nrow(alphap)){
-  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=logit(alphap[j,]),beta=logit(betap[j,])),Iteration=j)
+  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
   }
 
 postplot<-rbind_all(postplot)
@@ -469,8 +475,9 @@ postplot<-rbind_all(postplot)
 dsum<-postplot %>% group_by(x,Begin,State) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #overlay true value
-trued<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1,beta=beta)
+trued<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1_mu,beta=beta_mu)
 
+#mean env estimate
 ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + geom_line(data=trued,aes(x=x,y=y,col=State),linetype='dashed')
 
 #overla
