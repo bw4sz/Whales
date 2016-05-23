@@ -23,6 +23,7 @@ library(chron)
 library(gridExtra)
 library(stringr)
 library(R2jags)
+library(survival)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE
@@ -363,10 +364,10 @@ obs<-acast(obs,Animal~Step~variable)
 data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
 
 #paramters to track
-pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau")
+pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=3,DIC=FALSE)
+  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=4,DIC=FALSE)
 }
 
 ```
@@ -391,12 +392,12 @@ splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")]<-lap
 })
 
 #Double index
-#splitpc[c("alpha","beta")]<-lapply(splitpc[c("alpha","beta")],function(x){
-#As matrices
- #   sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]
-  #  colnames(sv)<-c("Animal","Behavior")
-   # pc<-data.frame(x,sv)
-#})
+splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
+    #As matrices
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]
+    colnames(sv)<-c("Animal","step")
+    pc<-data.frame(x,sv)
+})
 
 #Three index
 splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
@@ -411,7 +412,7 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 #plot all but phi
-ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 
 ```
 
@@ -421,7 +422,7 @@ tv<-melt(list('lalpha_mu[1]'=a1_mu[1],'lalpha_mu[2]'=a1_mu[2],'theta[2]'=theta[2
 colnames(tv)<-c("value","par")
 
 #Plot
-ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
+ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw() + geom_vline(data=tv,aes(xintercept=value),col='red',linetype='dashed') + ggtitle("Estimated parameters, true values in red")
 ```
 
 ###Compare to priors
@@ -459,7 +460,6 @@ ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(
 ```{r}
 
 #get the posterior estimates of the env function
-
 alphap<-cbind(pc %>% filter(par=='lalpha_mu[1]') %>% .$value,pc %>% filter(par=='lalpha_mu[2]') %>% .$value)
 
 betap<-cbind(pc %>% filter(par=='lbeta_mu[1]') %>% .$value,pc %>% filter(par=='lbeta_mu[2]') %>% .$value)
@@ -480,7 +480,6 @@ trued<-dplot(x=seq(min(habitat[]),max(habitat[]),0.1),a1=a1_mu,beta=beta_mu)
 #mean env estimate
 ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + geom_line(data=trued,aes(x=x,y=y,col=State),linetype='dashed')
 
-#overla
 ```
 
 #Behavioral Prediction
@@ -513,13 +512,13 @@ mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=1.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal,scales="free")
 
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding")
+ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal)
 ```
 
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding")
+ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding") + facet_wrap(~Animal)
 ```
 
 ##Phase prediction
@@ -537,10 +536,63 @@ colnames(state_shade)<-c("xmin","xmax","Behavior","Animal")
 
 state_shade$Behavior<-as.factor(state_shade$Behavior)
 levels(state_shade$Behavior)<-c("Traveling","Feeding")
-ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=Step,y=phi)) + ylim(0,1) + labs(y="Estimated Probability of Feeding")
+ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=Step,y=phi)) + ylim(0,1) + labs(fill="True Behavior",y="Estimated Probability of Feeding")
 ```
 
 ##Behavioral description
+
+###Average time in phase
+
+To calculate this, while propogating uncertainty, we can either save the state variable in jags, or draw multinomial draws from phi. Here we recreate it from phi.
+
+* For each draw, create a behavioral sequence, calulate the average runs for each behavior
+
+## Failure time analysis
+
+* Fit a curve to the runs as a function of time to get 'patch time'
+* the curve could be a function of temporal covariates.
+* per draw? How to get confidence intervals?
+* cox regression - see jenica allen and jeff diez.
+
+## Predicted Run Length
+```{r}
+statec<-pc %>% filter(parameter=='state')
+
+#split by animal and draw and chain
+astate<-split(statec,list(statec$Animal,statec$Draw,statec$chain))
+
+#get run length
+
+runs<-lapply(astate,function(x){
+  #arrange by step
+  #calculate run length
+  state_change<-rle(as.numeric(x$value))
+  runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
+  runl$Behavior<-as.factor(runl$Behavior)
+  levels(runl$Behavior)<-c("Traveling","Feeding")
+  return(runl)
+})
+
+runs<-rbind_all(runs)
+
+ggplot(runs,aes(x=as.numeric(runs),fill=Behavior)) + geom_histogram(position='dodge') + scale_x_continuous(breaks=seq(0,max(runs$runs),by=10)) + labs(x="Run Length") + ggtitle("Predicted Behavior Duration") + theme_bw()
+```
+
+##Proportional Hazards
+```{r}
+#Create a 'bout' encoding for every time it changes
+cox_frame<-data.frame()
+for(x in 1:nrow(runs)){
+  
+}
+runs[runs==Beha]
+
+cox_intercept<-coxph(Surv(as.numeric(x$step),as.numeric(x$value))~1,data=x)
+Sim1 <- coxsimLinear(cox_intercept,qi="Relative Hazard",Xj = c(0,200))
+# Plot
+simGG(Sim1)
+
+```
 
 ```{r}
 save.image("MultiSpecies.RData")
