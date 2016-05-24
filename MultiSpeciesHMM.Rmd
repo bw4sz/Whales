@@ -24,6 +24,7 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(survival)
+library(survMisc)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE
@@ -95,7 +96,6 @@ It generally follows the form, conditional on behavior at t -1:
 $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 $$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
-
 
 ```{r}
 traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_sd,steps=steps){
@@ -570,6 +570,7 @@ runs<-lapply(astate,function(x){
   runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
   runl$Behavior<-as.factor(runl$Behavior)
   levels(runl$Behavior)<-c("Traveling","Feeding")
+  
   return(runl)
 })
 
@@ -578,21 +579,54 @@ runs<-rbind_all(runs)
 ggplot(runs,aes(x=as.numeric(runs),fill=Behavior)) + geom_histogram(position='dodge') + scale_x_continuous(breaks=seq(0,max(runs$runs),by=10)) + labs(x="Run Length") + ggtitle("Predicted Behavior Duration") + theme_bw()
 ```
 
-##Proportional Hazards
+```{r,fig.height=3,fig.with=3.5}
+mr<-runs %>% group_by(Behavior) %>% summarize(mean=mean(runs),lower=quantile(runs,0.05),upper=quantile(runs,0.95))
+ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2) + theme_bw() + ggtitle("Average Duration of Behavior") + labs(y="Steps")
+```
+
+###Proportional Hazards
+
+Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the liklihood of death.
+
+Let T represent survival time.
+
+$$ P(t) = Pr(T<t)$$ 
+with a pdf
+$$p(t) = \frac{dP(t)}{dt}$$
+
+The instantaneous risk of death at time t, confitional on survival to that time:
+
+$$log (h_i(t)) = \alpha + \beta_i *x$$
+
+The cox model has no intercept, making it semi-parametric
+$$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
+
 ```{r}
 #Create a 'bout' encoding for every time it changes
-cox_frame<-data.frame()
-for(x in 1:nrow(runs)){
-  
-}
-runs[runs==Beha]
+statec[cumsum(runs$runs),"Bout"]<-seq(1,nrow(runs),1)
 
-cox_intercept<-coxph(Surv(as.numeric(x$step),as.numeric(x$value))~1,data=x)
-Sim1 <- coxsimLinear(cox_intercept,qi="Relative Hazard",Xj = c(0,200))
-# Plot
-simGG(Sim1)
+#Fill missing NA values
+repeat.before = function(x) {   # repeats the last non NA value. Keeps leading NA
+    ind = which(!is.na(x))      # get positions of nonmissing values
+    if(is.na(x[1]))             # if it begins with a missing, add the 
+          ind = c(1,ind)        # first position to the indices
+    rep(x[ind], times = diff(   # repeat the values at these indices
+       c(ind, length(x) + 1) )) # diffing the indices + length yields how often 
+}                               
 
+statec$Bout<-repeat.before(statec$Bout)
+
+feedr<-runs[runs$Behavior %in% "Feeding",]
+
+#Every run eventually ends in a switch (that's what makes it a run)
+feedr$status<-1
+
+#survival analysis
+tf<-coxph(Surv(time=feedr$runs,event=feedr$status)~feedr$Animal)
+summary(tf)
+plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (steps)")
 ```
+
 
 ```{r}
 save.image("MultiSpecies.RData")
