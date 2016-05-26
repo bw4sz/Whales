@@ -8,6 +8,13 @@ cat("
     for(i in 1:ind){
 
     ###First Step###
+
+    ## Priors for first location
+    #for lat long
+    for(k in 1:2){
+      y[i,1,k] ~ dnorm(argos[i,1,k],itau2.prior)
+    }
+
     #First movement - random walk.
     y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)
     
@@ -35,13 +42,25 @@ cat("
     #Gaussian Displacement
     y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)
     }
+
     #Final behavior state
     logit(phi[i,steps[i],1]) <- lalpha[i,state[i,steps[i]-1]] + lbeta[i,state[i,steps[i]-1]] * ocean[i,steps[i]]
     phi[i,steps[i],2] <- 1-phi[i,steps[i],1]
     state[i,steps[i]] ~ dcat(phi[i,steps[i],])
-    }
     
-    #Priors
+    ##	Measurement equation - irregular observations
+    for(t in 2:steps[i]){					# loops over regular time intervals (t)
+        zhat[i,t,1:2] <- (1-j[i,t]) * y[i,t-1,1:2] + j[i,t] * y[i,t,1:2]
+      #for lat and long
+      for (k in 1:2){
+        #argos error
+        argos[i,t,k] ~ dnorm(zhat[i,t,k],itau2.prior)
+        }
+      }	
+    }
+
+    ###Priors###
+
     #Process Variance
     iSigma ~ dwish(R,2)
     Sigma <- inverse(iSigma)
@@ -107,6 +126,9 @@ cat("
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
     lambda[2] <- 1 - lambda[1]
+
+    ##Argos priors##
+    itau2.prior ~ dunif(0,10)
     
     }"
     ,fill=TRUE)

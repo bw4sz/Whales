@@ -72,7 +72,7 @@ For both behaviors process variance is:
 $$ \sigma_{latitude} = 0.1$$
 $$ \sigma_{longitude} = 0.1$$
 
-###Behavioral States
+##Behavioral States
 
 $$ \text{For each individual i}$$
 $$ Behavior_1 = \text{traveling}$$
@@ -87,7 +87,7 @@ $$\begin{matrix}
 \end{matrix}
 $$
 
-###Environment
+##Environment
 
 Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
 
@@ -98,7 +98,17 @@ $$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 ```{r}
-traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_sd,steps=steps){
+traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_sd,total_time=total_time,step_length){
+  
+  ##Constants
+  #time interval in days, divided into 4 hours intervals
+  steps<-length(seq(0,total_time*24,by=step_length))
+  
+  #generate observations along time interval
+  timestep<-sort(runif(100,0,total_time) * 24)  
+  
+  ##Argos Observation error if 1 degree is 112 km, 0.01 would be ~ 1km error.
+  epsilon=0.01
   
   #Position Vector
   xy<-matrix(nrow=steps,ncol=2)
@@ -152,7 +162,7 @@ traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_
   #Transition matrix for correlated movement
   T<-array(dim=c(steps,2,2))
   
-##Process Model
+  ##Process Model
   
   ##Initial position##
   xy[1,]<-mvrnorm(mu=c(0,0),Sigma=Sigma)
@@ -208,6 +218,49 @@ traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_
 
   dxy$ocean<-ocean
   levels(dxy$State)<-c("Traveling","Feeding")
+  
+  #add time label
+  dxy$Hour<-seq(0,total_time*24,by=4)
+  
+  ##Measurement model
+  argosdf<-list()
+    
+  for (x in 2:steps){
+    
+      #which time slices sit in interval
+      argos_time<-timestep[step_length * (x-1) < timestep & timestep < step_length * x]
+      
+      #step locations
+      trueloc<-dxy[dxy$Step==x,c("x","y")]
+      pastloc<-dxy[dxy$Step==(x-1),c("x","y")]
+
+      #for each of those observations
+      stepdf<-list()
+      for(i in 1:length(argos_time)){
+        
+        #interpolation distance
+        j<-(argos_time[i]-step_length*(x-1))/step_length
+        
+        #observed locations
+        #Add argos noise.
+        argos_x<-rnorm(1,(1-j)*pastloc$x+j*trueloc$x,epsilon)
+        argos_y<-rnorm(1,(1-j)*pastloc$y+j*trueloc$y,epsilon)
+        
+        #order dataframe, if there are no observations, fill with NA
+        if(!length(argos_time)==0){
+          stepdf[[i]]<-data.frame(Step=x,time=argos_time[i],argos_x,argos_y)
+        } else{
+          stepdf[[i+1]]<-data.frame(Step=x,time=NA,argos_x,argos_y)
+        }
+      }
+      argosdf[[x]]<-rbind_all(stepdf)
+    }
+  #bind df together
+  argosdf<-rbind_all(argosdf)
+  
+  #merge with true positions
+  dxy<-merge(dxy,argosdf,by="Step")
+
   return(dxy)
 }
 ```
@@ -227,18 +280,25 @@ $$\theta_2 = pi = \text{Many reversals in turns}$$
 
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
 
-### Environment
+## Environment
 Whales tend to travel in deep habitats, slighlty weaker effect of ocean depth. The importance of this effect varies by individual.
 
 $$\alpha_{i,1,1} \sim Normal(-2,0.2)$$
-$$\beta_1{i,1,1} \sim Normal(1,0.1)$$
+$$\beta_{i,1,1} \sim Normal(1,0.1)$$
 
 $$\alpha_{i,2,1} \sim Normal(-2,0.2)$$
-$$\beta_1_{i,2,1} \sim Normal(1,0.1)$$
-The intercept alpha determines the crossing point, i.e the depth at which a foraging whale is likely to begin foraging. Here is set to be around 2000m water following 
-[dive profile based on Stimpert (2012).](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0051214)
+$$\beta_{i,2,1} \sim Normal(1,0.1)$$
 
-This is easiest to understand graphically.
+## Observation Model
+
+Discrete time steps ($x_i$) are related to irregularly spaced observed locations ($X_i$)
+
+$$ x_{n,t,i} = (1-j_{n,t,i})*X_{n,t-1} + j_{n,t,i}*X_{n,t} + \epsilon_{n,t,i}$$
+
+where 
+
+$$ j = \text{The proportion of time interval between locations}$$
+$$ \epsilon ~ N(0,\sigma_2)$$
 
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta,x){
@@ -309,14 +369,17 @@ mxy<-list()
 #individuals
 ind<-4
 
-#how many steps for each individual
-step.ind<-rpois(ind,100)
+#Total time length for each individual track
+step.ind<-abs(rnorm(ind,20))
+
+#time for each step
+step_length=4
 
 if(newModel){
     for(x in 1:ind){
-      mxy[[x]]<-traj(gamma=gamma,theta=theta,habitat=habitat,a1_mu=a1_mu,a1_sd=a1_sd,beta_mu=beta_mu,beta_sd=beta_sd,steps=step.ind[x])
+      mxy[[x]]<-traj(gamma=gamma,theta=theta,habitat=habitat,a1_mu=a1_mu,a1_sd=a1_sd,beta_mu=beta_mu,beta_sd=beta_sd,total_time = step.ind[x],step_length=step_length)
   } 
-  mxy<-melt(mxy,id.vars=c("x","y","Step","State","ocean"))
+  mxy<-melt(mxy,id.vars=c("x","y","Step","Hour","State","ocean"))
   #Label Individual
   colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
 
@@ -361,13 +424,16 @@ ind=max(mxy$Animal)
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Step~variable)
 
-data=list(y=obs,steps=steps,R=R,ocean=oc,ind=ind)
+#time diff array
+j<-acast(mxy,Animal~Step,value.var="Stepi")
+
+data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j)
 
 #paramters to track
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=4,DIC=FALSE)
+  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=800,n.thin=4,DIC=FALSE)
 }
 
 ```
