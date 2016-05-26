@@ -44,10 +44,10 @@ I simulated correlated random walks with similar properties to previous marine p
 
 ## Current State
 
-A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean.
+A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean. Observation error is modeled as normal distribution. Irregularly spaced observations are indexed to discrete time steps.
 
 ## To add
-* Observation Error
+* Observation Error based on location class and long tails (Brost 2015)
 * Posterior Model Checks
 * Seasonal Variation
 ** Variation in process error (Breed 2012)
@@ -460,7 +460,7 @@ data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=800,n.thin=2,DIC=FALSE)
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=80,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -581,7 +581,7 @@ ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State)
 #We just need Feeding behavior
 behav_chains<-pc[pc$Behavior == 2 & pc$parameter %in% "phi",]
 
-#arrange by step - capitalize
+#arrange by time - capitalize
 behav_chains$Step<-as.numeric(as.character(behav_chains$step))
 behav_chains<-behav_chains %>% arrange(Step)
 
@@ -591,18 +591,10 @@ levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
 #average phi
 mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(value))
-  
-#merge with input
-sxy<-split(mxy,mxy$Animal)
-sxy<-lapply(sxy,function(x){
-  x$Step<-1:nrow(x)
-  return(x)
-})
-mxy<-rbind_all(sxy)
 
 mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 
-ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=1.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal,scales="free")
+ggplot(data=mxy,aes(x=x, y=y,col=phi))+geom_path(size=1.5) + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal,scales="free") + theme_bw()
 
 #phi and ocean plot
 ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal)
@@ -611,17 +603,31 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 ##Autocorrelation in behavior
 
 ```{r}
-ggplot(data=mxy,aes(x=as.numeric(Step),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time Step",y="Liklihood of Feeding") + facet_wrap(~Animal)
+#create proper time stamp
+ggplot(data=mxy,aes(x=time,y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time (hour)",y="Liklihood of Feeding") + facet_wrap(~Animal)
 ```
 
 ##Phase prediction
 ```{r}
 ggplot(mxy[!is.na(mxy$State),],aes(x=phi,fill=State)) + geom_density(alpha=0.8) + labs("Probability of Feeding") + theme_bw() + labs(fill="True State",x="Estimate Probability of Feeding")
 
+#order by time.
+mxy<-mxy %>% arrange(Animal,`time`)
+
 #calculate runs
+sxy<-split(mxy,mxy$Animal)
+
 state_shade<-lapply(sxy,function(x){
+  
+  #run lengths
   state_change<-rle(as.numeric(x$State))
-  state_shade<-data.frame(xmin=c(0,cumsum(state_change$lengths[-length(state_change$lengths)])),xmax=cumsum(state_change$lengths),Behavior=state_change$values)
+  
+  #get time for each length switch
+  xt<-x$time[cumsum(state_change$lengths[-length(state_change$lengths)])]
+  xmax<-x$time[cumsum(state_change$lengths)]
+  
+  #time limits
+  state_shade<-data.frame(xmin=c(0,xt),xmax=xmax,Behavior=state_change$values)
 })
 names(state_shade)<-1:length(state_shade)
 state_shade<-melt(state_shade,c("xmin","xmax","Behavior"))
@@ -629,7 +635,7 @@ colnames(state_shade)<-c("xmin","xmax","Behavior","Animal")
 
 state_shade$Behavior<-as.factor(state_shade$Behavior)
 levels(state_shade$Behavior)<-c("Traveling","Feeding")
-ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=Step,y=phi)) + ylim(0,1) + labs(fill="True Behavior",y="Estimated Probability of Feeding")
+ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=time,y=phi)) + ylim(0,1) + labs(fill="True Behavior",y="Estimated Probability of Feeding")
 ```
 
 ##Behavioral description
@@ -687,8 +693,11 @@ $$ P(t) = Pr(T<t)$$
 with a pdf
 $$p(t) = \frac{dP(t)}{dt}$$
 
-The instantaneous risk of death at time t, conditional on survival to that time:
+The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
 
+$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\delta t}$$
+
+with covariates:
 $$log (h_i(t)) = \alpha + \beta_i *x$$
 
 The cox model has no intercept, making it semi-parametric
