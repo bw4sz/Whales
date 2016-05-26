@@ -224,6 +224,11 @@ traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_
   ##Measurement model
   argosdf<-list()
     
+  #first location has no interpolation error
+  argos_x<-rnorm(1,dxy[dxy$Step==1,c("x")],epsilon)
+  argos_y<-rnorm(1,dxy[dxy$Step==1,c("y")],epsilon)
+  argosdf[[1]]<-data.frame(Step=1,time=0.5,argos_x,argos_y)
+
   for (x in 2:steps){
     
       #which time slices sit in interval
@@ -280,7 +285,7 @@ $$\theta_2 = pi = \text{Many reversals in turns}$$
 Essentially, whales travel long straight distances to find food sources, but then stay in those patches for a long time. 
 
 ## Environment
-Whales tend to travel in deep habitats, slighlty weaker effect of ocean depth. The importance of this effect varies by individual.
+Whales tend to travel in deep habitats, slightly weaker effect of ocean depth. The importance of this effect varies by individual.
 
 $$\alpha_{i,1,1} \sim Normal(-2,0.2)$$
 $$\beta_{i,1,1} \sim Normal(1,0.1)$$
@@ -629,9 +634,9 @@ ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ym
 
 ###Average time in phase
 
-To calculate this, while propogating uncertainty, we can either save the state variable in jags, or draw multinomial draws from phi. Here we recreate it from phi.
+To calculate this, while propagating uncertainty, we can either save the state variable in jags, or draw multinomial draws from phi. Here we recreate it from phi.
 
-* For each draw, create a behavioral sequence, calulate the average runs for each behavior
+* For each draw, create a behavioral sequence, calculate the average runs for each behavior
 
 ## Failure time analysis
 
@@ -672,7 +677,7 @@ ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2
 
 ###Proportional Hazards
 
-Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the liklihood of death.
+Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
 
 Let T represent survival time.
 
@@ -680,7 +685,7 @@ $$ P(t) = Pr(T<t)$$
 with a pdf
 $$p(t) = \frac{dP(t)}{dt}$$
 
-The instantaneous risk of death at time t, confitional on survival to that time:
+The instantaneous risk of death at time t, conditional on survival to that time:
 
 $$log (h_i(t)) = \alpha + \beta_i *x$$
 
