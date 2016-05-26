@@ -1,0 +1,119 @@
+  |                                                                         |                                                                 |   0%  |                                                                         |..                                                               |   3%
+   inline R code fragments
+
+  |                                                                         |...                                                              |   5%
+label: unnamed-chunk-1 (with options) 
+List of 3
+ $ warning: logi FALSE
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+
+  |                                                                         |.....                                                            |   8%
+  ordinary text without R code
+
+  |                                                                         |.......                                                          |  11%
+label: unnamed-chunk-2 (with options) 
+List of 1
+ $ eval: symbol F
+
+  |                                                                         |.........                                                        |  13%
+  ordinary text without R code
+
+  |                                                                         |..........                                                       |  16%
+label: unnamed-chunk-3
+  |                                                                         |............                                                     |  18%
+  ordinary text without R code
+
+  |                                                                         |..............                                                   |  21%
+label: unnamed-chunk-4 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ fig.width : num 3.5
+
+  |                                                                         |...............                                                  |  24%
+  ordinary text without R code
+
+  |                                                                         |.................                                                |  26%
+label: unnamed-chunk-5
+  |                                                                         |...................                                              |  29%
+  ordinary text without R code
+
+  |                                                                         |.....................                                            |  32%
+label: unnamed-chunk-6
+  |                                                                         |......................                                           |  34%
+  ordinary text without R code
+
+  |                                                                         |........................                                         |  37%
+label: unnamed-chunk-7
+  |                                                                         |..........................                                       |  39%
+  ordinary text without R code
+
+  |                                                                         |...........................                                      |  42%
+label: unnamed-chunk-8 (with options) 
+List of 1
+ $ eval: symbol T
+
+  |                                                                         |.............................                                    |  45%
+  ordinary text without R code
+
+  |                                                                         |...............................                                  |  47%
+label: unnamed-chunk-9 (with options) 
+List of 1
+ $ fig.height: num 10
+
+  |                                                                         |................................                                 |  50%
+  ordinary text without R code
+
+  |                                                                         |..................................                               |  53%
+label: unnamed-chunk-10
+  |                                                                         |....................................                             |  55%
+  ordinary text without R code
+
+  |                                                                         |......................................                           |  58%
+label: unnamed-chunk-11
+  |                                                                         |.......................................                          |  61%
+  ordinary text without R code
+
+  |                                                                         |.........................................                        |  63%
+label: unnamed-chunk-12
+  |                                                                         |...........................................                      |  66%
+  ordinary text without R code
+
+  |                                                                         |............................................                     |  68%
+label: unnamed-chunk-13
+  |                                                                         |..............................................                   |  71%
+  ordinary text without R code
+
+  |                                                                         |................................................                 |  74%
+label: unnamed-chunk-14
+  |                                                                         |..................................................               |  76%
+  ordinary text without R code
+
+  |                                                                         |...................................................              |  79%
+label: unnamed-chunk-15
+  |                                                                         |.....................................................            |  82%
+  ordinary text without R code
+
+  |                                                                         |.......................................................          |  84%
+label: unnamed-chunk-16
+  |                                                                         |........................................................         |  87%
+  ordinary text without R code
+
+  |                                                                         |..........................................................       |  89%
+label: unnamed-chunk-17 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ fig.with  : num 3.5
+
+  |                                                                         |............................................................     |  92%
+  ordinary text without R code
+
+  |                                                                         |..............................................................   |  95%
+label: unnamed-chunk-18
+  |                                                                         |...............................................................  |  97%
+  ordinary text without R code
+
+  |                                                                         |.................................................................| 100%
+label: unnamed-chunk-19
+
+/usr/bin/pandoc +RTS -K512m -RTS MultiSpeciesHMM.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output MultiSpeciesHMM.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpAeXqHc/rmarkdown-str5a1fa6d962.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
