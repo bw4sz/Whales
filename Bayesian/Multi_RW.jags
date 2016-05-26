@@ -8,10 +8,10 @@
 
     ###First Step###
 
-    ## Priors for first location
+    ## Priors for first true location
     #for lat long
     for(k in 1:2){
-      y[i,1,k] ~ dnorm(argos[i,1,,k],itau2.prior)
+      y[i,1,k] ~ dnorm(argos[i,1,1,k],itau2.prior)
     }
 
     #First movement - random walk.

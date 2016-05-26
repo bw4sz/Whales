@@ -386,7 +386,6 @@ if(newModel){
   mxy<-melt(mxy,id.vars=colnames(mxy[[1]]))
   #Label Individual
   colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
-
 }
 
 #bounding box
@@ -439,7 +438,10 @@ obs<-melt(mxy,measure.vars=c("argos_x","argos_y"))
 obs<-acast(obs,Animal~Step~jStep~variable)
 
 #time diff array
-j<-acast(mxy,Animal~Step~jStep,value.var="Hour")
+mxy$j<-(mxy$time-step_length*(mxy$Step-1))/step_length
+j<-acast(mxy,Animal~Step~jStep,value.var="j")
+
+
 ```
 
 ```{r,eval=T}
@@ -458,7 +460,7 @@ data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=800,n.thin=4,DIC=FALSE)
+  jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=800,n.thin=2,DIC=FALSE)
 }
 
 ```
