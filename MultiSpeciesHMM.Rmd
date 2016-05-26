@@ -24,7 +24,6 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(survival)
-library(survMisc)
 
 #New model to be run, flag turned off if just updating.
 newModel<-TRUE
@@ -105,7 +104,7 @@ traj<-function(gamma=gamma,theta=theta,habitat=habitat,a1_mu,a1_sd,beta_mu,beta_
   steps<-length(seq(0,total_time*24,by=step_length))
   
   #generate observations along time interval
-  timestep<-sort(runif(100,0,total_time) * 24)  
+  timestep<-sort(runif(300,0,total_time) * 24)  
   
   ##Argos Observation error if 1 degree is 112 km, 0.01 would be ~ 1km error.
   epsilon=0.01
@@ -379,7 +378,7 @@ if(newModel){
     for(x in 1:ind){
       mxy[[x]]<-traj(gamma=gamma,theta=theta,habitat=habitat,a1_mu=a1_mu,a1_sd=a1_sd,beta_mu=beta_mu,beta_sd=beta_sd,total_time = step.ind[x],step_length=step_length)
   } 
-  mxy<-melt(mxy,id.vars=c("x","y","Step","Hour","State","ocean"))
+  mxy<-melt(mxy,id.vars=colnames(mxy[[1]]))
   #Label Individual
   colnames(mxy)[colnames(mxy) %in% 'L1']<-"Animal"
 
@@ -401,6 +400,43 @@ ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(meth
 
 The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
 
+```{r}
+
+#Format matrices for jags
+
+#Get the total time, divide into steps, round up
+steps_all<-mxy %>% group_by(Animal) %>% summarize(mt=max(time,na.rm=T)) %>% mutate(n=floor(mt/step_length))
+
+#How many observations in each step length segment
+mxy$bin<-as.numeric(cut(mxy$time,seq(0,max(steps_all$mt),by=step_length)),include.lowest=TRUE)
+
+# give each step a label
+stepmxy<-split(mxy,list(mxy$Step,mxy$Animal),drop = TRUE)
+stepmxy<-lapply(stepmxy,function(x){
+  x$jStep<-1:nrow(x)
+  return(x)
+})
+
+mxy<-rbind_all(stepmxy)
+
+#how many observations per individual in each bin
+mxy$bin<-factor(mxy$bin,levels=1:max(steps_all$n))
+idx<-as.matrix(table(mxy$Animal,mxy$bin))
+
+#make ocean a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
+oc<-acast(mxy,Animal~Step,value.var="ocean",fun.aggregate = mean)
+
+#Individuals
+ind=max(mxy$Animal)
+
+#obs array
+obs<-melt(mxy,measure.vars=c("argos_x","argos_y"))
+obs<-acast(obs,Animal~Step~jStep~variable)
+
+#time diff array
+j<-acast(mxy,Animal~Step~jStep,value.var="Hour")
+```
+
 ```{r,eval=T}
 #source model
 source("Bayesian/MultiSpecies.R")
@@ -411,23 +447,7 @@ print.noquote(readLines("Bayesian/MultiSpecies.R"))
 #prior shape
 R <- diag(c(1,1))
 
-#steps for each individual
-steps<-as.numeric(table(mxy$Animal))
-
-#make ocean a matrix
-oc<-acast(mxy,Animal~Step,value.var="ocean")
-
-#Individuals
-ind=max(mxy$Animal)
-
-#obs array
-obs<-melt(mxy,measure.vars=c("x","y"))
-obs<-acast(obs,Animal~Step~variable)
-
-#time diff array
-j<-acast(mxy,Animal~Step,value.var="Stepi")
-
-data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j)
+data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
 
 #paramters to track
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")

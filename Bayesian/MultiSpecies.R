@@ -12,7 +12,7 @@ cat("
     ## Priors for first location
     #for lat long
     for(k in 1:2){
-      y[i,1,k] ~ dnorm(argos[i,1,k],itau2.prior)
+      y[i,1,k] ~ dnorm(argos[i,1,,k],itau2.prior)
     }
 
     #First movement - random walk.
@@ -49,16 +49,23 @@ cat("
     state[i,steps[i]] ~ dcat(phi[i,steps[i],])
     
     ##	Measurement equation - irregular observations
-    for(t in 2:steps[i]){					# loops over regular time intervals (t)
-        zhat[i,t,1:2] <- (1-j[i,t]) * y[i,t-1,1:2] + j[i,t] * y[i,t,1:2]
-      #for lat and long
-      for (k in 1:2){
-        #argos error
-        argos[i,t,k] ~ dnorm(zhat[i,t,k],itau2.prior)
-        }
-      }	
-    }
+    # loops over regular time intervals (t)    
+    
+    for(t in 2:steps[i]){					
+    
+    # loops over observed locations within interval t
+    for(u in 1:idx[i,t]){ 
+      zhat[i,t,u,1:2] <- (1-j[i,t,u]) * y[i,t-1,1:2] + j[i,t,u] * y[i,t,1:2]
 
+        #for each lat and long
+        for (k in 1:2){
+          #argos error
+          argos[i,t,u,k] ~ dnorm(zhat[i,t,u,k],itau2.prior)
+          }
+        }	
+      }
+    }
+    
     ###Priors###
 
     #Process Variance
@@ -129,7 +136,6 @@ cat("
 
     ##Argos priors##
     itau2.prior ~ dunif(0,10)
-    
     }"
     ,fill=TRUE)
 sink()
