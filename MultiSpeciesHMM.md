@@ -170,10 +170,10 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##  [48]     phi[i,steps[i],2] <- 1-phi[i,steps[i],1]                                                                    
 ##  [49]     state[i,steps[i]] ~ dcat(phi[i,steps[i],])                                                                  
 ##  [50]                                                                                                                 
-##  [51]     ##\tMeasurement equation - irregular observations                                                            
+##  [51]     ##\tMeasurement equation - irregular observations                                                           
 ##  [52]     # loops over regular time intervals (t)                                                                     
 ##  [53]                                                                                                                 
-##  [54]     for(t in 2:steps[i]){\t\t\t\t\t                                                                                  
+##  [54]     for(t in 2:steps[i]){\t\t\t\t\t                                                                             
 ##  [55]                                                                                                                 
 ##  [56]     # loops over observed locations within interval t                                                           
 ##  [57]     for(u in 1:idx[i,t]){                                                                                       
@@ -184,7 +184,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ##  [62]           #argos error                                                                                          
 ##  [63]           argos[i,t,u,k] ~ dnorm(zhat[i,t,u,k],itau2.prior)                                                     
 ##  [64]           }                                                                                                     
-##  [65]         }\t                                                                                                      
+##  [65]         }\t                                                                                                     
 ##  [66]       }                                                                                                         
 ##  [67]     }                                                                                                           
 ##  [68]                                                                                                                 
@@ -263,6 +263,11 @@ The goal of the model is to capture the true parameter we simulated above. As we
 ## [141] sink()
 ```
 
+```
+##    user  system elapsed 
+##   3.949   0.286 741.076
+```
+
 ##Chains
 ![](MultiSpeciesHMM_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
@@ -319,7 +324,7 @@ $$p(t) = \frac{dP(t)}{dt}$$
 
 The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
 
-$$ h(t) = \lim{\delta t\to\0} \frac{Pr[(t<T<t + \delta_t)]|T>t}{\delta t}$$
+$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\delta t}$$
 
 with covariates:
 $$log (h_i(t)) = \alpha + \beta_i *x$$
@@ -333,25 +338,25 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$runs, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 2724, number of events= 2724 
+##   n= 368075, number of events= 368075 
 ## 
-##                   coef exp(coef) se(coef)      z Pr(>|z|)    
-## feedr$Animal2 -0.44397   0.64149  0.05258 -8.444  < 2e-16 ***
-## feedr$Animal3 -0.03910   0.96165  0.05418 -0.722     0.47    
-## feedr$Animal4 -0.40116   0.66954  0.05782 -6.938 3.97e-12 ***
+##                    coef exp(coef)  se(coef)       z Pr(>|z|)    
+## feedr$Animal2  0.022500  1.022755  0.004292   5.242 1.59e-07 ***
+## feedr$Animal3 -0.283690  0.753000  0.004935 -57.482  < 2e-16 ***
+## feedr$Animal4  0.224762  1.252024  0.004524  49.687  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2    0.6415      1.559    0.5787    0.7111
-## feedr$Animal3    0.9617      1.040    0.8648    1.0694
-## feedr$Animal4    0.6695      1.494    0.5978    0.7499
+## feedr$Animal2     1.023     0.9778    1.0142    1.0314
+## feedr$Animal3     0.753     1.3280    0.7458    0.7603
+## feedr$Animal4     1.252     0.7987    1.2410    1.2632
 ## 
-## Concordance= 0.657  (se = 0.034 )
-## Rsquare= 0.039   (max possible= 1 )
-## Likelihood ratio test= 108.1  on 3 df,   p=0
-## Wald test            = 108.5  on 3 df,   p=0
-## Score (logrank) test = 109.8  on 3 df,   p=0
+## Concordance= 0.579  (se = 0.002 )
+## Rsquare= 0.025   (max possible= 1 )
+## Likelihood ratio test= 9131  on 3 df,   p=0
+## Wald test            = 8926  on 3 df,   p=0
+## Score (logrank) test = 9021  on 3 df,   p=0
 ```
 
 ![](MultiSpeciesHMM_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
