@@ -6,13 +6,13 @@ cat("
     pi <- 3.141592653589
     
     ##argos observation error##
-    #argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
     
     #Constructing the covariance matrix
-    #argos_cov[1,1] <- 1
-    #argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    #argos_cov[2,1] <- sqrt(argos_alpha) * rho
-    #argos_cov[2,2] <- argos_alpha
+    argos_cov[1,1] <- 1
+    argos_cov[1,2] <- sqrt(argos_alpha) * rho
+    argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
 
@@ -20,7 +20,7 @@ cat("
 
     ## Priors for first true location -> this is wrong, conflates observation and process error.
     #for lat long
-    y[i,1,1:2] ~ dt(argos[i,1,1,1:2],argos_prec,4)
+    y[i,1,1:2] ~ dnorm(argos[i,1,1,1:2],argos_prec)
 
     #First movement - random walk.
     y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)
@@ -140,15 +140,14 @@ cat("
     lambda[2] <- 1 - lambda[1]
 
     ##Argos priors##
-    
     #longitudinal argos error
-    #argos_sigma ~ dunif(0,10)
+    argos_sigma ~ dunif(0,10)
     
     #latitidunal argos error
-    #argos_alpha~dunif(0,10)
+    argos_alpha~dunif(0,10)
     
     #correlation in argos error
-    #rho ~ dunif(-1, 1)
+    rho ~ dunif(-1, 1)
     
 
     }"
