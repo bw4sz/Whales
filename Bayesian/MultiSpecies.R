@@ -20,7 +20,7 @@ cat("
 
     ## Priors for first true location -> this is wrong, conflates observation and process error.
     #for lat long
-    y[i,1,1:2] ~ dnorm(argos[i,1,1,1:2],argos_prec)
+    y[i,1,1:2] ~ dmnorm(argos[i,1,1,1:2],argos_prec)
 
     #First movement - random walk.
     y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)

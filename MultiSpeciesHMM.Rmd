@@ -451,8 +451,7 @@ print.noquote(readLines("Bayesian/MultiSpecies.R"))
 
 #prior cov shape
 R <- diag(c(1,1))
-argos_prec<-c(0.1,0.1)
-data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx,argos_prec=argos_prec)
+data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
 
 #paramters to track
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
