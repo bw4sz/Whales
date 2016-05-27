@@ -344,15 +344,15 @@ beta_mu=c(1,1)
 #sd
 beta_sd=c(0.1,0.1)
 
-#Simulate environment
-#Create environment
-#m<-raster(mountains(7,0.2))
-#r<-(m-max(m[]))*-3
-#ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA)
-#r2<-setExtent(r,ras2)
-#habitat<-resample(r2,ras2)
-
 if(newModel){
+  #Simulate environment
+  #Spatial auto correlated?
+  #m<-raster(mountains(7,0.2))
+  #r<-(m-max(m[]))*-3
+  #ras2<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA)
+  #r2<-setExtent(r,ras2)
+  #habitat<-resample(r2,ras2)
+  
   habitat<-raster(xmn=-100,xmx=100,ymn=-100,ymx=100,resolution=0.25,crs=NA,vals=runif(640000,0,6))
 }
 
@@ -405,7 +405,6 @@ ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(meth
 The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
 
 ```{r}
-
 #Format matrices for jags
 
 #Get the total time, divide into steps, round up
@@ -441,7 +440,6 @@ obs<-acast(obs,Animal~Step~jStep~variable)
 mxy$j<-(mxy$time-step_length*(mxy$Step-1))/step_length
 j<-acast(mxy,Animal~Step~jStep,value.var="j")
 
-
 ```
 
 ```{r,eval=T}
@@ -451,16 +449,16 @@ source("Bayesian/MultiSpecies.R")
 #print model
 print.noquote(readLines("Bayesian/MultiSpecies.R"))
 
-#prior shape
+#prior cov shape
 R <- diag(c(1,1))
-
-data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
+argos_prec<-c(0.1,0.1)
+data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx,argos_prec=argos_prec)
 
 #paramters to track
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=15000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1500,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -642,16 +640,7 @@ ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ym
 
 ###Average time in phase
 
-To calculate this, while propagating uncertainty, we can either save the state variable in jags, or draw multinomial draws from phi. Here we recreate it from phi.
-
 * For each draw, create a behavioral sequence, calculate the average runs for each behavior
-
-## Failure time analysis
-
-* Fit a curve to the runs as a function of time to get 'patch time'
-* the curve could be a function of temporal covariates.
-* per draw? How to get confidence intervals?
-* cox regression - see jenica allen and jeff diez.
 
 ## Predicted Run Length
 ```{r}
