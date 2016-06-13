@@ -58,7 +58,7 @@ cat("
     ##	Measurement equation - irregular observations
     # loops over regular time intervals (t)    
     
-    for(t in 2:steps[i]){					
+    for(t in 2:steps[i]){
     
     # loops over observed locations within interval t
     for(u in 1:idx[i,t]){ 
@@ -67,7 +67,7 @@ cat("
         #for each lat and long
           #argos error
           argos[i,t,u,1:2] ~ dmnorm(zhat[i,t,u,1:2],argos_prec)
-        }	
+        }
       }
     }
     

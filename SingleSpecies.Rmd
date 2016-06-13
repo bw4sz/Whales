@@ -40,7 +40,6 @@ newModel<-TRUE
 
 #Abstract
 
-We are currently ignoring any observation process or time regularization.
 
 ```{r}
 mdat<-read.csv("InputData/FullData-550793189439001813.csv")
@@ -58,10 +57,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131142","131159","131153"),]
+mxy<-mxy[mxy$Animal %in% c("131159","131153","131130"),]
 
 #grab three individuals
-#mxy<-mxy[mxy$Animal %in% c('131133','131120','131118'),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
 
@@ -80,21 +78,21 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs
 
 ##Distance Statistics
 
-```{r}
+```{r,fig.height=5}
 moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal)
 dstat<-melt(move::distanceSummary(moved))
 ggplot(dstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
 ##Temporal Statistics
-```{r}
+```{r,fig.height=4}
 tstat<-move::timeSummary(moved)
 tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
 ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
 ##Velocity Statistics
-```{r}
+```{r,fig.height=3}
 vstat<-move::speedSummary(moved)
 vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
 ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
@@ -102,7 +100,7 @@ ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free"
 
 ##Angle Statistics
 
-```{r}
+```{r,fig.height=3}
 astat<-move::angleSummary(moved)
 astat<-melt(astat,measure.vars=colnames(astat[[1]]))
 ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
@@ -114,20 +112,6 @@ load("MultiSpecies.RData")
 jags$recompile()
 newModel<-F
 ```
-
-#Abstract
-I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
-
-## Current State
-
-A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean. Observation error is modeled as normal distribution. Irregularly spaced observations are indexed to discrete time steps.
-
-## To add
-* Observation Error based on long tails (Brost 2015)
-* Posterior Model Checks
-* Seasonal Variation
-** Variation in process error (Breed 2012)
-** Variation in diel?
 
 #Correlated random walk
 
@@ -262,7 +246,7 @@ data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1500,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9500,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -392,7 +376,7 @@ mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
 
 ##Spatial Prediction
 ```{r}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),size=.5))
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi),size=.5)+ scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") 
 ```
 
 ```{r,fig.height=15,fig.width=12}
@@ -402,7 +386,7 @@ spp<-lapply(sxy,function(x){
   m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
-marrangeGrob(spp,ncol=2,nrow=(length(spp)/2)+1)
+spp
 ```
 
 ##Log Odds of Feeding

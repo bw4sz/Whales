@@ -258,7 +258,7 @@ The goal of the model is to capture the true parameter we simulated above. As we
 
 ```
 ##    user  system elapsed 
-##    3.66    1.57  774.15
+##    3.14    1.01 1581.58
 ```
 
 ##Chains
@@ -279,14 +279,16 @@ The goal of the model is to capture the true parameter we simulated above. As we
 
 
 ##Spatial Prediction
-![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ##Log Odds of Feeding
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 ##Phase prediction
 
@@ -299,9 +301,9 @@ The goal of the model is to capture the true parameter we simulated above. As we
 * For each draw, create a behavioral sequence, calculate the average runs for each behavior
 
 ## Predicted Run Length
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 ###Proportional Hazards
 
@@ -329,25 +331,25 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 1947, number of events= 1947 
+##   n= 4897, number of events= 4897 
 ## 
-##                  coef exp(coef) se(coef)      z Pr(>|z|)    
-## feedr$Animal2 0.35861   1.43134  0.06598  5.435 5.47e-08 ***
-## feedr$Animal3 1.35605   3.88085  0.07400 18.325  < 2e-16 ***
+##                  coef exp(coef) se(coef)     z Pr(>|z|)    
+## feedr$Animal2 0.71622   2.04669  0.04188 17.10   <2e-16 ***
+## feedr$Animal3 1.40970   4.09473  0.04238 33.26   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2     1.431     0.6986     1.258     1.629
-## feedr$Animal3     3.881     0.2577     3.357     4.487
+## feedr$Animal2     2.047     0.4886     1.885     2.222
+## feedr$Animal3     4.095     0.2442     3.768     4.449
 ## 
-## Concordance= 0.569  (se = 0.008 )
-## Rsquare= 0.181   (max possible= 1 )
-## Likelihood ratio test= 389.8  on 2 df,   p=0
-## Wald test            = 377.7  on 2 df,   p=0
-## Score (logrank) test = 417.2  on 2 df,   p=0
+## Concordance= 0.624  (se = 0.005 )
+## Rsquare= 0.225   (max possible= 1 )
+## Likelihood ratio test= 1249  on 2 df,   p=0
+## Wald test            = 1121  on 2 df,   p=0
+## Score (logrank) test = 1228  on 2 df,   p=0
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 
