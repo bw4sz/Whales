@@ -17,7 +17,7 @@
 
     ###First Step###
 
-    ## Priors for first true location -> this is wrong, conflates observation and process error.
+    ## Priors for first true location
     #for lat long
     y[i,1,1:2] ~ dmnorm(argos[i,1,1,1:2],argos_prec)
 

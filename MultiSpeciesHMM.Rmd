@@ -47,7 +47,7 @@ I simulated correlated random walks with similar properties to previous marine p
 A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean. Observation error is modeled as normal distribution. Irregularly spaced observations are indexed to discrete time steps.
 
 ## To add
-* Observation Error based on location class and long tails (Brost 2015)
+* Observation Error based on long tails (Brost 2015)
 * Posterior Model Checks
 * Seasonal Variation
 ** Variation in process error (Breed 2012)
@@ -605,6 +605,7 @@ ggplot(data=mxy,aes(x=time,y=phi,col=ocean)) + geom_line(aes(group=Animal),size=
 ```
 
 ##Phase prediction
+
 ```{r}
 ggplot(mxy[!is.na(mxy$State),],aes(x=phi,fill=State)) + geom_density(alpha=0.8) + labs("Probability of Feeding") + theme_bw() + labs(fill="True State",x="Estimate Probability of Feeding")
 
@@ -683,7 +684,7 @@ $$p(t) = \frac{dP(t)}{dt}$$
 
 The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
 
-$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\delta t}$$
+$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\Delta t}$$
 
 with covariates:
 $$log (h_i(t)) = \alpha + \beta_i *x$$
@@ -716,7 +717,6 @@ tf<-coxph(Surv(time=feedr$runs,event=feedr$status)~feedr$Animal)
 summary(tf)
 plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (steps)")
 ```
-
 
 ```{r}
 save.image("MultiSpecies.RData")

@@ -1,51 +1,53 @@
 # Antarctic Whale Project: Single Species
 Ben Weinstein  
-May 5th, 2016  
+`r format(Sys.time(), '%d %B, %Y')`  
 
 
 
 
-```
-## Compiling model graph
-##    Resolving undeclared variables
-##    Allocating nodes
-## Graph information:
-##    Observed stochastic nodes: 59
-##    Unobserved stochastic nodes: 69
-##    Total graph size: 4760
-## 
-## Initializing model
-## 
-## Adapting
-```
 
 #Abstract
 
 We are currently ignoring any observation process or time regularization.
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 
-```
-## Compiling model graph
-##    Resolving undeclared variables
-##    Allocating nodes
-## Graph information:
-##    Observed stochastic nodes: 796
-##    Unobserved stochastic nodes: 810
-##    Total graph size: 176752
-## 
-## Initializing model
-## 
-## Adapting
-```
+#Observation Filter
+
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+##Distance Statistics
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+##Temporal Statistics
+![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+##Velocity Statistics
+![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+##Angle Statistics
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+
 
 #Abstract
+I simulated correlated random walks with similar properties to previous marine pinnepid studies. The virtue of the simulation is that we can build complexity slowly. At each step we can verify that the model captures the true, known, relationship. Once we have developed a model that satisfies our aims, we can then apply it to the observed data.
 
+## Current State
 
-#Movement model
+A dynamic correlated random walk with two states (traveling, feeding) that are a function of local environmental conditions. There are multiple individuals whose covariates are drawn from a group level mean. Observation error is modeled as normal distribution. Irregularly spaced observations are indexed to discrete time steps.
 
-Dynamic correlation random walk following Jonsen (2005) and Jonsen (2016).
+## To add
+* Observation Error based on long tails (Brost 2015)
+* Posterior Model Checks
+* Seasonal Variation
+** Variation in process error (Breed 2012)
+** Variation in diel?
+
+#Correlated random walk
 
 *Process Model*
 
@@ -54,26 +56,33 @@ $$ x_t = x_{t-1} + d_{t} $$
 
 ## Parameters
 
+For each individual:
+
 $$\theta = \text{Mean turning angle}$$
 $$\gamma = \text{Move persistence} $$
 
-###Behavioral States
+For both behaviors process variance is:
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
 
+##Behavioral States
+
+$$ \text{For each individual i}$$
 $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
-$$ \alpha_{1,1} = \text{Probability of remaining traveling when traveling}$$
-$$\alpha_{2,1} = \text{Probability of switching from feeding to traveling}$$
+$$ \alpha_{i,1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{i,2,1} = \text{Probability of switching from feeding to traveling}$$
 
 $$\begin{matrix}
-  \alpha_{1,1} & 1-\alpha_{1,1} \\
-  \alpha_{2,1} & 1-\alpha_{2,1} \\
+  \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
+  \alpha_{i,2,1} & 1-\alpha_{i,2,1} \\
 \end{matrix}
 $$
 
-###Environment
+##Environment
 
-Behavioral states are a function of local environmental conditions. Here I use ocean depth as a first covariate.
+Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
 
 It generally follows the form, conditional on behavior at t -1:
 
@@ -84,160 +93,261 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 
 
-
-#Model Fitting
-
 The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
 
 
+
+
 ```
-##  [1] sink("Bayesian/Multi_RW.jags")                                                                  
-##  [2] cat("                                                                                           
-##  [3]     model{                                                                                      
-##  [4]                                                                                                 
-##  [5]     #Constants                                                                                  
-##  [6]     pi <- 3.141592653589                                                                        
-##  [7]                                                                                                 
-##  [8]     for(i in 1:ind){                                                                            
-##  [9]                                                                                                 
-## [10]     ###First Step###                                                                            
-## [11]     #First movement - random walk.                                                              
-## [12]     y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)                                                      
-## [13]                                                                                                 
-## [14]     ###First Behavioral State###                                                                
-## [15]     state[i,1] ~ dcat(lambda[]) ## assign state for first obs                                   
-## [16]                                                                                                 
-## [17]     #Process Model for movement                                                                 
-## [18]     for(t in 2:(steps-1)){                                                                      
-## [19]                                                                                                 
-## [20]     #Behavioral State at time T                                                                 
-## [21]     logit(phi[i,t,1]) <- lalpha[state[i,t-1]] + lbeta[state[i,t-1]] * ocean[i,t]                
-## [22]     phi[i,t,2] <- 1-phi[i,t,1]                                                                  
-## [23]     state[i,t] ~ dcat(phi[i,t,])                                                                
-## [24]                                                                                                 
-## [25]     #Turning covariate                                                                          
-## [26]     #Transition Matrix for turning angles                                                       
-## [27]     T[i,t,1,1] <- cos(theta[state[i,t]])                                                        
-## [28]     T[i,t,1,2] <- (-sin(theta[state[i,t]]))                                                     
-## [29]     T[i,t,2,1] <- sin(theta[state[i,t]])                                                        
-## [30]     T[i,t,2,2] <- cos(theta[state[i,t]])                                                        
-## [31]                                                                                                 
-## [32]     #Correlation in movement change                                                             
-## [33]     d[i,t,1:2] <- y[i,t,] + gamma[state[i,t]] * T[i,t,,] %*% (y[i,t,1:2] - y[i,t-1,1:2])        
-## [34]                                                                                                 
-## [35]     #Gaussian Displacement                                                                      
-## [36]     y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)                                                    
-## [37]     }                                                                                           
-## [38]     #Final behavior state                                                                       
-## [39]     logit(phi[i,steps,1]) <- lalpha[state[i,steps-1]] + lbeta[state[i,steps-1]] * ocean[i,steps]
-## [40]     phi[i,steps,2] <- 1-phi[i,steps,1]                                                          
-## [41]     state[i,steps] ~ dcat(phi[i,steps,])                                                        
-## [42]     }                                                                                           
-## [43]                                                                                                 
-## [44]     #Priors                                                                                     
-## [45]     #Process Variance                                                                           
-## [46]     iSigma ~ dwish(R,2)                                                                         
-## [47]     Sigma <- inverse(iSigma)                                                                    
-## [48]                                                                                                 
-## [49]     ##Mean Angle                                                                                
-## [50]     tmp[1] ~ dbeta(10, 10)                                                                      
-## [51]     tmp[2] ~ dbeta(10, 10)                                                                      
-## [52]                                                                                                 
-## [53]     # prior for theta in 'traveling state'                                                      
-## [54]     theta[1] <- (2 * tmp[1] - 1) * pi                                                           
-## [55]                                                                                                 
-## [56]     # prior for theta in 'foraging state'                                                       
-## [57]     theta[2] <- (tmp[2] * pi * 2)                                                               
-## [58]                                                                                                 
-## [59]     ##Move persistance                                                                          
-## [60]     # prior for gamma (autocorrelation parameter) in state 1                                    
-## [61]     gamma[1] ~ dbeta(5,2)                                                                       
-## [62]                                                                                                 
-## [63]     # prior for gamma in state 2                                                                
-## [64]     gamma[2] ~ dbeta(2,5)                                                                       
-## [65]                                                                                                 
-## [66]     ##Behavioral States                                                                         
-## [67]     # Following lunn 2012 p85                                                                   
-## [68]                                                                                                 
-## [69]     # prob of being in state 1 at t, given in state 1 at t-1                                    
-## [70]     lalpha[1] ~ dnorm(0,0.386)                                                                  
-## [71]     logit(alpha[1]) <- lalpha[1]                                                                
-## [72]                                                                                                 
-## [73]     lbeta[1] ~ dnorm(0,0.386)                                                                   
-## [74]     logit(beta[1]) <- lbeta[1]                                                                  
-## [75]                                                                                                 
-## [76]     #Prob of transition to state 1 given state 2 at t-1                                         
-## [77]     lalpha[2] ~ dnorm(0,0.386)                                                                  
-## [78]     logit(alpha[2]) <- lalpha[2]                                                                
-## [79]                                                                                                 
-## [80]     lbeta[2] ~ dnorm(0,0.386)                                                                   
-## [81]     logit(beta[2]) <- lbeta[2]                                                                  
-## [82]                                                                                                 
-## [83]     #Probability of behavior switching                                                          
-## [84]     lambda[1] ~ dbeta(1,1)                                                                      
-## [85]     lambda[2] <- 1 - lambda[1]                                                                  
-## [86]                                                                                                 
-## [87]     }"                                                                                          
-## [88]     ,fill=TRUE)                                                                                 
-## [89] sink()
+##   [1] sink("Bayesian/Multi_RW.jags")                                                                                  
+##   [2] cat("                                                                                                           
+##   [3]     model{                                                                                                      
+##   [4]                                                                                                                 
+##   [5]     #Constants                                                                                                  
+##   [6]     pi <- 3.141592653589                                                                                        
+##   [7]                                                                                                                 
+##   [8]     ##argos observation error##                                                                                 
+##   [9]     argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])                                                    
+##  [10]                                                                                                                 
+##  [11]     #Constructing the covariance matrix                                                                         
+##  [12]     argos_cov[1,1] <- 1                                                                                         
+##  [13]     argos_cov[1,2] <- sqrt(argos_alpha) * rho                                                                   
+##  [14]     argos_cov[2,1] <- sqrt(argos_alpha) * rho                                                                   
+##  [15]     argos_cov[2,2] <- argos_alpha                                                                               
+##  [16]                                                                                                                 
+##  [17]     for(i in 1:ind){                                                                                            
+##  [18]                                                                                                                 
+##  [19]     ###First Step###                                                                                            
+##  [20]                                                                                                                 
+##  [21]     ## Priors for first true location                                                                           
+##  [22]     #for lat long                                                                                               
+##  [23]     y[i,1,1:2] ~ dmnorm(argos[i,1,1,1:2],argos_prec)                                                            
+##  [24]                                                                                                                 
+##  [25]     #First movement - random walk.                                                                              
+##  [26]     y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)                                                                      
+##  [27]                                                                                                                 
+##  [28]     ###First Behavioral State###                                                                                
+##  [29]     state[i,1] ~ dcat(lambda[]) ## assign state for first obs                                                   
+##  [30]                                                                                                                 
+##  [31]     #Process Model for movement                                                                                 
+##  [32]     for(t in 2:(steps[i]-1)){                                                                                   
+##  [33]                                                                                                                 
+##  [34]     #Behavioral State at time T                                                                                 
+##  [35]     logit(phi[i,t,1]) <- lalpha[i,state[i,t-1]] + lbeta[i,state[i,t-1]] * ocean[i,t]                            
+##  [36]     phi[i,t,2] <- 1-phi[i,t,1]                                                                                  
+##  [37]     state[i,t] ~ dcat(phi[i,t,])                                                                                
+##  [38]                                                                                                                 
+##  [39]     #Turning covariate                                                                                          
+##  [40]     #Transition Matrix for turning angles                                                                       
+##  [41]     T[i,t,1,1] <- cos(theta[state[i,t]])                                                                        
+##  [42]     T[i,t,1,2] <- (-sin(theta[state[i,t]]))                                                                     
+##  [43]     T[i,t,2,1] <- sin(theta[state[i,t]])                                                                        
+##  [44]     T[i,t,2,2] <- cos(theta[state[i,t]])                                                                        
+##  [45]                                                                                                                 
+##  [46]     #Correlation in movement change                                                                             
+##  [47]     d[i,t,1:2] <- y[i,t,] + gamma[state[i,t]] * T[i,t,,] %*% (y[i,t,1:2] - y[i,t-1,1:2])                        
+##  [48]                                                                                                                 
+##  [49]     #Gaussian Displacement                                                                                      
+##  [50]     y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)                                                                    
+##  [51]     }                                                                                                           
+##  [52]                                                                                                                 
+##  [53]     #Final behavior state                                                                                       
+##  [54]     logit(phi[i,steps[i],1]) <- lalpha[i,state[i,steps[i]-1]] + lbeta[i,state[i,steps[i]-1]] * ocean[i,steps[i]]
+##  [55]     phi[i,steps[i],2] <- 1-phi[i,steps[i],1]                                                                    
+##  [56]     state[i,steps[i]] ~ dcat(phi[i,steps[i],])                                                                  
+##  [57]                                                                                                                 
+##  [58]     ##\tMeasurement equation - irregular observations                                                            
+##  [59]     # loops over regular time intervals (t)                                                                     
+##  [60]                                                                                                                 
+##  [61]     for(t in 2:steps[i]){\t\t\t\t\t                                                                                  
+##  [62]                                                                                                                 
+##  [63]     # loops over observed locations within interval t                                                           
+##  [64]     for(u in 1:idx[i,t]){                                                                                       
+##  [65]       zhat[i,t,u,1:2] <- (1-j[i,t,u]) * y[i,t-1,1:2] + j[i,t,u] * y[i,t,1:2]                                    
+##  [66]                                                                                                                 
+##  [67]         #for each lat and long                                                                                  
+##  [68]           #argos error                                                                                          
+##  [69]           argos[i,t,u,1:2] ~ dmnorm(zhat[i,t,u,1:2],argos_prec)                                                 
+##  [70]         }\t                                                                                                      
+##  [71]       }                                                                                                         
+##  [72]     }                                                                                                           
+##  [73]                                                                                                                 
+##  [74]     ###Priors###                                                                                                
+##  [75]                                                                                                                 
+##  [76]     #Process Variance                                                                                           
+##  [77]     iSigma ~ dwish(R,2)                                                                                         
+##  [78]     Sigma <- inverse(iSigma)                                                                                    
+##  [79]                                                                                                                 
+##  [80]     ##Mean Angle                                                                                                
+##  [81]     tmp[1] ~ dbeta(10, 10)                                                                                      
+##  [82]     tmp[2] ~ dbeta(10, 10)                                                                                      
+##  [83]                                                                                                                 
+##  [84]     # prior for theta in 'traveling state'                                                                      
+##  [85]     theta[1] <- (2 * tmp[1] - 1) * pi                                                                           
+##  [86]                                                                                                                 
+##  [87]     # prior for theta in 'foraging state'                                                                       
+##  [88]     theta[2] <- (tmp[2] * pi * 2)                                                                               
+##  [89]                                                                                                                 
+##  [90]     ##Move persistance                                                                                          
+##  [91]     # prior for gamma (autocorrelation parameter) in state 1                                                    
+##  [92]     gamma[1] ~ dbeta(5,2)                                                                                       
+##  [93]                                                                                                                 
+##  [94]     # prior for gamma in state 2                                                                                
+##  [95]     gamma[2] ~ dbeta(2,5)                                                                                       
+##  [96]                                                                                                                 
+##  [97]     ##Behavioral States                                                                                         
+##  [98]     # Following lunn 2012 p85                                                                                   
+##  [99]                                                                                                                 
+## [100]     #Hierarchical structure                                                                                     
+## [101]     #Intercepts                                                                                                 
+## [102]     lalpha_mu[1] ~ dnorm(0,0.386)                                                                               
+## [103]     lalpha_mu[2] ~ dnorm(0,0.386)                                                                               
+## [104]                                                                                                                 
+## [105]     #Variance                                                                                                   
+## [106]     lalpha_tau[1] ~ dt(0,1,1)I(0,)                                                                              
+## [107]     lalpha_tau[2] ~ dt(0,1,1)I(0,)                                                                              
+## [108]                                                                                                                 
+## [109]     #Slopes                                                                                                     
+## [110]     lbeta_mu[1] ~ dnorm(0,0.386)                                                                                
+## [111]     lbeta_mu[2] ~ dnorm(0,0.386)                                                                                
+## [112]                                                                                                                 
+## [113]     #Variance                                                                                                   
+## [114]     lbeta_tau[1] ~ dt(0,1,1)I(0,)                                                                               
+## [115]     lbeta_tau[2] ~ dt(0,1,1)I(0,)                                                                               
+## [116]                                                                                                                 
+## [117]     #For each individual                                                                                        
+## [118]     for(i in 1:ind){                                                                                            
+## [119]       # prob of being in state 1 at t, given in state 1 at t-1                                                  
+## [120]       #Individual Intercept                                                                                     
+## [121]       lalpha[i,1] ~ dnorm(lalpha_mu[1],lalpha_tau[1])                                                           
+## [122]       logit(alpha[i,1]) <- lalpha[i,1]                                                                          
+## [123]                                                                                                                 
+## [124]       #effect of ocean on traveling -> traveling                                                                
+## [125]       lbeta[i,1] ~ dnorm(lbeta_mu[1],lbeta_tau[1])                                                              
+## [126]       logit(beta[i,1]) <- lbeta[i,1]                                                                            
+## [127]                                                                                                                 
+## [128]       #Prob of transition to state 1 given state 2 at t-1                                                       
+## [129]       lalpha[i,2] ~ dnorm(lalpha_mu[2],lalpha_tau[2])                                                           
+## [130]       logit(alpha[i,2]) <- lalpha[i,2]                                                                          
+## [131]                                                                                                                 
+## [132]       #effect of ocean on feeding -> traveling                                                                  
+## [133]       lbeta[i,2] ~ dnorm(lbeta_mu[2],lbeta_tau[2])                                                              
+## [134]       logit(beta[i,2]) <- lbeta[i,2]                                                                            
+## [135]                                                                                                                 
+## [136]     }                                                                                                           
+## [137]                                                                                                                 
+## [138]     #Probability of behavior switching                                                                          
+## [139]     lambda[1] ~ dbeta(1,1)                                                                                      
+## [140]     lambda[2] <- 1 - lambda[1]                                                                                  
+## [141]                                                                                                                 
+## [142]     ##Argos priors##                                                                                            
+## [143]     #longitudinal argos error                                                                                   
+## [144]     argos_sigma ~ dunif(0,10)                                                                                   
+## [145]                                                                                                                 
+## [146]     #latitidunal argos error                                                                                    
+## [147]     argos_alpha~dunif(0,10)                                                                                     
+## [148]                                                                                                                 
+## [149]     #correlation in argos error                                                                                 
+## [150]     rho ~ dunif(-1, 1)                                                                                          
+## [151]                                                                                                                 
+## [152]                                                                                                                 
+## [153]     }"                                                                                                          
+## [154]     ,fill=TRUE)                                                                                                 
+## [155] sink()
 ```
 
 ```
 ##    user  system elapsed 
-##  984.19    0.74 1012.54
-```
-
-```
-## NOTE: Stopping adaptation
+##    3.66    1.57  774.15
 ```
 
 ##Chains
-![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-##Posteriors
-![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
 ##Prediction - environmental function
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 #Behavioral Prediction
 
 
-```
-## $`1`
-```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+##Spatial Prediction
+![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
 
-```
-## 
-## $`2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
-
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-4.png)<!-- -->
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-5.png)<!-- -->
+##Log Odds of Feeding
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+
+##Phase prediction
+
+
+
+##Behavioral description
+
+###Average time in phase
+
+* For each draw, create a behavioral sequence, calculate the average runs for each behavior
+
+## Predicted Run Length
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+###Proportional Hazards
+
+Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
+
+Let T represent survival time.
+
+$$ P(t) = Pr(T<t)$$ 
+with a pdf
+$$p(t) = \frac{dP(t)}{dt}$$
+
+The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
+
+$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\Delta t}$$
+
+with covariates:
+$$log (h_i(t)) = \alpha + \beta_i *x$$
+
+The cox model has no intercept, making it semi-parametric
+$$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
+
+
+```
+## Call:
+## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
+##     feedr$Animal)
+## 
+##   n= 1947, number of events= 1947 
+## 
+##                  coef exp(coef) se(coef)      z Pr(>|z|)    
+## feedr$Animal2 0.35861   1.43134  0.06598  5.435 5.47e-08 ***
+## feedr$Animal3 1.35605   3.88085  0.07400 18.325  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##               exp(coef) exp(-coef) lower .95 upper .95
+## feedr$Animal2     1.431     0.6986     1.258     1.629
+## feedr$Animal3     3.881     0.2577     3.357     4.487
+## 
+## Concordance= 0.569  (se = 0.008 )
+## Rsquare= 0.181   (max possible= 1 )
+## Likelihood ratio test= 389.8  on 2 df,   p=0
+## Wald test            = 377.7  on 2 df,   p=0
+## Score (logrank) test = 417.2  on 2 df,   p=0
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 
