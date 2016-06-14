@@ -308,19 +308,19 @@ splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")]<-lap
     return(pc)
 })
 
-#Double index
+#State index
 splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
     #As matrices
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]
-    colnames(sv)<-c("Animal","step")
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
+    colnames(sv)<-c("Animal","Track","step")
     pc<-data.frame(x,sv)
 })
 
 #Three index
 splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 #As matrices
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
-    colnames(sv)<-c("Animal","step","Behavior")
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+),(\\d+)]"))[,3:6]
+    colnames(sv)<-c("Animal","Track","step","Behavior")
     pc<-data.frame(x,sv)
 })
 
@@ -371,7 +371,6 @@ ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(
 ##Prediction - environmental function
 
 ```{r}
-
 #get the posterior estimates of the env function
 alphap<-cbind(pc %>% filter(par=='lalpha_mu[1]') %>% .$value,pc %>% filter(par=='lalpha_mu[2]') %>% .$value)
 
@@ -407,18 +406,29 @@ behav_chains$Behavior<-as.factor(behav_chains$Behavior)
 levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
 #average phi
-mean_phi<-behav_chains %>% group_by(Animal,Step) %>% summarize(phi=mean(value))
+mean_phi<-behav_chains %>% group_by(Animal,Track,Step) %>% summarize(phi=mean(value))
 
-mxy<-merge(mxy,mean_phi,by=c("Step","Animal"))
+mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
 ```
 
 ##Spatial Prediction
+
+### Per Animal
 ```{r}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi),size=.5)+ scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") 
+sxy<-split(mxy,mxy$Animal)
+spp<-lapply(sxy,function(x){
+  pp<-c(mean(x$x),mean(x$y))
+  m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
+})
+spp
+
 ```
 
+
+### Per Track
 ```{r,fig.height=15,fig.width=12}
-sxy<-split(mxy,mxy$Animal)
+sxy<-split(mxy,list(mxy$Animal,mxy$Track))
 spp<-lapply(sxy,function(x){
   pp<-c(mean(x$x),mean(x$y))
   m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
