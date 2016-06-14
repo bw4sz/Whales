@@ -57,7 +57,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","131136"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737"),]
 
 #grab three individuals
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -220,10 +220,7 @@ sxy<-lapply(sxy,timed,step_length=6)
 #Format matrices for jags
 mxy<-rbind_all(sxy)
 
-#Get the total time, divide into steps, round up
-steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% mutate(n=floor(as.numeric(mt)/step_length))
-
-sxy<-split(mxy,mxy$Animal)
+sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
@@ -231,11 +228,13 @@ x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
 return(x)
 })
 
-
 mxy<-rbind_all(sxy)
 
+#total number of steps per track/animal
+steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(Step)))
+
 # give each step a label
-stepmxy<-split(mxy,list(mxy$Step,mxy$Animal),drop = TRUE)
+stepmxy<-split(mxy,list(mxy$Step,mxy$Track,mxy$Animal),drop = TRUE)
 stepmxy<-lapply(stepmxy,function(x){
   x$jStep<-1:nrow(x)
   return(x)
@@ -258,6 +257,12 @@ oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 #Individuals
 ind=max(mxy$Animal)
 
+#tracks per indivudal
+tracks<-mxy %>% group_by(Animal) %>% summarize(tracks=length(unique(Track))) %>% .$tracks
+
+#steps per track
+steps<-acast(steps_all,Animal~Track,value.var="n")
+
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~Step~jStep~variable)
@@ -273,13 +278,13 @@ print.noquote(readLines("Bayesian/MultiSpecies.R"))
 
 #prior cov shape
 R <- diag(c(1,1))
-data=list(argos=obs,steps=steps_all$n,R=R,ocean=oc,ind=ind,j=j,idx=idx)
+data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 
 #paramters to track
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9500,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=2,DIC=FALSE))
 }
 
 ```

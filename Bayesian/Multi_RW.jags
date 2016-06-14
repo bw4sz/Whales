@@ -31,7 +31,7 @@
         for(t in 2:(steps[i,g]-1)){
         
         #Behavioral State at time T
-        logit(phi[i,g,t,1]) <- lalpha[i,state[i,g,t-1]] + lbeta[i,g,state[i,g,t-1]] * ocean[i,g,t]
+        logit(phi[i,g,t,1]) <- lalpha[i,state[i,g,t-1]] + lbeta[i,state[i,g,t-1]] * ocean[i,g,t]
         phi[i,g,t,2] <- 1-phi[i,g,t,1]
         state[i,g,t] ~ dcat(phi[i,g,t,])
             
@@ -50,7 +50,7 @@
       }
 
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- lalpha[i,g,state[i,g,steps[i,g]-1]] + lbeta[i,g,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- lalpha[i,state[i,g,steps[i,g]-1]] + lbeta[i,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]]
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
