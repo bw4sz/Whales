@@ -284,7 +284,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -428,11 +428,11 @@ spp
 
 ### Per Track
 ```{r,fig.height=15,fig.width=12}
-sxy<-split(mxy,list(mxy$Animal,mxy$Track))
+sxy<-split(mxy,list(mxy$Animal),drop=T)
 spp<-lapply(sxy,function(x){
   pp<-c(mean(x$x),mean(x$y))
   m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
 })
 spp
 ```
@@ -525,6 +525,8 @@ ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2
 ```
 
 ###Proportional Hazards
+
+TODO: NEEDS TO ACCOUNT FOR CENSORED DATA! 
 
 Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
 
