@@ -57,7 +57,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131159","131153","131130"),]
+mxy<-mxy[mxy$Animal %in% c("131132","131136"),]
 
 #grab three individuals
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -175,24 +175,62 @@ dplot<-function(a1,beta,x){
 ```
 
 
-The goal of the model is to capture the true parameter we simulated above. As we increase complexity, we will be able to monitor the validity of our approach.
+##Continious tracks
+
+The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than a reaosnable numberof points. 
+
+Specify a duration, calculate the number of tracks and the number of removed points. Iteratively.
+
+```{r}
+
+##Time is the beginning of the first point.
+step_length=6
+
+sxy<-split(mxy,mxy$Animal)
+
+#time diff function
+timed<-function(d,step_length){
+  d$j[1]<-0
+  for (x in 2:nrow(d)){
+    d$j[x]<-as.numeric(difftime(as.POSIXct(d$timestamp[x]),as.POSIXct(d$timestamp[x-1]),units="mins"))/(step_length*60)
+  }
+  
+  #Split out track endings
+  ends<-c(1,which(d$j>1),nrow(d))
+
+  for(w in 2:length(ends)){
+    d[ends[w-1]:ends[w],"Track"]<-w-1
+  }
+  
+  #remove tracks that are shorter than two days
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="days")) %>% filter(mt>2) %>% .$Track
+
+  
+  d<-d[d$Track %in% track_time,]
+  
+  #renumber the tracks
+  d$Track<-as.numeric(as.factor(d$Track))
+  return(d)
+  }
+
+sxy<-lapply(sxy,timed,step_length=6)
+```
 
 ```{r}
 #Format matrices for jags
-
-##Time is the beginning of the first point.
-step_length=4
+mxy<-rbind_all(sxy)
 
 #Get the total time, divide into steps, round up
-steps_all<-mxy %>% group_by(Animal) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% mutate(n=floor(as.numeric(mt)/step_length))
+steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% mutate(n=floor(as.numeric(mt)/step_length))
 
 sxy<-split(mxy,mxy$Animal)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
+x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
 return(x)
 })
+
 
 mxy<-rbind_all(sxy)
 
@@ -205,29 +243,24 @@ stepmxy<-lapply(stepmxy,function(x){
 
 mxy<-rbind_all(stepmxy)
 
+#Cast time array
+j<-acast(mxy,Animal~Track~Step~jStep,value.var="j")
+
 #how many observations per individual in each Step
 mxy$Step<-factor(mxy$Step,levels=1:max(steps_all$n))
-idx<-as.matrix(table(mxy$Animal,mxy$Step))
+idx<-melt(table(mxy$Animal,mxy$Track,mxy$Step))
+colnames(idx)<-c("Animal","Track","Step","jStep")
+idx<-acast(data=idx,Animal~Track~Step)
 
 #make ocean a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
-oc<-acast(mxy,Animal~Step,value.var="ocean",fun.aggregate = mean)
+oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 
 #Individuals
 ind=max(mxy$Animal)
 
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
-obs<-acast(obs,Animal~Step~jStep~variable)
-
-#time diff array
-mxy$j[1]<-0
-
-for (x in 2:nrow(mxy)){
-  mxy$j[x]<-as.numeric(as.POSIXct(mxy$timestamp[x])-as.POSIXct(mxy$timestamp[x-1]))/(step_length*60)
-}
-
-
-j<-acast(mxy,Animal~Step~jStep,value.var="j")
+obs<-acast(obs,Animal~Track~Step~jStep~variable)
 
 ```
 

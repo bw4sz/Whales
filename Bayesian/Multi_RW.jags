@@ -14,62 +14,62 @@
     argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
+      for(g in 1:tracks[i]){
 
-    ###First Step###
-
-    ## Priors for first true location
-    #for lat long
-    y[i,1,1:2] ~ dmnorm(argos[i,1,1,1:2],argos_prec)
-
-    #First movement - random walk.
-    y[i,2,1:2] ~ dmnorm(y[i,1,1:2],iSigma)
+        ###First Step###
+        ## Priors for first true location
+        #for lat long
+        y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec)
     
-    ###First Behavioral State###
-    state[i,1] ~ dcat(lambda[]) ## assign state for first obs
-    
-    #Process Model for movement
-    for(t in 2:(steps[i]-1)){
-    
-    #Behavioral State at time T
-    logit(phi[i,t,1]) <- lalpha[i,state[i,t-1]] + lbeta[i,state[i,t-1]] * ocean[i,t]
-    phi[i,t,2] <- 1-phi[i,t,1]
-    state[i,t] ~ dcat(phi[i,t,])
+        #First movement - random walk.
+        y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
         
-    #Turning covariate
-    #Transition Matrix for turning angles
-    T[i,t,1,1] <- cos(theta[state[i,t]])
-    T[i,t,1,2] <- (-sin(theta[state[i,t]]))
-    T[i,t,2,1] <- sin(theta[state[i,t]])
-    T[i,t,2,2] <- cos(theta[state[i,t]])
-    
-    #Correlation in movement change
-    d[i,t,1:2] <- y[i,t,] + gamma[state[i,t]] * T[i,t,,] %*% (y[i,t,1:2] - y[i,t-1,1:2])
-    
-    #Gaussian Displacement
-    y[i,t+1,1:2] ~ dmnorm(d[i,t,1:2],iSigma)
-    }
+        ###First Behavioral State###
+        state[i,g,1] ~ dcat(lambda[]) ## assign state for first obs
+        
+        #Process Model for movement
+        for(t in 2:(steps[i,g]-1)){
+        
+        #Behavioral State at time T
+        logit(phi[i,g,t,1]) <- lalpha[i,state[i,g,t-1]] + lbeta[i,g,state[i,g,t-1]] * ocean[i,g,t]
+        phi[i,g,t,2] <- 1-phi[i,g,t,1]
+        state[i,g,t] ~ dcat(phi[i,g,t,])
+            
+        #Turning covariate
+        #Transition Matrix for turning angles
+        T[i,g,t,1,1] <- cos(theta[state[i,g,t]])
+        T[i,g,t,1,2] <- (-sin(theta[state[i,g,t]]))
+        T[i,g,t,2,1] <- sin(theta[state[i,g,t]])
+        T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
+        
+        #Correlation in movement change
+        d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
+        
+        #Gaussian Displacement
+        y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
+      }
 
     #Final behavior state
-    logit(phi[i,steps[i],1]) <- lalpha[i,state[i,steps[i]-1]] + lbeta[i,state[i,steps[i]-1]] * ocean[i,steps[i]]
-    phi[i,steps[i],2] <- 1-phi[i,steps[i],1]
-    state[i,steps[i]] ~ dcat(phi[i,steps[i],])
+    logit(phi[i,g,steps[i,g],1]) <- lalpha[i,g,state[i,g,steps[i,g]-1]] + lbeta[i,g,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]]
+    phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
+    state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
     ##	Measurement equation - irregular observations
     # loops over regular time intervals (t)    
     
-    for(t in 2:steps[i]){					
+    for(t in 2:steps[i,g]){
     
     # loops over observed locations within interval t
-    for(u in 1:idx[i,t]){ 
-      zhat[i,t,u,1:2] <- (1-j[i,t,u]) * y[i,t-1,1:2] + j[i,t,u] * y[i,t,1:2]
+    for(u in 1:idx[i,g,t]){ 
+      zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
 
         #for each lat and long
           #argos error
-          argos[i,t,u,1:2] ~ dmnorm(zhat[i,t,u,1:2],argos_prec)
-        }	
+          argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
+          }
+        }
       }
     }
-    
     ###Priors###
 
     #Process Variance
