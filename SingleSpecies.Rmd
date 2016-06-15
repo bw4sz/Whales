@@ -11,7 +11,6 @@ output:
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
-install.packages("circular")
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 6)
 library(boot)
@@ -29,10 +28,10 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-FALSE
+newModel<-TRUE
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -57,9 +56,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705"),]
+#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134",""),]
 
-#grab three individuals
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
 
@@ -207,11 +205,12 @@ timed<-function(d,step_length){
   }
 
 sxy<-lapply(sxy,timed,step_length=6)
-```
 
-```{r}
 #Format matrices for jags
 mxy<-rbind_all(sxy)
+
+######recode whales
+mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
@@ -250,7 +249,7 @@ idx<-acast(data=idx,Animal~Track~Step)
 oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 
 #Individuals
-ind=max(mxy$Animal)
+ind=length(unique(mxy$Animal))
 
 #tracks per indivudal
 tracks<-mxy %>% group_by(Animal) %>% summarize(tracks=length(unique(Track))) %>% .$tracks
@@ -290,7 +289,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=13000,n.burnin=10000,n.thin=5,DIC=FALSE))
 }
 
 ```
