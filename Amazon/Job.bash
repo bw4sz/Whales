@@ -13,7 +13,7 @@ iid=$(ec2metadata --instance-id)
 git checkout -b $iid
 
 #render script
-Rscript -e "rmarkdown::render('MultiSpeciesHMM.Rmd')" > run.txt
+Rscript -e "rmarkdown::render('SingleSpecies.Rmd')" > run.txt
 
 #push results
 git add --all

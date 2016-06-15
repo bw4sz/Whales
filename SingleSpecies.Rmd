@@ -28,18 +28,17 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-FALSE
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
-#load("SingleSpecies.RData")
+load("SingleSpecies.RData")
 #jags$recompile()
-#newModel<-F
+newModel<-F
 ```
 
 #Abstract
-
 
 ```{r}
 mdat<-read.csv("InputData/FullData-550793189439001813.csv")
@@ -57,7 +56,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705"),]
 
 #grab three individuals
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -72,7 +71,7 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```{r}
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
@@ -104,13 +103,6 @@ ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free"
 astat<-move::angleSummary(moved)
 astat<-melt(astat,measure.vars=colnames(astat[[1]]))
 ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-```
-
-```{r,eval=F}
-#Load in data
-load("MultiSpecies.RData")
-jags$recompile()
-newModel<-F
 ```
 
 #Correlated random walk
@@ -229,7 +221,9 @@ return(x)
 })
 
 mxy<-rbind_all(sxy)
+```
 
+```{r}
 #total number of steps per track/animal
 steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(Step)))
 
@@ -267,6 +261,17 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~Step~jStep~variable)
 
+```
+
+How did the filter change the extent of tracks?
+
+```{r}
+#Plot
+mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
+
+pp<-c(mean(mxy$x),mean(mxy$y))
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
 ```{r,eval=T}
@@ -409,6 +414,10 @@ levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 mean_phi<-behav_chains %>% group_by(Animal,Track,Step) %>% summarize(phi=mean(value))
 
 mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
+
+#ensure order for plotting
+mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
+
 ```
 
 ##Spatial Prediction
@@ -419,7 +428,7 @@ sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-c(mean(x$x),mean(x$y))
   m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
 spp
 
@@ -427,12 +436,12 @@ spp
 
 
 ### Per Track
-```{r,fig.height=15,fig.width=12}
+```{r,fig.height=10,fig.width=12}
 sxy<-split(mxy,list(mxy$Animal),drop=T)
 spp<-lapply(sxy,function(x){
   pp<-c(mean(x$x),mean(x$y))
   m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(limits=c(0,1),low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
 })
 spp
 ```
@@ -447,7 +456,7 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 
 ```{r}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time (hour)",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
 
 ##Phase prediction

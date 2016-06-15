@@ -10,7 +10,6 @@ Ben Weinstein
 
 
 
-
 #Observation Filter
 
 
@@ -29,8 +28,6 @@ Ben Weinstein
 ##Angle Statistics
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
-
-
 
 #Correlated random walk
 
@@ -87,6 +84,12 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 
 
+
+
+
+How did the filter change the extent of tracks?
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 
 ```
@@ -247,23 +250,18 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 ## [155] sink()
 ```
 
-```
-##    user  system elapsed 
-##    2.11    1.02 3444.61
-```
-
 ##Chains
-![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
-
-###Compare to priors
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
-##Prediction - environmental function
+###Compare to priors
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+
+##Prediction - environmental function
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -272,22 +270,6 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 ##Spatial Prediction
 
 ### Per Animal
-
-```
-## $`1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
-
-```
-## 
-## $`2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
-
-
-### Per Track
 
 ```
 ## $`1`
@@ -302,12 +284,28 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
 
-##Log Odds of Feeding
+
+### Per Track
+
+```
+## $`1`
+```
+
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+
+```
+## 
+## $`2`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
+
+##Log Odds of Feeding
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 ##Phase prediction
 
@@ -320,9 +318,9 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 * For each draw, create a behavioral sequence, calculate the average runs for each behavior
 
 ## Predicted Run Length
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ###Proportional Hazards
 
@@ -369,6 +367,6 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## Score (logrank) test = 111.3  on 1 df,   p=0
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 
