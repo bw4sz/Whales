@@ -11,6 +11,7 @@ output:
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
+install.packages("circular")
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 10,fig.height = 6)
 library(boot)
