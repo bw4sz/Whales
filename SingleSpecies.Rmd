@@ -56,7 +56,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134"),]
+#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134"),]
+mxy<-mxy[mxy$Animal %in% c("131156","112737"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
@@ -70,7 +71,7 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```{r}
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
@@ -270,8 +271,13 @@ How did the filter change the extent of tracks?
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
+```
+
+```{r,fig.height=4,fig.width=6}
+ggplot(data=steps_all,aes(x=n*6/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
+ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
 ```{r,eval=T}
@@ -289,7 +295,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=7000,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -333,7 +339,7 @@ splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 pc<-rbind_all(splitpc)
 rm(splitpc)
 
-#plot all but phi
+#plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 
 ```
@@ -426,8 +432,8 @@ mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 ```{r}
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
-  pp<-c(mean(x$x),mean(x$y))
-  m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
+  pp<-bbox(cbind(x$x,x$y))
+  m <- get_map(location=pp,zoom=4,source="google",scale=2,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
 spp
@@ -439,8 +445,8 @@ spp
 ```{r,fig.height=10,fig.width=12}
 sxy<-split(mxy,list(mxy$Animal),drop=T)
 spp<-lapply(sxy,function(x){
-  pp<-c(mean(x$x),mean(x$y))
-  m <- get_map(location=pp,source="google",zoom=7,scale=2,maptype="satellite")
+  pp<-bbox(cbind(x$x,x$y))
+  m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(limits=c(0,1),low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
 })
 spp
@@ -583,6 +589,5 @@ plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
 
 ```{r}
 #notify end of run
-send.mail(from="benweinstein2010@gmail.com",to="benweinstein2010@gmail.com",subject=paste("Run Completed at",Sys.time()),body="")
 save.image("SingleSpecies.RData")
 ```

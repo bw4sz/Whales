@@ -1,6 +1,6 @@
 # Antarctic Whale Project: Single Species
 Ben Weinstein  
-`r format(Sys.time(), '%d %B, %Y')`  
+`r Sys.time()`  
 
 
 
@@ -85,11 +85,11 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 
 
-
-
 How did the filter change the extent of tracks?
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
 
 
 ```
@@ -250,6 +250,11 @@ How did the filter change the extent of tracks?
 ## [155] sink()
 ```
 
+```
+##    user  system elapsed 
+##    1.89    0.10  235.54
+```
+
 ##Chains
 ![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
@@ -350,21 +355,21 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 11804, number of events= 11804 
+##   n= 16027, number of events= 16027 
 ## 
-##                  coef exp(coef) se(coef)      z Pr(>|z|)    
-## feedr$Animal2 -0.3352    0.7152   0.0319 -10.51   <2e-16 ***
+##                  coef exp(coef) se(coef)    z Pr(>|z|)    
+## feedr$Animal2 0.34277   1.40884  0.01731 19.8   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2    0.7152      1.398    0.6719    0.7613
+## feedr$Animal2     1.409     0.7098     1.362     1.457
 ## 
-## Concordance= 0.522  (se = 0.008 )
-## Rsquare= 0.01   (max possible= 1 )
-## Likelihood ratio test= 120.3  on 1 df,   p=0
-## Wald test            = 110.4  on 1 df,   p=0
-## Score (logrank) test = 111.3  on 1 df,   p=0
+## Concordance= 0.557  (se = 0.004 )
+## Rsquare= 0.023   (max possible= 1 )
+## Likelihood ratio test= 375  on 1 df,   p=0
+## Wald test            = 391.9  on 1 df,   p=0
+## Score (logrank) test = 395.7  on 1 df,   p=0
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
