@@ -285,3 +285,273 @@ Warning: Permanently added the RSA host key for IP address '192.30.252.131' to t
 To git@github.com:bw4sz/Whales.git
  * [new branch]      i-044cf8d9 -> i-044cf8d9
 Branch i-044cf8d9 set up to track remote branch i-044cf8d9 from origin.
+Warning: Permanently added 'ec2-52-41-82-13.us-west-2.compute.amazonaws.com,52.41.82.13' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'ec2-52-41-82-13.us-west-2.compute.amazonaws.com,52.41.82.13' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.252.130' to the list of known hosts.
+From github.com:bw4sz/Whales
+   95484da..19fb234  master     -> origin/master
+   56fdb07..9a3b6a2  gh-pages   -> origin/gh-pages
+Updating 95484da..19fb234
+Fast-forward
+ .Rhistory                                          | 926 ++++++++++-----------
+ .Rproj.user/8641BD5D/pcs/windowlayoutstate.pper    |  12 +-
+ .Rproj.user/8641BD5D/pcs/workbench-pane.pper       |   2 +-
+ .Rproj.user/8641BD5D/sdb/prop/AFAA8604             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/DED848CC             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/E8726973             |   3 +
+ .Rproj.user/8641BD5D/sdb/prop/INDEX                |   3 +
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04        |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file      |   0
+ .gitignore                                         |   2 +
+ Amazon/Job.bash                                    |  24 +
+ Amazon/Startup.bash                                |  19 +
+ Amazon/nohup.out                                   | 287 +++++++
+ Bayesian/MultiSpecies.R                            | 150 +++-
+ Bayesian/Multi_RW.jags                             | 150 +++-
+ InputData/CCAMLR_aggregated_catch_C1.xlsx          | Bin 0 -> 65371 bytes
+ MultiSpeciesHMM.Rmd                                | 403 +++++++--
+ MultiSpeciesHMM.html                               | 385 ++++++---
+ MultiSpeciesHMM.md                                 | 374 ++++++---
+ .../figure-html/unnamed-chunk-10-1.png             | Bin 37346 -> 47926 bytes
+ .../figure-html/unnamed-chunk-11-1.png             | Bin 39084 -> 50088 bytes
+ .../figure-html/unnamed-chunk-12-1.png             | Bin 124425 -> 36785 bytes
+ .../figure-html/unnamed-chunk-12-2.png             | Bin 21712 -> 10266 bytes
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 151118 -> 139487 bytes
+ .../figure-html/unnamed-chunk-13-2.png             | Bin 0 -> 22797 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 27507 -> 111596 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 17068 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 31342 bytes
+ .../figure-html/unnamed-chunk-15-2.png             | Bin 0 -> 87769 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 20462 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 6422 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 8095 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 48519 -> 50961 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 100485 -> 77770 bytes
+ .../figure-html/unnamed-chunk-6-2.png              | Bin 30221 -> 30945 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 157308 -> 38015 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 39270 -> 311102 bytes
+ SingleSpecies.Rmd                                  | 441 ++++++++--
+ SingleSpecies.html                                 | 517 ++++++++----
+ SingleSpecies.md                                   | 495 +++++++----
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 364973 -> 421410 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 9935 -> 5276 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 4475 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 529403 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 350147 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 23916 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 60695 bytes
+ .../figure-html/unnamed-chunk-19-1.png             | Bin 0 -> 21035 bytes
+ .../figure-html/unnamed-chunk-19-2.png             | Bin 0 -> 261271 bytes
+ .../figure-html/unnamed-chunk-20-1.png             | Bin 0 -> 504276 bytes
+ .../figure-html/unnamed-chunk-20-2.png             | Bin 0 -> 471604 bytes
+ .../figure-html/unnamed-chunk-21-1.png             | Bin 0 -> 383123 bytes
+ .../figure-html/unnamed-chunk-21-2.png             | Bin 0 -> 412059 bytes
+ .../figure-html/unnamed-chunk-21-3.png             | Bin 0 -> 375595 bytes
+ .../figure-html/unnamed-chunk-21-4.png             | Bin 0 -> 375839 bytes
+ .../figure-html/unnamed-chunk-21-5.png             | Bin 0 -> 374886 bytes
+ .../figure-html/unnamed-chunk-21-6.png             | Bin 0 -> 382705 bytes
+ .../figure-html/unnamed-chunk-22-1.png             | Bin 0 -> 419024 bytes
+ .../figure-html/unnamed-chunk-22-2.png             | Bin 0 -> 948221 bytes
+ .../figure-html/unnamed-chunk-22-3.png             | Bin 0 -> 1052046 bytes
+ .../figure-html/unnamed-chunk-22-4.png             | Bin 0 -> 1051912 bytes
+ .../figure-html/unnamed-chunk-22-5.png             | Bin 0 -> 637117 bytes
+ .../figure-html/unnamed-chunk-22-6.png             | Bin 0 -> 1054996 bytes
+ .../figure-html/unnamed-chunk-23-1.png             | Bin 0 -> 20990 bytes
+ .../figure-html/unnamed-chunk-24-1.png             | Bin 0 -> 79567 bytes
+ .../figure-html/unnamed-chunk-25-1.png             | Bin 0 -> 10366 bytes
+ .../figure-html/unnamed-chunk-26-1.png             | Bin 0 -> 20850 bytes
+ .../figure-html/unnamed-chunk-27-1.png             | Bin 0 -> 6757 bytes
+ .../figure-html/unnamed-chunk-28-1.png             | Bin 0 -> 9078 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 10212 -> 419907 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 12401 -> 15356 bytes
+ .../figure-html/unnamed-chunk-7-1.png              | Bin 50194 -> 11083 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 13474 -> 8650 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 11720 -> 8781 bytes
+ run.txt                                            | 192 +++++
+ 79 files changed, 3098 insertions(+), 1381 deletions(-)
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/AFAA8604
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/DED848CC
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/E8726973
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file
+ create mode 100644 Amazon/Job.bash
+ create mode 100644 Amazon/Startup.bash
+ create mode 100644 Amazon/nohup.out
+ create mode 100644 InputData/CCAMLR_aggregated_catch_C1.xlsx
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-24-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-28-1.png
+ create mode 100644 run.txt
+Switched to a new branch 'i-cc338711'
+
+
+processing file: SingleSpecies.Rmd
+Loading required package: methods
+Loading required package: sp
+Loading required package: splines
+
+Attaching package: 'survival'
+
+The following object is masked from 'package:boot':
+
+    aml
+
+
+Attaching package: 'MASS'
+
+The following objects are masked from 'package:raster':
+
+    area, select
+
+
+Attaching package: 'dplyr'
+
+The following object is masked from 'package:MASS':
+
+    select
+
+The following objects are masked from 'package:raster':
+
+    intersect, select, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'gridExtra'
+
+The following object is masked from 'package:dplyr':
+
+    combine
+
+Loading required package: rjags
+Loading required package: coda
+Linked to JAGS 4.2.0
+Loaded modules: basemod,bugs
+
+Attaching package: 'R2jags'
+
+The following object is masked from 'package:coda':
+
+    traceplot
+
+Loading required package: geosphere
+Loading required package: rgdal
+rgdal: version: 1.1-10, (SVN revision 622)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 1.10.1, released 2013/08/26
+ Path to GDAL shared files: /usr/share/gdal/1.10
+ Loaded PROJ.4 runtime: Rel. 4.8.0, 6 March 2012, [PJ_VERSION: 480]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.2-3 
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-58.89604,-64.167772&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Loading required namespace: circular
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Using jStep as value column: use value.var to override.
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-58.819353,-64.154285&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.497002,-58.191498&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-30.3225,-70.664505&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.758,-62.939&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.679,-64.151&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.652,-67.187&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.145,-61.102&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.497002,-58.191498&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-30.3225,-70.664505&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.758,-62.939&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.679,-64.151&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.652,-67.187&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.145,-61.102&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+output file: SingleSpecies.knit.md
+
+
+Output created: SingleSpecies.html
+There were 50 or more warnings (use warnings() to see the first 50)
+[i-cc338711 a2736ff] ec2 run complete
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-18-1.png (98%)
+Warning: Permanently added the RSA host key for IP address '192.30.252.131' to the list of known hosts.
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      i-cc338711 -> i-cc338711
+Branch i-cc338711 set up to track remote branch i-cc338711 from origin.

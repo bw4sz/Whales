@@ -251,7 +251,7 @@ How did the filter change the extent of tracks?
 
 ```
 ##    user  system elapsed 
-##  10.762   0.438 697.336
+##  10.678   0.446 699.645
 ```
 
 ##Chains
