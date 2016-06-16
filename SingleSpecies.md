@@ -77,8 +77,7 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 ##Continious tracks
 
-The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than a reaosnable numberof points. 
-
+The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than three days.
 Specify a duration, calculate the number of tracks and the number of removed points. Iteratively.
 
 
@@ -150,7 +149,7 @@ How did the filter change the extent of tracks?
 ##  [55]     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]                                                                            
 ##  [56]     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])                                                                          
 ##  [57]                                                                                                                                 
-##  [58]     ##\tMeasurement equation - irregular observations                                                                            
+##  [58]     ##\tMeasurement equation - irregular observations                                                                           
 ##  [59]     # loops over regular time intervals (t)                                                                                     
 ##  [60]                                                                                                                                 
 ##  [61]     for(t in 2:steps[i,g]){                                                                                                     
@@ -252,7 +251,7 @@ How did the filter change the extent of tracks?
 
 ```
 ##    user  system elapsed 
-##    1.89    0.10  235.54
+##  10.762   0.438 697.336
 ```
 
 ##Chains
@@ -289,6 +288,34 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
 
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-6.png)<!-- -->
+
 
 ### Per Track
 
@@ -304,6 +331,34 @@ How did the filter change the extent of tracks?
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
+
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-6.png)<!-- -->
 
 ##Log Odds of Feeding
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -355,21 +410,29 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 16027, number of events= 16027 
+##   n= 174581, number of events= 174581 
 ## 
-##                  coef exp(coef) se(coef)    z Pr(>|z|)    
-## feedr$Animal2 0.34277   1.40884  0.01731 19.8   <2e-16 ***
+##                    coef exp(coef)  se(coef)       z Pr(>|z|)    
+## feedr$Animal2  0.117214  1.124360  0.005579  21.010   <2e-16 ***
+## feedr$Animal3 -0.659469  0.517126  0.024069 -27.399   <2e-16 ***
+## feedr$Animal4 -0.219313  0.803070  0.022740  -9.644   <2e-16 ***
+## feedr$Animal5  0.226462  1.254154  0.007337  30.864   <2e-16 ***
+## feedr$Animal6 -1.004306  0.366299  0.023106 -43.464   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2     1.409     0.7098     1.362     1.457
+## feedr$Animal2    1.1244     0.8894    1.1121    1.1367
+## feedr$Animal3    0.5171     1.9338    0.4933    0.5421
+## feedr$Animal4    0.8031     1.2452    0.7681    0.8397
+## feedr$Animal5    1.2542     0.7974    1.2362    1.2723
+## feedr$Animal6    0.3663     2.7300    0.3501    0.3833
 ## 
-## Concordance= 0.557  (se = 0.004 )
-## Rsquare= 0.023   (max possible= 1 )
-## Likelihood ratio test= 375  on 1 df,   p=0
-## Wald test            = 391.9  on 1 df,   p=0
-## Score (logrank) test = 395.7  on 1 df,   p=0
+## Concordance= 0.539  (se = 0.001 )
+## Rsquare= 0.032   (max possible= 1 )
+## Likelihood ratio test= 5601  on 5 df,   p=0
+## Wald test            = 4433  on 5 df,   p=0
+## Score (logrank) test = 4717  on 5 df,   p=0
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
