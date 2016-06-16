@@ -56,8 +56,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134"),]
-mxy<-mxy[mxy$Animal %in% c("131156","112737"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134"),]
+#mxy<-mxy[mxy$Animal %in% c("131156","112737"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
@@ -169,8 +169,7 @@ dplot<-function(a1,beta,x){
 
 ##Continious tracks
 
-The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than a reaosnable numberof points. 
-
+The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than three days.
 Specify a duration, calculate the number of tracks and the number of removed points. Iteratively.
 
 ```{r}
@@ -194,8 +193,8 @@ timed<-function(d,step_length){
     d[ends[w-1]:ends[w],"Track"]<-w-1
   }
   
-  #remove tracks that are shorter than two days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="days")) %>% filter(mt>2) %>% .$Track
+  #remove tracks that are shorter than three days
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="days")) %>% filter(mt>3) %>% .$Track
 
   
   d<-d[d$Track %in% track_time,]
@@ -276,7 +275,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs
 ```
 
 ```{r,fig.height=4,fig.width=6}
-ggplot(data=steps_all,aes(x=n*6/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
+ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
@@ -295,7 +294,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1000,n.thin=2,DIC=FALSE))
 }
 
 ```
