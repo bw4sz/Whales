@@ -56,13 +56,12 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134"),]
-#mxy<-mxy[mxy$Animal %in% c("131156","112737"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","112705","154187","121210","131134","131141","112701"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
 
-#Observation Filter
+#Descriptive Statistics
 ```{r}
 #no distance to coast,elevation
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
@@ -75,7 +74,7 @@ m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
-##Distance Statistics
+##Distance
 
 ```{r,fig.height=5}
 moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal)
@@ -83,21 +82,21 @@ dstat<-melt(move::distanceSummary(moved))
 ggplot(dstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
-##Temporal Statistics
+##Time 
 ```{r,fig.height=4}
 tstat<-move::timeSummary(moved)
 tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
 ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
-##Velocity Statistics
+##Velocity
 ```{r,fig.height=3}
 vstat<-move::speedSummary(moved)
 vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
 ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
-##Angle Statistics
+##Angles
 
 ```{r,fig.height=3}
 astat<-move::angleSummary(moved)
@@ -294,7 +293,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4000,n.thin=2,DIC=FALSE))
 }
 
 ```
