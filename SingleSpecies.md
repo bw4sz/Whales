@@ -10,22 +10,22 @@ Ben Weinstein
 
 
 
-#Observation Filter
+#Descriptive Statistics
 
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-##Distance Statistics
+##Distance
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-##Temporal Statistics
+##Time 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-##Velocity Statistics
+##Velocity
 ![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
-##Angle Statistics
+##Angles
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
@@ -250,8 +250,8 @@ How did the filter change the extent of tracks?
 ```
 
 ```
-##    user  system elapsed 
-##  10.678   0.446 699.645
+##     user   system  elapsed 
+##   10.657    0.425 1600.008
 ```
 
 ##Chains
@@ -410,29 +410,29 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 174581, number of events= 174581 
+##   n= 163558, number of events= 163558 
 ## 
 ##                    coef exp(coef)  se(coef)       z Pr(>|z|)    
-## feedr$Animal2  0.117214  1.124360  0.005579  21.010   <2e-16 ***
-## feedr$Animal3 -0.659469  0.517126  0.024069 -27.399   <2e-16 ***
-## feedr$Animal4 -0.219313  0.803070  0.022740  -9.644   <2e-16 ***
-## feedr$Animal5  0.226462  1.254154  0.007337  30.864   <2e-16 ***
-## feedr$Animal6 -1.004306  0.366299  0.023106 -43.464   <2e-16 ***
+## feedr$Animal2  0.053270  1.054715  0.005809   9.170   <2e-16 ***
+## feedr$Animal3 -0.471873  0.623832  0.023374 -20.188   <2e-16 ***
+## feedr$Animal4 -0.233853  0.791478  0.023569  -9.922   <2e-16 ***
+## feedr$Animal5  0.370968  1.449137  0.007464  49.701   <2e-16 ***
+## feedr$Animal6 -0.948574  0.387293  0.022452 -42.249   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2    1.1244     0.8894    1.1121    1.1367
-## feedr$Animal3    0.5171     1.9338    0.4933    0.5421
-## feedr$Animal4    0.8031     1.2452    0.7681    0.8397
-## feedr$Animal5    1.2542     0.7974    1.2362    1.2723
-## feedr$Animal6    0.3663     2.7300    0.3501    0.3833
+## feedr$Animal2    1.0547     0.9481    1.0428    1.0668
+## feedr$Animal3    0.6238     1.6030    0.5959    0.6531
+## feedr$Animal4    0.7915     1.2635    0.7557    0.8289
+## feedr$Animal5    1.4491     0.6901    1.4281    1.4705
+## feedr$Animal6    0.3873     2.5820    0.3706    0.4047
 ## 
-## Concordance= 0.539  (se = 0.001 )
-## Rsquare= 0.032   (max possible= 1 )
-## Likelihood ratio test= 5601  on 5 df,   p=0
-## Wald test            = 4433  on 5 df,   p=0
-## Score (logrank) test = 4717  on 5 df,   p=0
+## Concordance= 0.546  (se = 0.001 )
+## Rsquare= 0.038   (max possible= 1 )
+## Likelihood ratio test= 6365  on 5 df,   p=0
+## Wald test            = 5646  on 5 df,   p=0
+## Score (logrank) test = 5922  on 5 df,   p=0
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
