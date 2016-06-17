@@ -59,6 +59,12 @@ mxy$y<-mxy$location.lat
 mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131117","112692","112703","121211"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+
+#set datestamp
+mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+
+#remove empty timestamps
+mxy<-mxy[!is.na(mxy$timestamp),]
 ```
 
 #Descriptive Statistics
@@ -77,7 +83,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs
 ##Distance
 
 ```{r,fig.height=5}
-moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal)
+moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
 dstat<-melt(move::distanceSummary(moved))
 ggplot(dstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
@@ -287,7 +293,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=15000,n.burnin=0,n.thin=3,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1500,n.burnin=0,n.thin=3,DIC=FALSE))
 }
 
 ```
