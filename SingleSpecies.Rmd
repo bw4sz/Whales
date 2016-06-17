@@ -56,8 +56,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
-mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+#mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
