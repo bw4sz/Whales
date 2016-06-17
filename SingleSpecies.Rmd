@@ -227,13 +227,7 @@ mxy<-rbind_all(sxy)
 steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(Step)))
 
 # give each step a label
-stepmxy<-split(mxy,list(mxy$Step,mxy$Track,mxy$Animal),drop = TRUE)
-stepmxy<-lapply(stepmxy,function(x){
-  x$jStep<-1:nrow(x)
-  return(x)
-})
-
-mxy<-rbind_all(stepmxy)
+mxy<-mxy %>% group_by(Animal,Track,Step) %>% mutate(jStep=1:n())
 
 #Cast time array
 j<-acast(mxy,Animal~Track~Step~jStep,value.var="j")
@@ -290,10 +284,10 @@ R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 
 #paramters to track
-pt<-c("theta","gamma","phi","lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","state")
+pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=9000,n.burnin=7000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -375,11 +369,13 @@ prs$Behavior<-as.factor(prs$Behavior)
 allp<-rbind_all(list(pc[!pc$parameter %in% c("phi"),],prs))
 
 ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parameter,scale="free")
+rm(allp)
 ```
 
 ##Prediction - environmental function
 
 ```{r}
+gc()
 #get the posterior estimates of the env function
 alphap<-cbind(pc %>% filter(par=='lalpha_mu[1]') %>% .$value,pc %>% filter(par=='lalpha_mu[2]') %>% .$value)
 
@@ -389,7 +385,11 @@ postplot<-list()
 
 for(j in 1:nrow(alphap)){
   postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
-  }
+}
+
+#remove large objects
+rm(alphap)
+rm(betap)
 
 postplot<-rbind_all(postplot)
 
@@ -398,6 +398,9 @@ dsum<-postplot %>% group_by(x,Begin,State) %>% summarize(y_mean=mean(y),lower=qu
 #mean env estimate
 ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 
+#remove large object
+rm(postplot)
+gc()
 ```
 
 #Behavioral Prediction
@@ -422,6 +425,7 @@ mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
 #ensure order for plotting
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
+rm(behav_chains)
 ```
 
 ##Spatial Prediction
