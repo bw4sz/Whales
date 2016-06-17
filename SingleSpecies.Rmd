@@ -46,7 +46,7 @@ mdat<-read.csv("InputData/FullData-550793189439001813.csv")
 ##need to look into making into a movebank object.
 
 #Create a oceandepth in km 
-mdat$ocean<-mdat$ETOPO1.Elevation*-1 / 1000
+mdat$ocean<-mdat$NASA.Distance.to.Coast
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -56,7 +56,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131117","112692","112703","121211"),]
+#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -70,7 +71,7 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #Descriptive Statistics
 ```{r}
 #no distance to coast,elevation
-mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+mxy<-mxy[!mxy$NASA.Distance.to.Coast<0,]
 ```
 
 ```{r}
@@ -311,7 +312,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")]<-lapply(splitpc[c("lalpha_mu","lalpha_tau","lbeta_mu","lbeta_tau","gamma","theta")],function(x){
+splitpc[c("lalpha_mu","lbeta_mu","gamma","theta")]<-lapply(splitpc[c("lalpha_mu","lbeta_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)

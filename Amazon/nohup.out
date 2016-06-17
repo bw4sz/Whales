@@ -893,3 +893,5 @@ Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-58.460985,-
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Connection reset by 52.26.184.68
+Connection to ec2-52-37-220-164.us-west-2.compute.amazonaws.com closed by remote host.
