@@ -56,9 +56,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
-
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","123232","112705","154187"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -290,12 +288,13 @@ ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per A
 ```
 
 
-```{r}
+```{r,comment=NA}
 #source model
 source("Bayesian/MultiSpecies.R")
+print.noquote(readLines("Bayesian/MultiSpecies.R"))
 ```
 
-```{r,eval=T,t}
+```{r,eval=T}
 #prior cov shape
 R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
@@ -570,7 +569,7 @@ $$log (h_i(t)) = \alpha + \beta_i *x$$
 The cox model has no intercept, making it semi-parametric
 $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
-```{r}
+```{r,eval=F}
 #Create a 'bout' encoding for every time it changes
 statec[cumsum(runs$hours),"Bout"]<-seq(1,nrow(runs),1)
 
