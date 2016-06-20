@@ -28,10 +28,10 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-FALSE
+newModel<-TRUE
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
