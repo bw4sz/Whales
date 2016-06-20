@@ -31,7 +31,7 @@ library(move)
 newModel<-FALSE
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
