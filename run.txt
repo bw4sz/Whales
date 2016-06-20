@@ -14,7 +14,7 @@ List of 3
   |                                                                         |....                                                             |   6%
 label: unnamed-chunk-2 (with options) 
 List of 1
- $ eval: symbol F
+ $ eval: symbol T
 
   |                                                                         |.....                                                            |   7%
   ordinary text without R code
@@ -128,5 +128,4 @@ List of 1
 label: unnamed-chunk-17 (with options) 
 List of 1
  $ fig.height: num 10
-
 
