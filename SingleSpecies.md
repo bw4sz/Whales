@@ -149,7 +149,7 @@ How did the filter change the extent of tracks?
 ##  [55]     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]                                                                            
 ##  [56]     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])                                                                          
 ##  [57]                                                                                                                                 
-##  [58]     ##\tMeasurement equation - irregular observations                                                                            
+##  [58]     ##\tMeasurement equation - irregular observations                                                                           
 ##  [59]     # loops over regular time intervals (t)                                                                                     
 ##  [60]                                                                                                                                 
 ##  [61]     for(t in 2:steps[i,g]){                                                                                                     
@@ -250,8 +250,8 @@ How did the filter change the extent of tracks?
 ```
 
 ```
-##    user  system elapsed 
-##   10.34    3.98 9651.15
+##     user   system  elapsed 
+##   23.529    1.118 1573.510
 ```
 
 ##Chains
@@ -265,20 +265,7 @@ How did the filter change the extent of tracks?
 
 ##Prediction - environmental function
 
-
-```
-##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
-## Ncells  1480894  79.1    3886542 207.6   3886542 207.6
-## Vcells 59105186 451.0  113595818 866.7 113487789 865.9
-```
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
-
-```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1524212  81.5    3886542  207.6   3886542  207.6
-## Vcells 51399316 392.2  253439596 1933.6 316790951 2417.0
-```
 
 #Behavioral Prediction
 
@@ -301,6 +288,48 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
 
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-8.png)<!-- -->
+
 
 ### Per Track
 
@@ -316,6 +345,48 @@ How did the filter change the extent of tracks?
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
+
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-8.png)<!-- -->
 
 ##Log Odds of Feeding
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -338,6 +409,18 @@ How did the filter change the extent of tracks?
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+##Location of Behavior
+
+
+
+Global Plotting
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+
+Just the West Antarctic Penisula
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 ###Proportional Hazards
 
@@ -367,23 +450,35 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 90626, number of events= 90626 
+##   n= 409297, number of events= 409297 
 ## 
-##                    coef exp(coef)  se(coef)      z Pr(>|z|)    
-## feedr$Animal2 -0.390448  0.676754  0.008944 -43.66   <2e-16 ***
+##                    coef exp(coef)  se(coef)       z Pr(>|z|)    
+## feedr$Animal2 -0.727254  0.483234  0.004645 -156.58   <2e-16 ***
+## feedr$Animal3 -0.338797  0.712627  0.004372  -77.48   <2e-16 ***
+## feedr$Animal4 -0.685687  0.503744  0.019453  -35.25   <2e-16 ***
+## feedr$Animal5 -0.641360  0.526576  0.020773  -30.88   <2e-16 ***
+## feedr$Animal6 -0.120023  0.886900  0.006073  -19.77   <2e-16 ***
+## feedr$Animal7 -0.458819  0.632030  0.009519  -48.20   <2e-16 ***
+## feedr$Animal8 -1.140690  0.319598  0.020511  -55.61   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2    0.6768      1.478     0.665    0.6887
+## feedr$Animal2    0.4832      2.069    0.4789    0.4877
+## feedr$Animal3    0.7126      1.403    0.7065    0.7188
+## feedr$Animal4    0.5037      1.985    0.4849    0.5233
+## feedr$Animal5    0.5266      1.899    0.5056    0.5485
+## feedr$Animal6    0.8869      1.128    0.8764    0.8975
+## feedr$Animal7    0.6320      1.582    0.6203    0.6439
+## feedr$Animal8    0.3196      3.129    0.3070    0.3327
 ## 
-## Concordance= 0.572  (se = 0.003 )
-## Rsquare= 0.019   (max possible= 1 )
-## Likelihood ratio test= 1754  on 1 df,   p=0
-## Wald test            = 1906  on 1 df,   p=0
-## Score (logrank) test = 1930  on 1 df,   p=0
+## Concordance= 0.638  (se = 0.001 )
+## Rsquare= 0.071   (max possible= 1 )
+## Likelihood ratio test= 29989  on 7 df,   p=0
+## Wald test            = 29613  on 7 df,   p=0
+## Score (logrank) test = 30491  on 7 df,   p=0
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 
