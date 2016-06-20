@@ -689,3 +689,4 @@ Using jStep as value column: use value.var to override.
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-57.898832,-64.440264&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Connection reset by 52.40.248.213
