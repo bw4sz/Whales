@@ -244,3 +244,448 @@ Warning: Permanently added the RSA host key for IP address '192.30.252.130' to t
 To git@github.com:bw4sz/Whales.git
  * [new branch]      i-6f3ef8c0 -> i-6f3ef8c0
 Branch i-6f3ef8c0 set up to track remote branch i-6f3ef8c0 from origin.
+Warning: Permanently added 'ec2-52-40-248-213.us-west-2.compute.amazonaws.com,52.40.248.213' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.252.122' to the list of known hosts.
+From github.com:bw4sz/Whales
+   95484da..d19486f  master     -> origin/master
+   56fdb07..e55d979  gh-pages   -> origin/gh-pages
+Updating 95484da..d19486f
+Fast-forward
+ .Rhistory                                          | 928 ++++++++++-----------
+ .Rproj.user/8641BD5D/pcs/windowlayoutstate.pper    |   2 +-
+ .Rproj.user/8641BD5D/pcs/workbench-pane.pper       |   2 +-
+ .Rproj.user/8641BD5D/sdb/prop/AFAA8604             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/DED848CC             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/E8726973             |   3 +
+ .Rproj.user/8641BD5D/sdb/prop/INDEX                |   3 +
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04        |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file      |   0
+ .gitignore                                         |   2 +
+ Amazon/Job.bash                                    |  24 +
+ Amazon/Startup.bash                                |  19 +
+ Amazon/nohup.out                                   | 246 ++++++
+ Bayesian/MultiSpecies.R                            | 150 +++-
+ Bayesian/Multi_RW.jags                             | 150 +++-
+ InputData/CCAMLR_aggregated_catch_C1.xlsx          | Bin 0 -> 65371 bytes
+ MultiSpeciesHMM.Rmd                                | 403 +++++++--
+ MultiSpeciesHMM.html                               | 385 ++++++---
+ MultiSpeciesHMM.md                                 | 374 ++++++---
+ .../figure-html/unnamed-chunk-10-1.png             | Bin 37346 -> 47926 bytes
+ .../figure-html/unnamed-chunk-11-1.png             | Bin 39084 -> 50088 bytes
+ .../figure-html/unnamed-chunk-12-1.png             | Bin 124425 -> 36785 bytes
+ .../figure-html/unnamed-chunk-12-2.png             | Bin 21712 -> 10266 bytes
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 151118 -> 139487 bytes
+ .../figure-html/unnamed-chunk-13-2.png             | Bin 0 -> 22797 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 27507 -> 111596 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 17068 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 31342 bytes
+ .../figure-html/unnamed-chunk-15-2.png             | Bin 0 -> 87769 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 20462 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 6422 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 8095 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 48519 -> 50961 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 100485 -> 77770 bytes
+ .../figure-html/unnamed-chunk-6-2.png              | Bin 30221 -> 30945 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 157308 -> 38015 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 39270 -> 311102 bytes
+ SingleSpecies.Rmd                                  | 507 ++++++++---
+ SingleSpecies.html                                 | 473 +++++++----
+ SingleSpecies.md                                   | 450 ++++++----
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 364973 -> 444010 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 9935 -> 4309 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 4087 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 529403 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 42374 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 13500 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 13391 bytes
+ .../figure-html/unnamed-chunk-19-1.png             | Bin 0 -> 9952 bytes
+ .../figure-html/unnamed-chunk-19-2.png             | Bin 0 -> 261271 bytes
+ .../figure-html/unnamed-chunk-20-1.png             | Bin 0 -> 504276 bytes
+ .../figure-html/unnamed-chunk-20-2.png             | Bin 0 -> 471604 bytes
+ .../figure-html/unnamed-chunk-21-1.png             | Bin 0 -> 399246 bytes
+ .../figure-html/unnamed-chunk-21-2.png             | Bin 0 -> 443415 bytes
+ .../figure-html/unnamed-chunk-21-3.png             | Bin 0 -> 375592 bytes
+ .../figure-html/unnamed-chunk-21-4.png             | Bin 0 -> 375837 bytes
+ .../figure-html/unnamed-chunk-21-5.png             | Bin 0 -> 374892 bytes
+ .../figure-html/unnamed-chunk-21-6.png             | Bin 0 -> 382706 bytes
+ .../figure-html/unnamed-chunk-22-1.png             | Bin 0 -> 379704 bytes
+ .../figure-html/unnamed-chunk-22-2.png             | Bin 0 -> 344192 bytes
+ .../figure-html/unnamed-chunk-22-3.png             | Bin 0 -> 1052048 bytes
+ .../figure-html/unnamed-chunk-22-4.png             | Bin 0 -> 1051933 bytes
+ .../figure-html/unnamed-chunk-22-5.png             | Bin 0 -> 637128 bytes
+ .../figure-html/unnamed-chunk-22-6.png             | Bin 0 -> 1054988 bytes
+ .../figure-html/unnamed-chunk-23-1.png             | Bin 0 -> 9954 bytes
+ .../figure-html/unnamed-chunk-24-1.png             | Bin 0 -> 19658 bytes
+ .../figure-html/unnamed-chunk-25-1.png             | Bin 0 -> 10366 bytes
+ .../figure-html/unnamed-chunk-26-1.png             | Bin 0 -> 15948 bytes
+ .../figure-html/unnamed-chunk-27-1.png             | Bin 0 -> 4316 bytes
+ .../figure-html/unnamed-chunk-28-1.png             | Bin 0 -> 4416 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 10212 -> 442127 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 12401 -> 9799 bytes
+ .../figure-html/unnamed-chunk-7-1.png              | Bin 50194 -> 7765 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 13474 -> 5819 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 11720 -> 5592 bytes
+ ggmapTemp.png                                      | Bin 2820 -> 0 bytes
+ 79 files changed, 2835 insertions(+), 1380 deletions(-)
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/AFAA8604
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/DED848CC
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/E8726973
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file
+ create mode 100644 Amazon/Job.bash
+ create mode 100644 Amazon/Startup.bash
+ create mode 100644 Amazon/nohup.out
+ create mode 100644 InputData/CCAMLR_aggregated_catch_C1.xlsx
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-24-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-28-1.png
+Switched to a new branch 'i-c3883b1e'
+
+
+processing file: SingleSpecies.Rmd
+Loading required package: methods
+Loading required package: sp
+Loading required package: splines
+
+Attaching package: 'survival'
+
+The following object is masked from 'package:boot':
+
+    aml
+
+
+Attaching package: 'MASS'
+
+The following objects are masked from 'package:raster':
+
+    area, select
+
+
+Attaching package: 'dplyr'
+
+The following object is masked from 'package:MASS':
+
+    select
+
+The following objects are masked from 'package:raster':
+
+    intersect, select, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'gridExtra'
+
+The following object is masked from 'package:dplyr':
+
+    combine
+
+Loading required package: rjags
+Loading required package: coda
+Linked to JAGS 4.2.0
+Loaded modules: basemod,bugs
+
+Attaching package: 'R2jags'
+
+The following object is masked from 'package:coda':
+
+    traceplot
+
+Loading required package: geosphere
+Loading required package: rgdal
+rgdal: version: 1.1-10, (SVN revision 622)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 1.10.1, released 2013/08/26
+ Path to GDAL shared files: /usr/share/gdal/1.10
+ Loaded PROJ.4 runtime: Rel. 4.8.0, 6 March 2012, [PJ_VERSION: 480]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.2-3 
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-57.975718,-64.273396&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Loading required namespace: circular
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Using jStep as value column: use value.var to override.
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-57.898832,-64.440264&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning: Permanently added 'ec2-52-39-154-200.us-west-2.compute.amazonaws.com,52.39.154.200' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.252.122' to the list of known hosts.
+From github.com:bw4sz/Whales
+   95484da..d19486f  master     -> origin/master
+   56fdb07..e55d979  gh-pages   -> origin/gh-pages
+ * [new branch]      i-c3883b1e -> origin/i-c3883b1e
+Updating 95484da..d19486f
+Fast-forward
+ .Rhistory                                          | 928 ++++++++++-----------
+ .Rproj.user/8641BD5D/pcs/windowlayoutstate.pper    |   2 +-
+ .Rproj.user/8641BD5D/pcs/workbench-pane.pper       |   2 +-
+ .Rproj.user/8641BD5D/sdb/prop/AFAA8604             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/DED848CC             |   2 +
+ .Rproj.user/8641BD5D/sdb/prop/E8726973             |   3 +
+ .Rproj.user/8641BD5D/sdb/prop/INDEX                |   3 +
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182       |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04        |  18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file      |   0
+ .gitignore                                         |   2 +
+ Amazon/Job.bash                                    |  24 +
+ Amazon/Startup.bash                                |  19 +
+ Amazon/nohup.out                                   | 246 ++++++
+ Bayesian/MultiSpecies.R                            | 150 +++-
+ Bayesian/Multi_RW.jags                             | 150 +++-
+ InputData/CCAMLR_aggregated_catch_C1.xlsx          | Bin 0 -> 65371 bytes
+ MultiSpeciesHMM.Rmd                                | 403 +++++++--
+ MultiSpeciesHMM.html                               | 385 ++++++---
+ MultiSpeciesHMM.md                                 | 374 ++++++---
+ .../figure-html/unnamed-chunk-10-1.png             | Bin 37346 -> 47926 bytes
+ .../figure-html/unnamed-chunk-11-1.png             | Bin 39084 -> 50088 bytes
+ .../figure-html/unnamed-chunk-12-1.png             | Bin 124425 -> 36785 bytes
+ .../figure-html/unnamed-chunk-12-2.png             | Bin 21712 -> 10266 bytes
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 151118 -> 139487 bytes
+ .../figure-html/unnamed-chunk-13-2.png             | Bin 0 -> 22797 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 27507 -> 111596 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 17068 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 31342 bytes
+ .../figure-html/unnamed-chunk-15-2.png             | Bin 0 -> 87769 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 20462 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 6422 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 8095 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 48519 -> 50961 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 100485 -> 77770 bytes
+ .../figure-html/unnamed-chunk-6-2.png              | Bin 30221 -> 30945 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 157308 -> 38015 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 39270 -> 311102 bytes
+ SingleSpecies.Rmd                                  | 507 ++++++++---
+ SingleSpecies.html                                 | 473 +++++++----
+ SingleSpecies.md                                   | 450 ++++++----
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 364973 -> 444010 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 9935 -> 4309 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 0 -> 4087 bytes
+ .../figure-html/unnamed-chunk-15-1.png             | Bin 0 -> 529403 bytes
+ .../figure-html/unnamed-chunk-16-1.png             | Bin 0 -> 42374 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 0 -> 13500 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 0 -> 13391 bytes
+ .../figure-html/unnamed-chunk-19-1.png             | Bin 0 -> 9952 bytes
+ .../figure-html/unnamed-chunk-19-2.png             | Bin 0 -> 261271 bytes
+ .../figure-html/unnamed-chunk-20-1.png             | Bin 0 -> 504276 bytes
+ .../figure-html/unnamed-chunk-20-2.png             | Bin 0 -> 471604 bytes
+ .../figure-html/unnamed-chunk-21-1.png             | Bin 0 -> 399246 bytes
+ .../figure-html/unnamed-chunk-21-2.png             | Bin 0 -> 443415 bytes
+ .../figure-html/unnamed-chunk-21-3.png             | Bin 0 -> 375592 bytes
+ .../figure-html/unnamed-chunk-21-4.png             | Bin 0 -> 375837 bytes
+ .../figure-html/unnamed-chunk-21-5.png             | Bin 0 -> 374892 bytes
+ .../figure-html/unnamed-chunk-21-6.png             | Bin 0 -> 382706 bytes
+ .../figure-html/unnamed-chunk-22-1.png             | Bin 0 -> 379704 bytes
+ .../figure-html/unnamed-chunk-22-2.png             | Bin 0 -> 344192 bytes
+ .../figure-html/unnamed-chunk-22-3.png             | Bin 0 -> 1052048 bytes
+ .../figure-html/unnamed-chunk-22-4.png             | Bin 0 -> 1051933 bytes
+ .../figure-html/unnamed-chunk-22-5.png             | Bin 0 -> 637128 bytes
+ .../figure-html/unnamed-chunk-22-6.png             | Bin 0 -> 1054988 bytes
+ .../figure-html/unnamed-chunk-23-1.png             | Bin 0 -> 9954 bytes
+ .../figure-html/unnamed-chunk-24-1.png             | Bin 0 -> 19658 bytes
+ .../figure-html/unnamed-chunk-25-1.png             | Bin 0 -> 10366 bytes
+ .../figure-html/unnamed-chunk-26-1.png             | Bin 0 -> 15948 bytes
+ .../figure-html/unnamed-chunk-27-1.png             | Bin 0 -> 4316 bytes
+ .../figure-html/unnamed-chunk-28-1.png             | Bin 0 -> 4416 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 10212 -> 442127 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 12401 -> 9799 bytes
+ .../figure-html/unnamed-chunk-7-1.png              | Bin 50194 -> 7765 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 13474 -> 5819 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 11720 -> 5592 bytes
+ ggmapTemp.png                                      | Bin 2820 -> 0 bytes
+ 79 files changed, 2835 insertions(+), 1380 deletions(-)
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/AFAA8604
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/DED848CC
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/E8726973
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file
+ create mode 100644 Amazon/Job.bash
+ create mode 100644 Amazon/Startup.bash
+ create mode 100644 Amazon/nohup.out
+ create mode 100644 InputData/CCAMLR_aggregated_catch_C1.xlsx
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-24-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-28-1.png
+Switched to a new branch 'i-ad79ca70'
+
+
+processing file: SingleSpecies.Rmd
+Loading required package: methods
+Loading required package: sp
+Loading required package: splines
+
+Attaching package: 'survival'
+
+The following object is masked from 'package:boot':
+
+    aml
+
+
+Attaching package: 'MASS'
+
+The following objects are masked from 'package:raster':
+
+    area, select
+
+
+Attaching package: 'dplyr'
+
+The following object is masked from 'package:MASS':
+
+    select
+
+The following objects are masked from 'package:raster':
+
+    intersect, select, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'gridExtra'
+
+The following object is masked from 'package:dplyr':
+
+    combine
+
+Loading required package: rjags
+Loading required package: coda
+Linked to JAGS 4.2.0
+Loaded modules: basemod,bugs
+
+Attaching package: 'R2jags'
+
+The following object is masked from 'package:coda':
+
+    traceplot
+
+Loading required package: geosphere
+Loading required package: rgdal
+rgdal: version: 1.1-10, (SVN revision 622)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 1.10.1, released 2013/08/26
+ Path to GDAL shared files: /usr/share/gdal/1.10
+ Loaded PROJ.4 runtime: Rel. 4.8.0, 6 March 2012, [PJ_VERSION: 480]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.2-3 
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-57.975718,-64.273396&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Loading required namespace: circular
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Using jStep as value column: use value.var to override.
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-57.898832,-64.440264&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
