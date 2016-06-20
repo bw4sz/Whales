@@ -28,7 +28,7 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-FALSE
 ```
 
 ```{r,eval=F}
