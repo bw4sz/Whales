@@ -56,9 +56,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
-mxy<-mxy[mxy$Animal %in% c("112703","121211","123232","112705","154187"),]
+#mxy<-mxy[mxy$Animal %in% c("112703","121211","123232","112705","154187"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -296,7 +296,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=500,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=1500,n.thin=2,DIC=FALSE))
 }
 
 ```
