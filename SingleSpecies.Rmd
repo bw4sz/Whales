@@ -295,9 +295,6 @@ ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per A
 source("Bayesian/MultiSpecies.R")
 ```
 
-```{r,child="Bayesian/Multi_RW.jags"}
-```
-
 ```{r,eval=T,t}
 #prior cov shape
 R <- diag(c(1,1))
