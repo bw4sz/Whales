@@ -482,54 +482,11 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
 
-##Phase prediction
-
-```{r,eval=F}
-#order by time.
-mxy$time<-as.POSIXct(mxy$timestamp)
-
-mxy$State<-mxy$phi>0.5
-mxy$State<-as.factor(mxy$State)
-levels(mxy$State)<-c("Traveling","Feeding")  
-
-mxy<-mxy %>% arrange(Animal,`time`)
-
-#calculate runs
-sxy<-split(mxy,mxy$Animal)
-
-state_shade<-lapply(sxy,function(x){
-  
-  #run lengths
-  state_change<-rle(as.numeric(x$State))
-  
-  #get time for each length switch
-  xt<-x$time[cumsum(state_change$lengths[-length(state_change$lengths)])]
-  xmax<-x$time[cumsum(state_change$lengths)]
-  
-  #time limits
-  state_shade<-data.frame(xmin=c(0,xt),xmax=xmax,Behavior=state_change$values)
-})
-names(state_shade)<-1:length(state_shade)
-state_shade<-melt(state_shade,c("xmin","xmax","Behavior"))
-colnames(state_shade)<-c("xmin","xmax","Behavior","Animal")
-
-state_shade$Behavior<-as.factor(state_shade$Behavior)
-levels(state_shade$Behavior)<-c("Traveling","Feeding")
-ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ymin=-Inf,ymax=Inf) + facet_wrap(~Animal,ncol=1) + theme_bw() + geom_line(data=mxy,aes(x=time,y=phi)) + ylim(0,1) + labs(fill="True Behavior",y="Estimated Probability of Feeding")
-```
-
 ##Behavioral description
 
-## Predicted Run Length
+## Predicted behavior duration
 ```{r}
-statec<-pc %>% filter(parameter=='state')
-
-#split by animal and draw and chain
-astate<-split(statec,list(statec$Animal,statec$Draw,statec$chain))
-
-#get run length
-
-runs<-lapply(astate,function(x){
+runf<-function(x){
   #arrange by step
   #calculate run length
   state_change<-rle(as.numeric(x$value))
@@ -538,9 +495,10 @@ runs<-lapply(astate,function(x){
   levels(runl$Behavior)<-c("Traveling","Feeding")
   
   return(runl)
-})
+}
 
-runs<-rbind_all(runs)
+runs<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% do(runf(.))
+
 
 #turn steps to hours
 runs$hours<-runs$runs*step_length
