@@ -85,16 +85,21 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs
 
 ##Distance
 
-```{r,fig.height=5}
+```{r,fig.height=3}
 moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
 dstat<-melt(move::distanceSummary(moved))
-ggplot(dstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
+
+dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
+levels(dstat$variable)<-c("Total Distance (km)","Average Distance Between Points","Farthest Distance Between Points")
+ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
 ##Time 
-```{r,fig.height=4}
+```{r,fig.height=3}
 tstat<-move::timeSummary(moved)
 tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
+tstat<-droplevels(tstat[tstat$variable %in% c("Duration","AverDur"),])
+levels(tstat$variable)<-c("Total Time (Hours)","Average Time Between Points (Hours)")
 ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
@@ -102,14 +107,17 @@ ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free"
 ```{r,fig.height=3}
 vstat<-move::speedSummary(moved)
 vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
+levels(vstat$variable)<-c("Average Speed (m/s)","Variance in Speed (m/s)","Max Speed (m/s)")
 ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
 ##Angles
 
-```{r,fig.height=3}
+```{r,fig.height=2}
 astat<-move::angleSummary(moved)
 astat<-melt(astat,measure.vars=colnames(astat[[1]]))
+astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
+levels(astat$variable)<-"Turning Angle (degrees)"
 ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
@@ -281,13 +289,16 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
+
+```{r}
+#source model
+source("Bayesian/MultiSpecies.R")
+```
+
 ```{r,child="Bayesian/Multi_RW.jags"}
 ```
 
 ```{r,eval=T,t}
-#source model
-source("Bayesian/MultiSpecies.R")
-
 #prior cov shape
 R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
@@ -296,7 +307,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=1500,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=2500,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -449,10 +460,10 @@ spp
 
 ### Per Track
 ```{r,fig.height=10,fig.width=12}
-sxy<-split(mxy,list(mxy$Animal),drop=T)
+sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=T)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
+  m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(limits=c(0,1),low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
 })
 spp
@@ -508,10 +519,6 @@ ggplot() + geom_rect(data=state_shade,aes(xmin=xmin,xmax=xmax,fill=Behavior), ym
 ```
 
 ##Behavioral description
-
-###Average time in phase
-
-* For each draw, create a behavioral sequence, calculate the average runs for each behavior
 
 ## Predicted Run Length
 ```{r}
