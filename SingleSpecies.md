@@ -149,7 +149,7 @@ How did the filter change the extent of tracks?
 ##  [55]     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]                                                                            
 ##  [56]     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])                                                                          
 ##  [57]                                                                                                                                 
-##  [58]     ##\tMeasurement equation - irregular observations                                                                           
+##  [58]     ##\tMeasurement equation - irregular observations                                                                            
 ##  [59]     # loops over regular time intervals (t)                                                                                     
 ##  [60]                                                                                                                                 
 ##  [61]     for(t in 2:steps[i,g]){                                                                                                     
@@ -250,8 +250,8 @@ How did the filter change the extent of tracks?
 ```
 
 ```
-##     user   system  elapsed 
-##   10.657    0.425 1600.008
+##    user  system elapsed 
+##   10.34    3.98 9651.15
 ```
 
 ##Chains
@@ -265,7 +265,20 @@ How did the filter change the extent of tracks?
 
 ##Prediction - environmental function
 
+
+```
+##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
+## Ncells  1480894  79.1    3886542 207.6   3886542 207.6
+## Vcells 59105186 451.0  113595818 866.7 113487789 865.9
+```
+
 ![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
+```
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1524212  81.5    3886542  207.6   3886542  207.6
+## Vcells 51399316 392.2  253439596 1933.6 316790951 2417.0
+```
 
 #Behavioral Prediction
 
@@ -288,34 +301,6 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
 
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-4.png)<!-- -->
-
-```
-## 
-## $`5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-5.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-6.png)<!-- -->
-
 
 ### Per Track
 
@@ -331,34 +316,6 @@ How did the filter change the extent of tracks?
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
-
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-4.png)<!-- -->
-
-```
-## 
-## $`5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-5.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-6.png)<!-- -->
 
 ##Log Odds of Feeding
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -410,29 +367,21 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ## coxph(formula = Surv(time = feedr$hours, event = feedr$status) ~ 
 ##     feedr$Animal)
 ## 
-##   n= 163558, number of events= 163558 
+##   n= 90626, number of events= 90626 
 ## 
-##                    coef exp(coef)  se(coef)       z Pr(>|z|)    
-## feedr$Animal2  0.053270  1.054715  0.005809   9.170   <2e-16 ***
-## feedr$Animal3 -0.471873  0.623832  0.023374 -20.188   <2e-16 ***
-## feedr$Animal4 -0.233853  0.791478  0.023569  -9.922   <2e-16 ***
-## feedr$Animal5  0.370968  1.449137  0.007464  49.701   <2e-16 ***
-## feedr$Animal6 -0.948574  0.387293  0.022452 -42.249   <2e-16 ***
+##                    coef exp(coef)  se(coef)      z Pr(>|z|)    
+## feedr$Animal2 -0.390448  0.676754  0.008944 -43.66   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##               exp(coef) exp(-coef) lower .95 upper .95
-## feedr$Animal2    1.0547     0.9481    1.0428    1.0668
-## feedr$Animal3    0.6238     1.6030    0.5959    0.6531
-## feedr$Animal4    0.7915     1.2635    0.7557    0.8289
-## feedr$Animal5    1.4491     0.6901    1.4281    1.4705
-## feedr$Animal6    0.3873     2.5820    0.3706    0.4047
+## feedr$Animal2    0.6768      1.478     0.665    0.6887
 ## 
-## Concordance= 0.546  (se = 0.001 )
-## Rsquare= 0.038   (max possible= 1 )
-## Likelihood ratio test= 6365  on 5 df,   p=0
-## Wald test            = 5646  on 5 df,   p=0
-## Score (logrank) test = 5922  on 5 df,   p=0
+## Concordance= 0.572  (se = 0.003 )
+## Rsquare= 0.019   (max possible= 1 )
+## Likelihood ratio test= 1754  on 1 df,   p=0
+## Wald test            = 1906  on 1 df,   p=0
+## Score (logrank) test = 1930  on 1 df,   p=0
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->

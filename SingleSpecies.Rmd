@@ -46,7 +46,7 @@ mdat<-read.csv("InputData/FullData-550793189439001813.csv")
 ##need to look into making into a movebank object.
 
 #Create a oceandepth in km 
-mdat$ocean<-mdat$NASA.Distance.to.Coast
+mdat$ocean<-mdat$ETOPO1.Elevation * -1 /1000
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -56,8 +56,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab two animals
-mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
-#mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
+#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+
+mxy<-mxy[mxy$Animal %in% c("112703","121211","123232","112705","154187"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -71,7 +72,8 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #Descriptive Statistics
 ```{r}
 #no distance to coast,elevation
-mxy<-mxy[!mxy$NASA.Distance.to.Coast<0,]
+mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+
 ```
 
 ```{r}
@@ -294,7 +296,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1500,n.burnin=0,n.thin=3,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=500,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -382,32 +384,27 @@ rm(allp)
 ##Prediction - environmental function
 
 ```{r}
-gc()
 #get the posterior estimates of the env function
-alphap<-cbind(pc %>% filter(par=='lalpha_mu[1]') %>% .$value,pc %>% filter(par=='lalpha_mu[2]') %>% .$value)
+predp<-pc %>% filter(par %in% c('lbeta_mu[1]','lalpha_mu[1]')) %>% group_by(par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95)) %>% melt()
 
-betap<-cbind(pc %>% filter(par=='lbeta_mu[1]') %>% .$value,pc %>% filter(par=='lbeta_mu[2]') %>% .$value)
- 
+predp<-dcast(predp,...~par)
+
 postplot<-list()
-
-for(j in 1:nrow(alphap)){
-  postplot[[j]]<-data.frame(dplot(x=mxy$ocean,a1=alphap[j,],beta=betap[j,]),Iteration=j)
+for(x in 1:nrow(predp)){
+  postplot[[x]]<-dplot(a1=predp[x,"lalpha_mu[1]"],beta=predp[x,"lbeta_mu[1]"],x=mxy$ocean)
 }
+names(postplot)<-predp$variable
 
-#remove large objects
-rm(alphap)
-rm(betap)
+postplot<-lapply(postplot,function(x){
+  x$ID<-1:nrow(x)
+  return(x)
+})
+postplot<-melt(postplot,id.vars=colnames(postplot[[1]]))
 
-postplot<-rbind_all(postplot)
-
-dsum<-postplot %>% group_by(x,Begin,State) %>% summarize(y_mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+dsum<-dcast(postplot,ID+x+State+Begin~L1,value.var="y")
 
 #mean env estimate
-ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=y_mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
-
-#remove large object
-rm(postplot)
-gc()
+ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
 
 #Behavioral Prediction
@@ -546,6 +543,47 @@ ggplot(runs,aes(x=as.numeric(hours),fill=Behavior)) + geom_histogram(position='d
 ```{r,fig.height=3,fig.with=3.5}
 mr<-runs %>% group_by(Behavior) %>% summarize(mean=mean(hours),lower=quantile(runs,0.05),upper=quantile(runs,0.95))
 ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2) + theme_bw() + ggtitle("Average Duration of Behavior") + labs(y="Hours")
+```
+
+##Location of Behavior
+
+```{r}
+msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
+
+r<-raster(msp)
+res(r)<-1
+
+m<-rasterize(x=msp,y=r,field="phi")
+
+```
+
+Global Plotting
+
+```{r}
+#plotting
+feedmap <- data.frame(rasterToPoints(m))
+
+temp <- get_map(location=bbox(m),source="google",zoom=3,maptype="satellite")
+
+ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
+```
+
+Just the West Antarctic Penisula
+
+```{r}
+msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
+
+r<-raster(msp,ext=extent(c(-70,-55,-66,-58)))
+res(r)<-0.5
+
+m<-rasterize(x=msp,y=r,field="phi")
+
+#plotting
+feedmap <- data.frame(rasterToPoints(m))
+
+temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite")
+
+ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.8) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
 ###Proportional Hazards
