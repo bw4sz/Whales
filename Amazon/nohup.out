@@ -16,3 +16,119 @@ fatal: Not a git repository (or any of the parent directories): .git
 fatal: Not a git repository (or any of the parent directories): .git
 /home/ubuntu/Job.bash: line 22: $'\r': command not found
 sudo: halt: command not found
+Warning: Permanently added 'ec2-52-41-132-124.us-west-2.compute.amazonaws.com,52.41.132.124' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.252.123' to the list of known hosts.
+From github.com:bw4sz/Whales
+ + 95484da...cbff9f1 master     -> origin/master  (forced update)
+   56fdb07..fc61a99  gh-pages   -> origin/gh-pages
+warning: Cannot merge binary files: ggmapTemp.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-9-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-8-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-2.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-5-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-2.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-11-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+warning: Cannot merge binary files: MultiSpeciesHMM_files/figure-html/unnamed-chunk-10-1.png (HEAD vs. cbff9f14d4fe17e97921648e6f8346999ae12100)
+Auto-merging ggmapTemp.png
+CONFLICT (add/add): Merge conflict in ggmapTemp.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-9-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-9-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-8-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-8-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-7-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-7-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-6-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-6-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-5-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-5-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-14-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-14-1.png
+Auto-merging SingleSpecies_files/figure-html/unnamed-chunk-13-1.png
+CONFLICT (add/add): Merge conflict in SingleSpecies_files/figure-html/unnamed-chunk-13-1.png
+Auto-merging SingleSpecies.md
+CONFLICT (add/add): Merge conflict in SingleSpecies.md
+Auto-merging SingleSpecies.html
+CONFLICT (add/add): Merge conflict in SingleSpecies.html
+Auto-merging SingleSpecies.Rmd
+CONFLICT (add/add): Merge conflict in SingleSpecies.Rmd
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-9-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-9-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-8-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-8-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-2.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-2.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-5-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-5-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-2.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-2.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-11-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-11-1.png
+Auto-merging MultiSpeciesHMM_files/figure-html/unnamed-chunk-10-1.png
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM_files/figure-html/unnamed-chunk-10-1.png
+Auto-merging MultiSpeciesHMM.md
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM.md
+Auto-merging MultiSpeciesHMM.html
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM.html
+Auto-merging MultiSpeciesHMM.Rmd
+CONFLICT (add/add): Merge conflict in MultiSpeciesHMM.Rmd
+Auto-merging Bayesian/Multi_RW.jags
+CONFLICT (add/add): Merge conflict in Bayesian/Multi_RW.jags
+Auto-merging Bayesian/MultiSpecies.R
+CONFLICT (add/add): Merge conflict in Bayesian/MultiSpecies.R
+Auto-merging .gitignore
+CONFLICT (add/add): Merge conflict in .gitignore
+Auto-merging .Rhistory
+CONFLICT (add/add): Merge conflict in .Rhistory
+Automatic merge failed; fix conflicts and then commit the result.
+error: you need to resolve your current index first
+.Rhistory: needs merge
+.gitignore: needs merge
+Bayesian/MultiSpecies.R: needs merge
+Bayesian/Multi_RW.jags: needs merge
+MultiSpeciesHMM.Rmd: needs merge
+MultiSpeciesHMM.html: needs merge
+MultiSpeciesHMM.md: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-10-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-11-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-12-2.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-5-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-6-2.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-8-1.png: needs merge
+MultiSpeciesHMM_files/figure-html/unnamed-chunk-9-1.png: needs merge
+SingleSpecies.Rmd: needs merge
+SingleSpecies.html: needs merge
+SingleSpecies.md: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-13-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-14-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-5-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-6-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-7-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-8-1.png: needs merge
+SingleSpecies_files/figure-html/unnamed-chunk-9-1.png: needs merge
+ggmapTemp.png: needs merge
+[master 025c4b4] ec2 run complete
+error: src refspec i-68fa47b5 does not match any.
+error: failed to push some refs to 'git@github.com:bw4sz/Whales.git'

@@ -7,7 +7,7 @@ output:
     keep_md: true
     number_sections: true
     toc: true
-    theme: Journal
+    theme: journal
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
@@ -59,9 +59,14 @@ mxy$y<-mxy$location.lat
 #mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
-
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
+#crop by extent
+#crop by extent
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
+d<-crop(d,y=extent(c(-70,-55,-66,-58)))
+
+mxy<-as.data.frame(d)
 #set datestamp
 mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
 
@@ -448,23 +453,11 @@ rm(behav_chains)
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=4,source="google",scale=2,maptype="satellite")
+  m <- get_map(location=pp,zoom=4,source="google",scale=1,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
 spp
 
-```
-
-
-### Per Track
-```{r,fig.height=10,fig.width=12}
-sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=T)
-spp<-lapply(sxy,function(x){
-  pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,source="google",zoom=6,scale=1,maptype="satellite")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(limits=c(0,1),low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
-})
-spp
 ```
 
 ##Log Odds of Feeding
@@ -523,17 +516,6 @@ m<-rasterize(x=msp,y=r,field="phi")
 Global Plotting
 
 ```{r}
-#plotting
-feedmap <- data.frame(rasterToPoints(m))
-
-temp <- get_map(location=bbox(m),source="google",zoom=3,maptype="satellite")
-
-ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
-```
-
-Just the West Antarctic Penisula
-
-```{r}
 msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
 
 r<-raster(msp,ext=extent(c(-70,-55,-66,-58)))
@@ -574,22 +556,6 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 ```{r,eval=F}
 
 
-runf<-function(x){
-  #arrange by step
-  #calculate run length
-  state_change<-rle(as.numeric(x$value))
-  runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
-  runl$Behavior<-as.factor(runl$Behavior)
-  levels(runl$Behavior)<-c("Traveling","Feeding")
-  x[cumsum(runl$runs)+1,"Bout"]<-seq(1,nrow(runl),1)
-  return(runl)
-}
-
-statec<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% mutate(runf(.))
-
-
-#Create a 'bout' encoding for every time it changes
-statec[cumsum(runs$hours)+1,"Bout"]<-seq(1,nrow(runs),1)
 
 #Fill missing NA values
 repeat.before = function(x) {   # repeats the last non NA value. Keeps leading NA
@@ -600,12 +566,26 @@ repeat.before = function(x) {   # repeats the last non NA value. Keeps leading N
        c(ind, length(x) + 1) )) # diffing the indices + length yields how often 
 }                               
 
-statec$Bout<-repeat.before(statec$Bout)
+runB<-function(x){
+  #arrange by step
+  #calculate run length
+  state_change<-rle(as.numeric(x$value))
+  runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
+  runl$Behavior<-as.factor(runl$Behavior)
+  levels(runl$Behavior)<-c("Traveling","Feeding")
+  x[c(1,cumsum(runl$runs)),"Bout"]<-seq(1,nrow(runl),1)
+  x$Bout<-repeat.before(x$Bout)
+  feedr<-runs[runs$Behavior %in% "Feeding",]
+  feedr$status<-1
 
-feedr<-runs[runs$Behavior %in% "Feeding",]
+
+  return(x)
+}
+
+statec<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% mutate(runB(.))
+
 
 #Every run eventually ends in a switch (that's what makes it a run)
-feedr$status<-1
 
 #survival analysis
 tf<-coxph(Surv(time=feedr$hours,event=feedr$status)~feedr$Animal)
