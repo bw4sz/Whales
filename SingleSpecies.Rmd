@@ -56,7 +56,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -473,7 +473,7 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 
 ##Autocorrelation in behavior
 
-```{r}
+```{r,fig.height=10}
 #create proper time stamp
 ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
@@ -570,8 +570,24 @@ The cox model has no intercept, making it semi-parametric
 $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
 ```{r,eval=F}
+
+
+runf<-function(x){
+  #arrange by step
+  #calculate run length
+  state_change<-rle(as.numeric(x$value))
+  runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
+  runl$Behavior<-as.factor(runl$Behavior)
+  levels(runl$Behavior)<-c("Traveling","Feeding")
+  x[cumsum(runl$runs)+1,"Bout"]<-seq(1,nrow(runl),1)
+  return(runl)
+}
+
+statec<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% mutate(runf(.))
+
+
 #Create a 'bout' encoding for every time it changes
-statec[cumsum(runs$hours),"Bout"]<-seq(1,nrow(runs),1)
+statec[cumsum(runs$hours)+1,"Bout"]<-seq(1,nrow(runs),1)
 
 #Fill missing NA values
 repeat.before = function(x) {   # repeats the last non NA value. Keeps leading NA
