@@ -459,7 +459,7 @@ spp
 sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=T)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite")
+  m <- get_map(location=pp,source="google",zoom=6,scale=1,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(limits=c(0,1),low='blue',high='red') + labs(col="Probability of Feeding") + facet_wrap(~Track) + theme_bw()
 })
 spp
