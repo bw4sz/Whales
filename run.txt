@@ -77,7 +77,7 @@ rgdal: version: 1.1-10, (SVN revision 622)
   |                                                                         |...                                                              |   5%
   ordinary text without R code
 
-  |                                                                         |....                                                             |   6%
+  |                                                                         |....                                                             |   7%
 label: unnamed-chunk-2 (with options) 
 List of 1
  $ eval: symbol F
@@ -85,23 +85,23 @@ List of 1
   |                                                                         |.....                                                            |   8%
   ordinary text without R code
 
-  |                                                                         |......                                                           |   9%
+  |                                                                         |......                                                           |  10%
 label: unnamed-chunk-3
-  |                                                                         |.......                                                          |  11%
-  ordinary text without R code
-
   |                                                                         |........                                                         |  12%
+  ordinary text without R code
+
+  |                                                                         |.........                                                        |  13%
 label: unnamed-chunk-4
-  |                                                                         |.........                                                        |  14%
+  |                                                                         |..........                                                       |  15%
   ordinary text without R code
 
-  |                                                                         |..........                                                       |  16%
-label: unnamed-chunk-5
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-58.524538,-64.201928&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |...........                                                      |  17%
+label: unnamed-chunk-5
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.932957,-61.89704&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |............                                                     |  18%
   ordinary text without R code
 
-  |                                                                         |............                                                     |  19%
+  |                                                                         |.............                                                    |  20%
 label: unnamed-chunk-6 (with options) 
 List of 1
  $ fig.height: num 3
@@ -120,64 +120,64 @@ No id variables; using all as measure variables
 No id variables; using all as measure variables
 No id variables; using all as measure variables
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |.............                                                    |  20%
+  |                                                                         |..............                                                   |  22%
   ordinary text without R code
 
-  |                                                                         |..............                                                   |  22%
+  |                                                                         |...............                                                  |  23%
 label: unnamed-chunk-7 (with options) 
 List of 1
  $ fig.height: num 3
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |...............                                                  |  23%
+  |                                                                         |................                                                 |  25%
   ordinary text without R code
 
-  |                                                                         |................                                                 |  25%
+  |                                                                         |.................                                                |  27%
 label: unnamed-chunk-8 (with options) 
 List of 1
  $ fig.height: num 3
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |.................                                                |  27%
+  |                                                                         |..................                                               |  28%
   ordinary text without R code
 
-  |                                                                         |..................                                               |  28%
+  |                                                                         |....................                                             |  30%
 label: unnamed-chunk-9 (with options) 
 List of 1
  $ fig.height: num 2
 
 Loading required namespace: circular
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |...................                                              |  30%
+  |                                                                         |.....................                                            |  32%
   ordinary text without R code
 
-  |                                                                         |....................                                             |  31%
+  |                                                                         |......................                                           |  33%
 label: unnamed-chunk-10 (with options) 
 List of 2
  $ fig.height: num 3
  $ fig.width : num 3.5
 
-  |                                                                         |.....................                                            |  33%
+  |                                                                         |.......................                                          |  35%
   ordinary text without R code
 
-  |                                                                         |......................                                           |  34%
+  |                                                                         |........................                                         |  37%
 label: unnamed-chunk-11
-  |                                                                         |.......................                                          |  36%
+  |                                                                         |.........................                                        |  38%
   ordinary text without R code
 
-  |                                                                         |........................                                         |  38%
+  |                                                                         |..........................                                       |  40%
 label: unnamed-chunk-12
 Using jStep as value column: use value.var to override.
-  |                                                                         |.........................                                        |  39%
-  ordinary text without R code
-
-  |                                                                         |..........................                                       |  41%
-label: unnamed-chunk-13
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-58.165872,-64.286097&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |...........................                                      |  42%
   ordinary text without R code
 
-  |                                                                         |............................                                     |  44%
+  |                                                                         |............................                                     |  43%
+label: unnamed-chunk-13
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.892315,-61.850805&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |.............................                                    |  45%
+  ordinary text without R code
+
+  |                                                                         |..............................                                   |  47%
 label: unnamed-chunk-14 (with options) 
 List of 2
  $ fig.height: num 4
@@ -185,292 +185,125 @@ List of 2
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |.............................                                    |  45%
-  ordinary text without R code
-
-  |                                                                         |..............................                                   |  47%
-label: unnamed-chunk-15 (with options) 
-List of 1
- $ comment: logi NA
-
   |                                                                         |...............................                                  |  48%
   ordinary text without R code
 
   |                                                                         |................................                                 |  50%
-label: unnamed-chunk-16 (with options) 
+label: unnamed-chunk-15 (with options) 
 List of 1
- $ eval: symbol T
+ $ comment: logi NA
 
   |                                                                         |..................................                               |  52%
   ordinary text without R code
 
   |                                                                         |...................................                              |  53%
-label: unnamed-chunk-17 (with options) 
+label: unnamed-chunk-16 (with options) 
 List of 1
- $ fig.height: num 10
+ $ eval: symbol T
 
   |                                                                         |....................................                             |  55%
   ordinary text without R code
 
-  |                                                                         |.....................................                            |  56%
+  |                                                                         |.....................................                            |  57%
+label: unnamed-chunk-17 (with options) 
+List of 1
+ $ fig.height: num 10
+
+  |                                                                         |......................................                           |  58%
+  ordinary text without R code
+
+  |                                                                         |.......................................                          |  60%
 label: unnamed-chunk-18 (with options) 
 List of 1
  $ fig.width: num 11
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |......................................                           |  58%
+  |                                                                         |........................................                         |  62%
   ordinary text without R code
 
-  |                                                                         |.......................................                          |  59%
+  |                                                                         |.........................................                        |  63%
 label: unnamed-chunk-19
-  |                                                                         |........................................                         |  61%
+  |                                                                         |..........................................                       |  65%
   ordinary text without R code
 
-  |                                                                         |.........................................                        |  62%
+  |                                                                         |...........................................                      |  67%
 label: unnamed-chunk-20
 Using par as id variables
-  |                                                                         |..........................................                       |  64%
+  |                                                                         |............................................                     |  68%
   ordinary text without R code
 
-  |                                                                         |...........................................                      |  66%
+  |                                                                         |..............................................                   |  70%
 label: unnamed-chunk-21
-  |                                                                         |............................................                     |  67%
+  |                                                                         |...............................................                  |  72%
   ordinary text without R code
 
-  |                                                                         |.............................................                    |  69%
+  |                                                                         |................................................                 |  73%
 label: unnamed-chunk-22
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.497002,-58.191498&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.497002,-59.100006&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-30.3225,-70.664505&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.290001,-64.242996&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.065001,-61.77951&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.065001,-61.77951&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-29.722501,-69.718491&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62.544001,-61.102005&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.758,-62.939&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.758,-62.939&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.679,-64.151&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.679,-64.151&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.5255,-67.187&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.74,-66.2195&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.9035,-64.64&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.9035,-64.64&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.145,-61.102&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-  |                                                                         |..............................................                   |  70%
-  ordinary text without R code
-
-  |                                                                         |...............................................                  |  72%
-label: unnamed-chunk-23 (with options) 
-List of 2
- $ fig.height: num 10
- $ fig.width : num 12
-
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.514502,-61.348511&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.391499,-61.9785&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.624001,-62.417999&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.563999,-62.304504&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.758,-62.939&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.679,-64.151&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-66.082,-67.187&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.8595,-64.032&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.145,-61.102&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.217501,-59.128006&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.2775,-61.501999&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.461502,-62.020493&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.420002,-61.923508&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.961,-66.568&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.9035,-64.64&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62.896999,-56.160492&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.686501,-60.188004&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.002001,-61.77951&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.386497,-61.724991&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.5865,-65.726&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-61.029501,-67.255493&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.2575,-61.278&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.9225,-64.911&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-46.335999,-75.35051&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.596497,-62.169998&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.16,-65.089&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-26.259001,-75.551498&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.73,-62.560989&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.223,-65.159&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-15.144,-77.077988&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.593498,-61.98851&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-10.0135,-79.39299&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.509499,-62.490997&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=2.559,-78.722504&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-6.4815,-80.524994&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=0.8955,-79.76799&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-3.001,-80.682495&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-2.9005,-81.574493&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-1.3295,-80.817505&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-4.4225,-82.580002&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=0.948,-79.667999&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-4.524,-82.313004&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=2.908,-78.929504&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-9.1415,-78.949997&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-11.7465,-77.547501&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-16.7065,-75.48201&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-32.074999,-78.950485&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-51.049,-74.101501&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-61.147499,-61.102005&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-60.74,-57.382996&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-60.8965,-57.220993&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-  |                                                                         |................................................                 |  73%
-  ordinary text without R code
-
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.145,-61.102&zoom=4&size=640x640&scale=1&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |.................................................                |  75%
-label: unnamed-chunk-24
+  ordinary text without R code
+
   |                                                                         |..................................................               |  77%
-  ordinary text without R code
-
+label: unnamed-chunk-23
   |                                                                         |...................................................              |  78%
-label: unnamed-chunk-25
+  ordinary text without R code
+
   |                                                                         |....................................................             |  80%
+label: unnamed-chunk-24 (with options) 
+List of 1
+ $ fig.height: num 10
+
+  |                                                                         |.....................................................            |  82%
   ordinary text without R code
 
-  |                                                                         |.....................................................            |  81%
-label: unnamed-chunk-26
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
   |                                                                         |......................................................           |  83%
+label: unnamed-chunk-25
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+  |                                                                         |.......................................................          |  85%
   ordinary text without R code
 
-  |                                                                         |.......................................................          |  84%
-label: unnamed-chunk-27 (with options) 
+  |                                                                         |........................................................         |  87%
+label: unnamed-chunk-26 (with options) 
 List of 2
  $ fig.height: num 3
  $ fig.with  : num 3.5
 
-  |                                                                         |........................................................         |  86%
-  ordinary text without R code
-
   |                                                                         |.........................................................        |  88%
-label: unnamed-chunk-28
-  |                                                                         |..........................................................       |  89%
   ordinary text without R code
 
-  |                                                                         |...........................................................      |  91%
-label: unnamed-chunk-29
-Warning: bounding box given to google - spatial extent only approximate.
-converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-31.06,-68.040985&zoom=3&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..........................................................       |  90%
+label: unnamed-chunk-27
   |                                                                         |............................................................     |  92%
   ordinary text without R code
 
-  |                                                                         |.............................................................    |  94%
-label: unnamed-chunk-30
+  |                                                                         |.............................................................    |  93%
+label: unnamed-chunk-28
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62,-62.5&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
@@ -478,19 +311,19 @@ Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62,-62.5&zo
   ordinary text without R code
 
   |                                                                         |...............................................................  |  97%
-label: unnamed-chunk-31 (with options) 
+label: unnamed-chunk-29 (with options) 
 List of 1
- $ eval: symbol F
+ $ eval: symbol T
 
   |                                                                         |................................................................ |  98%
   ordinary text without R code
 
   |                                                                         |.................................................................| 100%
-label: unnamed-chunk-32
+label: unnamed-chunk-30
 
 output file: SingleSpecies.knit.md
 
-/usr/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpmoX2WK/rmarkdown-str5a94d069728.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+/usr/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/Rtmpzvumn3/rmarkdown-str599aafdf06.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
 
 Output created: SingleSpecies.html
-There were 32 warnings (use warnings() to see them)
+There were 22 warnings (use warnings() to see them)

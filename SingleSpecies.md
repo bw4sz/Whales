@@ -253,7 +253,7 @@ How did the filter change the extent of tracks?
 
 ```
 ##     user   system  elapsed 
-##   47.034    1.485 2330.062
+##   14.777    0.593 1707.768
 ```
 
 ##Chains
@@ -339,378 +339,19 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-9.png)<!-- -->
 
-
-### Per Track
-
-```
-## $`1.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
-
-```
-## 
-## $`2.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
-
-```
-## 
-## $`3.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
-
-```
-## 
-## $`4.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-4.png)<!-- -->
-
-```
-## 
-## $`5.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-5.png)<!-- -->
-
-```
-## 
-## $`6.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-6.png)<!-- -->
-
-```
-## 
-## $`7.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-7.png)<!-- -->
-
-```
-## 
-## $`8.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-8.png)<!-- -->
-
-```
-## 
-## $`9.1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-9.png)<!-- -->
-
-```
-## 
-## $`1.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-10.png)<!-- -->
-
-```
-## 
-## $`2.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-11.png)<!-- -->
-
-```
-## 
-## $`3.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-12.png)<!-- -->
-
-```
-## 
-## $`4.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-13.png)<!-- -->
-
-```
-## 
-## $`7.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-14.png)<!-- -->
-
-```
-## 
-## $`8.2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-15.png)<!-- -->
-
-```
-## 
-## $`1.3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-16.png)<!-- -->
-
-```
-## 
-## $`2.3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-17.png)<!-- -->
-
-```
-## 
-## $`3.3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-18.png)<!-- -->
-
-```
-## 
-## $`4.3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-19.png)<!-- -->
-
-```
-## 
-## $`7.3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-20.png)<!-- -->
-
-```
-## 
-## $`2.4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-21.png)<!-- -->
-
-```
-## 
-## $`4.4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-22.png)<!-- -->
-
-```
-## 
-## $`7.4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-23.png)<!-- -->
-
-```
-## 
-## $`2.5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-24.png)<!-- -->
-
-```
-## 
-## $`4.5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-25.png)<!-- -->
-
-```
-## 
-## $`7.5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-26.png)<!-- -->
-
-```
-## 
-## $`2.6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-27.png)<!-- -->
-
-```
-## 
-## $`4.6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-28.png)<!-- -->
-
-```
-## 
-## $`7.6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-29.png)<!-- -->
-
-```
-## 
-## $`2.7`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-30.png)<!-- -->
-
-```
-## 
-## $`4.7`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-31.png)<!-- -->
-
-```
-## 
-## $`2.8`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-32.png)<!-- -->
-
-```
-## 
-## $`4.8`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-33.png)<!-- -->
-
-```
-## 
-## $`2.9`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-34.png)<!-- -->
-
-```
-## 
-## $`4.9`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-35.png)<!-- -->
-
-```
-## 
-## $`2.10`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-36.png)<!-- -->
-
-```
-## 
-## $`4.10`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-37.png)<!-- -->
-
-```
-## 
-## $`2.11`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-38.png)<!-- -->
-
-```
-## 
-## $`4.11`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-39.png)<!-- -->
-
-```
-## 
-## $`2.12`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-40.png)<!-- -->
-
-```
-## 
-## $`4.12`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-41.png)<!-- -->
-
-```
-## 
-## $`2.13`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-42.png)<!-- -->
-
-```
-## 
-## $`4.13`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-43.png)<!-- -->
-
-```
-## 
-## $`4.14`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-44.png)<!-- -->
-
-```
-## 
-## $`4.15`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-45.png)<!-- -->
-
-```
-## 
-## $`4.16`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-46.png)<!-- -->
-
-```
-## 
-## $`4.17`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-47.png)<!-- -->
-
-```
-## 
-## $`4.18`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-48.png)<!-- -->
-
-```
-## 
-## $`4.19`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-49.png)<!-- -->
-
-```
-## 
-## $`4.20`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-50.png)<!-- -->
-
-```
-## 
-## $`4.21`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-51.png)<!-- -->
-
 ##Log Odds of Feeding
-![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ##Location of Behavior
 
@@ -718,11 +359,7 @@ How did the filter change the extent of tracks?
 
 Global Plotting
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
-
-Just the West Antarctic Penisula
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ###Proportional Hazards
 
@@ -747,10 +384,47 @@ The cox model has no intercept, making it semi-parametric
 $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
 
+```
+## Call:
+## coxph(formula = Surv(time = feedr$hours, event = feedr$status, 
+##     type = "right") ~ feedr$Animal)
+## 
+##   n= 272680, number of events= 266688 
+## 
+##                    coef exp(coef)  se(coef)      z Pr(>|z|)    
+## feedr$Animal2 -0.222194  0.800760  0.005716 -38.87   <2e-16 ***
+## feedr$Animal3 -0.402842  0.668417  0.007910 -50.93   <2e-16 ***
+## feedr$Animal4 -0.471656  0.623968  0.005604 -84.17   <2e-16 ***
+## feedr$Animal5 -0.596450  0.550763  0.021337 -27.95   <2e-16 ***
+## feedr$Animal6 -0.745654  0.474424  0.023698 -31.46   <2e-16 ***
+## feedr$Animal7  0.102635  1.108087  0.007328  14.01   <2e-16 ***
+## feedr$Animal8 -0.644162  0.525102  0.010143 -63.51   <2e-16 ***
+## feedr$Animal9 -1.086958  0.337241  0.017574 -61.85   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##               exp(coef) exp(-coef) lower .95 upper .95
+## feedr$Animal2    0.8008     1.2488    0.7918    0.8098
+## feedr$Animal3    0.6684     1.4961    0.6581    0.6789
+## feedr$Animal4    0.6240     1.6026    0.6172    0.6309
+## feedr$Animal5    0.5508     1.8157    0.5282    0.5743
+## feedr$Animal6    0.4744     2.1078    0.4529    0.4970
+## feedr$Animal7    1.1081     0.9025    1.0923    1.1241
+## feedr$Animal8    0.5251     1.9044    0.5148    0.5356
+## feedr$Animal9    0.3372     2.9652    0.3258    0.3491
+## 
+## Concordance= 0.595  (se = 0.001 )
+## Rsquare= 0.057   (max possible= 1 )
+## Likelihood ratio test= 16036  on 8 df,   p=0
+## Wald test            = 15590  on 8 df,   p=0
+## Score (logrank) test = 16023  on 8 df,   p=0
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 
 ```
-##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1630692   87.1    5295264  282.8   8273852  441.9
-## Vcells 342186930 2610.7  671329130 5121.9 627329149 4786.2
+##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1858084  99.3    4703850  251.3   4703850  251.3
+## Vcells 114469818 873.4  203408056 1551.9 203407856 1551.9
 ```
