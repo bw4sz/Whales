@@ -55,8 +55,8 @@ mxy$Animal<-mxy$individual.local.identifier
 mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
-#grab two animals
-mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+#grab set of animals
+#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
@@ -392,13 +392,13 @@ rm(allp)
 
 ```{r}
 #get the posterior estimates of the env function
-predp<-pc %>% filter(par %in% c('lbeta_mu[1]','lalpha_mu[1]')) %>% group_by(par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95)) %>% melt()
+predp<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% group_by(par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95)) %>% melt()
 
 predp<-dcast(predp,...~par)
 
 postplot<-list()
 for(x in 1:nrow(predp)){
-  postplot[[x]]<-dplot(a1=predp[x,"lalpha_mu[1]"],beta=predp[x,"lbeta_mu[1]"],x=mxy$ocean)
+  postplot[[x]]<-dplot(a1=as.numeric(predp[x,c("lalpha_mu[1]","lalpha_mu[2]")]),beta=as.numeric(predp[x,c("lbeta_mu[1]","lbeta_mu[2]")]),x=mxy$ocean)
 }
 names(postplot)<-predp$variable
 
