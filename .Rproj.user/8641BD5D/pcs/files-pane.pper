@@ -1,0 +1,9 @@
+{
+    "path" : "~/Whales",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
