@@ -310,7 +310,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=3000,n.thin=2,DIC=FALSE))
 }
 
 ```
