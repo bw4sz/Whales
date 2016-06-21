@@ -1206,3 +1206,279 @@ Fast-forward
  create mode 100644 test.html
 Switched to a new branch 'i-4d09ba90'
 Connection reset by 50.112.9.219
+Warning: Permanently added 'ec2-52-38-52-46.us-west-2.compute.amazonaws.com,52.38.52.46' (ECDSA) to the list of known hosts.
+/home/ubuntu/Job.bash: line 2: $'\r': command not found
+/home/ubuntu/Job.bash: line 4: cd: Whales: No such file or directory
+/home/ubuntu/Job.bash: line 5: $'\r': command not found
+git: 'pull' is not a git command. See 'git --help'.
+
+Did you mean this?
+	pull
+/home/ubuntu/Job.bash: line 8: $'\r': command not found
+/home/ubuntu/Job.bash: line 12: $'\r': command not found
+fatal: Not a git repository (or any of the parent directories): .git
+/home/ubuntu/Job.bash: line 14: $'\r': command not found
+/home/ubuntu/Job.bash: line 17: $'\r': command not found
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+/home/ubuntu/Job.bash: line 22: $'\r': command not found
+sudo: halt: command not found
+Warning: Permanently added 'ec2-50-112-18-242.us-west-2.compute.amazonaws.com,50.112.18.242' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.252.130' to the list of known hosts.
+From github.com:bw4sz/Whales
+   95484da..9a3c520  master     -> origin/master
+   56fdb07..e55d979  gh-pages   -> origin/gh-pages
+ * [new branch]      i-53ebefc6 -> origin/i-53ebefc6
+Updating 95484da..9a3c520
+Fast-forward
+ .Rhistory                                          |  966 ++++++++--------
+ .Rproj.user/8641BD5D/pcs/files-pane.pper           |    2 +-
+ .Rproj.user/8641BD5D/pcs/windowlayoutstate.pper    |    4 +-
+ .Rproj.user/8641BD5D/pcs/workbench-pane.pper       |    2 +-
+ .Rproj.user/8641BD5D/sdb/prop/AFAA8604             |    2 +
+ .Rproj.user/8641BD5D/sdb/prop/B2E3D616             |    1 -
+ .Rproj.user/8641BD5D/sdb/prop/DED848CC             |    2 +
+ .Rproj.user/8641BD5D/sdb/prop/E8726973             |    3 +
+ .Rproj.user/8641BD5D/sdb/prop/INDEX                |    6 +
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32       |   18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529       |   18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B       |   18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182       |   18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04        |   18 -
+ .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file      |    0
+ .gitignore                                         |    2 +
+ Amazon/Job.bash                                    |   24 +
+ Amazon/Startup.bash                                |   19 +
+ Amazon/nohup.out                                   | 1208 ++++++++++++++++++++
+ Bayesian/MultiSpecies.R                            |  150 ++-
+ Bayesian/Multi_RW.jags                             |  150 ++-
+ InputData/CCAMLR_aggregated_catch_C1.xlsx          |  Bin 0 -> 65371 bytes
+ MultiSpeciesHMM.Rmd                                |  403 +++++--
+ MultiSpeciesHMM.html                               |  385 +++++--
+ MultiSpeciesHMM.md                                 |  374 ++++--
+ .../figure-html/unnamed-chunk-10-1.png             |  Bin 37346 -> 47926 bytes
+ .../figure-html/unnamed-chunk-11-1.png             |  Bin 39084 -> 50088 bytes
+ .../figure-html/unnamed-chunk-12-1.png             |  Bin 124425 -> 36785 bytes
+ .../figure-html/unnamed-chunk-12-2.png             |  Bin 21712 -> 10266 bytes
+ .../figure-html/unnamed-chunk-13-1.png             |  Bin 151118 -> 139487 bytes
+ .../figure-html/unnamed-chunk-13-2.png             |  Bin 0 -> 22797 bytes
+ .../figure-html/unnamed-chunk-14-1.png             |  Bin 27507 -> 111596 bytes
+ .../figure-html/unnamed-chunk-14-2.png             |  Bin 0 -> 17068 bytes
+ .../figure-html/unnamed-chunk-15-1.png             |  Bin 0 -> 31342 bytes
+ .../figure-html/unnamed-chunk-15-2.png             |  Bin 0 -> 87769 bytes
+ .../figure-html/unnamed-chunk-16-1.png             |  Bin 0 -> 20462 bytes
+ .../figure-html/unnamed-chunk-17-1.png             |  Bin 0 -> 6422 bytes
+ .../figure-html/unnamed-chunk-18-1.png             |  Bin 0 -> 8095 bytes
+ .../figure-html/unnamed-chunk-5-1.png              |  Bin 48519 -> 50961 bytes
+ .../figure-html/unnamed-chunk-6-1.png              |  Bin 100485 -> 77770 bytes
+ .../figure-html/unnamed-chunk-6-2.png              |  Bin 30221 -> 30945 bytes
+ .../figure-html/unnamed-chunk-8-1.png              |  Bin 157308 -> 38015 bytes
+ .../figure-html/unnamed-chunk-9-1.png              |  Bin 39270 -> 311102 bytes
+ SingleSpecies.Rmd                                  |  472 ++++++--
+ SingleSpecies.html                                 |  632 +++++++---
+ SingleSpecies.md                                   |  821 ++++++++++---
+ .../figure-html/unnamed-chunk-13-1.png             |  Bin 364973 -> 300315 bytes
+ .../figure-html/unnamed-chunk-14-1.png             |  Bin 9935 -> 5064 bytes
+ .../figure-html/unnamed-chunk-14-2.png             |  Bin 0 -> 5321 bytes
+ .../figure-html/unnamed-chunk-15-1.png             |  Bin 0 -> 529403 bytes
+ .../figure-html/unnamed-chunk-16-1.png             |  Bin 0 -> 274731 bytes
+ .../figure-html/unnamed-chunk-17-1.png             |  Bin 0 -> 367782 bytes
+ .../figure-html/unnamed-chunk-18-1.png             |  Bin 0 -> 18422 bytes
+ .../figure-html/unnamed-chunk-19-1.png             |  Bin 0 -> 49475 bytes
+ .../figure-html/unnamed-chunk-19-2.png             |  Bin 0 -> 261271 bytes
+ .../figure-html/unnamed-chunk-20-1.png             |  Bin 0 -> 19832 bytes
+ .../figure-html/unnamed-chunk-20-2.png             |  Bin 0 -> 471604 bytes
+ .../figure-html/unnamed-chunk-21-1.png             |  Bin 0 -> 382827 bytes
+ .../figure-html/unnamed-chunk-21-2.png             |  Bin 0 -> 412254 bytes
+ .../figure-html/unnamed-chunk-21-3.png             |  Bin 0 -> 413190 bytes
+ .../figure-html/unnamed-chunk-21-4.png             |  Bin 0 -> 375559 bytes
+ .../figure-html/unnamed-chunk-21-5.png             |  Bin 0 -> 375850 bytes
+ .../figure-html/unnamed-chunk-21-6.png             |  Bin 0 -> 374762 bytes
+ .../figure-html/unnamed-chunk-21-7.png             |  Bin 0 -> 377343 bytes
+ .../figure-html/unnamed-chunk-21-8.png             |  Bin 0 -> 382727 bytes
+ .../figure-html/unnamed-chunk-22-1.png             |  Bin 0 -> 265944 bytes
+ .../figure-html/unnamed-chunk-22-2.png             |  Bin 0 -> 280806 bytes
+ .../figure-html/unnamed-chunk-22-3.png             |  Bin 0 -> 263047 bytes
+ .../figure-html/unnamed-chunk-22-4.png             |  Bin 0 -> 281737 bytes
+ .../figure-html/unnamed-chunk-22-5.png             |  Bin 0 -> 261168 bytes
+ .../figure-html/unnamed-chunk-22-6.png             |  Bin 0 -> 261518 bytes
+ .../figure-html/unnamed-chunk-22-7.png             |  Bin 0 -> 262677 bytes
+ .../figure-html/unnamed-chunk-22-8.png             |  Bin 0 -> 262269 bytes
+ .../figure-html/unnamed-chunk-22-9.png             |  Bin 0 -> 264848 bytes
+ .../figure-html/unnamed-chunk-23-1.png             |  Bin 0 -> 1197683 bytes
+ .../figure-html/unnamed-chunk-23-10.png            |  Bin 0 -> 1185552 bytes
+ .../figure-html/unnamed-chunk-23-11.png            |  Bin 0 -> 1165148 bytes
+ .../figure-html/unnamed-chunk-23-12.png            |  Bin 0 -> 1157737 bytes
+ .../figure-html/unnamed-chunk-23-13.png            |  Bin 0 -> 1140414 bytes
+ .../figure-html/unnamed-chunk-23-14.png            |  Bin 0 -> 1013336 bytes
+ .../figure-html/unnamed-chunk-23-15.png            |  Bin 0 -> 1083399 bytes
+ .../figure-html/unnamed-chunk-23-16.png            |  Bin 0 -> 1090566 bytes
+ .../figure-html/unnamed-chunk-23-17.png            |  Bin 0 -> 1194754 bytes
+ .../figure-html/unnamed-chunk-23-18.png            |  Bin 0 -> 1172985 bytes
+ .../figure-html/unnamed-chunk-23-19.png            |  Bin 0 -> 1153461 bytes
+ .../figure-html/unnamed-chunk-23-2.png             |  Bin 0 -> 1143646 bytes
+ .../figure-html/unnamed-chunk-23-20.png            |  Bin 0 -> 1045079 bytes
+ .../figure-html/unnamed-chunk-23-21.png            |  Bin 0 -> 995801 bytes
+ .../figure-html/unnamed-chunk-23-22.png            |  Bin 0 -> 1158302 bytes
+ .../figure-html/unnamed-chunk-23-23.png            |  Bin 0 -> 1086975 bytes
+ .../figure-html/unnamed-chunk-23-24.png            |  Bin 0 -> 1219107 bytes
+ .../figure-html/unnamed-chunk-23-25.png            |  Bin 0 -> 1128475 bytes
+ .../figure-html/unnamed-chunk-23-26.png            |  Bin 0 -> 1069237 bytes
+ .../figure-html/unnamed-chunk-23-27.png            |  Bin 0 -> 1163974 bytes
+ .../figure-html/unnamed-chunk-23-28.png            |  Bin 0 -> 1132668 bytes
+ .../figure-html/unnamed-chunk-23-29.png            |  Bin 0 -> 1068169 bytes
+ .../figure-html/unnamed-chunk-23-3.png             |  Bin 0 -> 1132604 bytes
+ .../figure-html/unnamed-chunk-23-30.png            |  Bin 0 -> 1096407 bytes
+ .../figure-html/unnamed-chunk-23-31.png            |  Bin 0 -> 1139203 bytes
+ .../figure-html/unnamed-chunk-23-32.png            |  Bin 0 -> 1102979 bytes
+ .../figure-html/unnamed-chunk-23-33.png            |  Bin 0 -> 1145841 bytes
+ .../figure-html/unnamed-chunk-23-34.png            |  Bin 0 -> 1196452 bytes
+ .../figure-html/unnamed-chunk-23-35.png            |  Bin 0 -> 1114239 bytes
+ .../figure-html/unnamed-chunk-23-36.png            |  Bin 0 -> 1191977 bytes
+ .../figure-html/unnamed-chunk-23-37.png            |  Bin 0 -> 1140313 bytes
+ .../figure-html/unnamed-chunk-23-38.png            |  Bin 0 -> 1149410 bytes
+ .../figure-html/unnamed-chunk-23-39.png            |  Bin 0 -> 1172913 bytes
+ .../figure-html/unnamed-chunk-23-4.png             |  Bin 0 -> 1143505 bytes
+ .../figure-html/unnamed-chunk-23-40.png            |  Bin 0 -> 1145378 bytes
+ .../figure-html/unnamed-chunk-23-41.png            |  Bin 0 -> 1191192 bytes
+ .../figure-html/unnamed-chunk-23-42.png            |  Bin 0 -> 1142863 bytes
+ .../figure-html/unnamed-chunk-23-43.png            |  Bin 0 -> 1205420 bytes
+ .../figure-html/unnamed-chunk-23-44.png            |  Bin 0 -> 1097117 bytes
+ .../figure-html/unnamed-chunk-23-45.png            |  Bin 0 -> 1108055 bytes
+ .../figure-html/unnamed-chunk-23-46.png            |  Bin 0 -> 1123250 bytes
+ .../figure-html/unnamed-chunk-23-47.png            |  Bin 0 -> 1032900 bytes
+ .../figure-html/unnamed-chunk-23-48.png            |  Bin 0 -> 1142123 bytes
+ .../figure-html/unnamed-chunk-23-49.png            |  Bin 0 -> 1178268 bytes
+ .../figure-html/unnamed-chunk-23-5.png             |  Bin 0 -> 1121493 bytes
+ .../figure-html/unnamed-chunk-23-50.png            |  Bin 0 -> 1117511 bytes
+ .../figure-html/unnamed-chunk-23-51.png            |  Bin 0 -> 1120494 bytes
+ .../figure-html/unnamed-chunk-23-6.png             |  Bin 0 -> 1082301 bytes
+ .../figure-html/unnamed-chunk-23-7.png             |  Bin 0 -> 1056135 bytes
+ .../figure-html/unnamed-chunk-23-8.png             |  Bin 0 -> 1090583 bytes
+ .../figure-html/unnamed-chunk-23-9.png             |  Bin 0 -> 1175322 bytes
+ .../figure-html/unnamed-chunk-24-1.png             |  Bin 0 -> 22356 bytes
+ .../figure-html/unnamed-chunk-25-1.png             |  Bin 0 -> 100448 bytes
+ .../figure-html/unnamed-chunk-26-1.png             |  Bin 0 -> 19997 bytes
+ .../figure-html/unnamed-chunk-27-1.png             |  Bin 0 -> 7266 bytes
+ .../figure-html/unnamed-chunk-28-1.png             |  Bin 0 -> 7173 bytes
+ .../figure-html/unnamed-chunk-29-1.png             |  Bin 0 -> 267475 bytes
+ .../figure-html/unnamed-chunk-30-1.png             |  Bin 0 -> 289239 bytes
+ .../figure-html/unnamed-chunk-31-1.png             |  Bin 0 -> 289332 bytes
+ .../figure-html/unnamed-chunk-32-1.png             |  Bin 0 -> 8387 bytes
+ .../figure-html/unnamed-chunk-5-1.png              |  Bin 10212 -> 303353 bytes
+ .../figure-html/unnamed-chunk-6-1.png              |  Bin 12401 -> 9411 bytes
+ .../figure-html/unnamed-chunk-7-1.png              |  Bin 50194 -> 7968 bytes
+ .../figure-html/unnamed-chunk-8-1.png              |  Bin 13474 -> 9268 bytes
+ .../figure-html/unnamed-chunk-9-1.png              |  Bin 11720 -> 5505 bytes
+ ggmapTemp.png                                      |  Bin 2820 -> 0 bytes
+ run.txt                                            |  496 ++++++++
+ 141 files changed, 4800 insertions(+), 1414 deletions(-)
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/AFAA8604
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/DED848CC
+ create mode 100644 .Rproj.user/8641BD5D/sdb/prop/E8726973
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3C0D1D32
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/3CAFF529
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/641BB23B
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/96258182
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/BC2ED04
+ delete mode 100644 .Rproj.user/8641BD5D/sdb/s-D449BE47/lock_file
+ create mode 100644 Amazon/Job.bash
+ create mode 100644 Amazon/Startup.bash
+ create mode 100644 Amazon/nohup.out
+ create mode 100644 InputData/CCAMLR_aggregated_catch_C1.xlsx
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-13-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-15-2.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 MultiSpeciesHMM_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-14-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-15-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-16-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-17-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-9.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-10.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-11.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-12.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-13.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-14.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-15.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-16.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-17.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-18.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-19.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-20.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-21.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-22.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-23.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-24.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-25.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-26.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-27.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-28.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-29.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-30.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-31.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-32.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-33.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-34.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-35.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-36.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-37.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-38.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-39.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-40.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-41.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-42.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-43.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-44.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-45.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-46.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-47.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-48.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-49.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-50.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-51.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-9.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-24-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-28-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-29-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-30-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-31-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-32-1.png
+ create mode 100644 run.txt
+Switched to a new branch 'i-301caeed'
