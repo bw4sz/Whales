@@ -58,7 +58,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
-mxy<-mxy[mxy$Animal %in% c("112703","121211"),]
+mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #crop by extent
@@ -310,7 +310,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=2500,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -553,42 +553,24 @@ $$log (h_i(t)) = \alpha + \beta_i *x$$
 The cox model has no intercept, making it semi-parametric
 $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
-```{r,eval=F}
-
-
-
-#Fill missing NA values
-repeat.before = function(x) {   # repeats the last non NA value. Keeps leading NA
-    ind = which(!is.na(x))      # get positions of nonmissing values
-    if(is.na(x[1]))             # if it begins with a missing, add the 
-          ind = c(1,ind)        # first position to the indices
-    rep(x[ind], times = diff(   # repeat the values at these indices
-       c(ind, length(x) + 1) )) # diffing the indices + length yields how often 
-}                               
-
-runB<-function(x){
-  #arrange by step
-  #calculate run length
-  state_change<-rle(as.numeric(x$value))
-  runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
-  runl$Behavior<-as.factor(runl$Behavior)
-  levels(runl$Behavior)<-c("Traveling","Feeding")
-  x[c(1,cumsum(runl$runs)),"Bout"]<-seq(1,nrow(runl),1)
-  x$Bout<-repeat.before(x$Bout)
-  feedr<-runs[runs$Behavior %in% "Feeding",]
-  feedr$status<-1
-
-
-  return(x)
-}
-
-statec<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% mutate(runB(.))
-
-
+```{r,eval=T}
 #Every run eventually ends in a switch (that's what makes it a run)
+feedr$status<-1
+
+
+endtrack<-function(x){
+  if(x[nrow(x),"Behavior"]=="Traveling"){
+    x[nrow(x),"Status"]<-0
+  }
+}
+#if track ends, status is 0 not 1
+runs %>% filter(Draw==1,chain==1,Animal==1)
+
+
+feedr<-runs[runs$Behavior %in% "Feeding",]
 
 #survival analysis
-tf<-coxph(Surv(time=feedr$hours,event=feedr$status)~feedr$Animal)
+tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~feedr$Animal)
 summary(tf)
 plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
 ```
