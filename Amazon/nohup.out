@@ -1,0 +1,13 @@
+Warning: Permanently added 'ec2-52-37-191-193.us-west-2.compute.amazonaws.com,52.37.191.193' (ECDSA) to the list of known hosts.
+From github.com:bw4sz/Whales
+   4204edb..90f429d  master     -> origin/master
+Your configuration specifies to merge with the ref 'i-4de45990'
+from the remote, but no such ref was fetched.
+Switched to a new branch 'i-1ad964c7'
+[i-1ad964c7 aecbd2d] ec2 run complete
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-19-1.png (99%)
+Warning: Permanently added the RSA host key for IP address '192.30.252.131' to the list of known hosts.
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      i-1ad964c7 -> i-1ad964c7
+Branch i-1ad964c7 set up to track remote branch i-1ad964c7 from origin.

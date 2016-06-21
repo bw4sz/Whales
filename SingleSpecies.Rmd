@@ -553,22 +553,20 @@ $$log (h_i(t)) = \alpha + \beta_i *x$$
 The cox model has no intercept, making it semi-parametric
 $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
-```{r,eval=F}
+```{r,eval=T}
 #Every run eventually ends in a switch (that's what makes it a run)
-runs$status<-runs$Behavior=="Traveling"
+runs$status<-1
 
 endtrack<-function(x){
-  if(x[nrow(x),"Behavior"]=="Traveling"){
-    x[nrow(x),"Status"]<-0
-  }
+  x[nrow(x),"status"]<-0
   return(x)
 }
 
 #if track ends, status is 0 not 1
-feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.))
+feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behavior=="Feeding")
 
-#survival analysis
-tf<-coxph(Surv(time=runs$hours,event=runs$status,type="right")~runs$Animal)
+#survival analysis for just feeding
+tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~feedr$Animal)
 summary(tf)
 plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
 ```
