@@ -16,11 +16,10 @@
     for(i in 1:ind){
       for(g in 1:tracks[i]){
 
-        ###First Step###
         ## Priors for first true location
         #for lat long
         y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec)
-    
+
         #First movement - random walk.
         y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
         

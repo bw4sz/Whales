@@ -1,8 +1,10 @@
-Warning: Permanently added 'ec2-52-25-91-66.us-west-2.compute.amazonaws.com,52.25.91.66' (ECDSA) to the list of known hosts.
-Warning: Permanently added the RSA host key for IP address '192.30.252.129' to the list of known hosts.
+Warning: Permanently added 'ec2-50-112-16-82.us-west-2.compute.amazonaws.com,50.112.16.82' (ECDSA) to the list of known hosts.
 From github.com:bw4sz/Whales
-   4204edb..fe36223  master     -> origin/master
-Your configuration specifies to merge with the ref 'i-4de45990'
-from the remote, but no such ref was fetched.
-Switched to a new branch 'i-17d26fca'
-Connection to ec2-52-25-91-66.us-west-2.compute.amazonaws.com closed by remote host.
+   fe36223..f607f8c  master     -> origin/master
+Updating fe36223..f607f8c
+Fast-forward
+ .Rhistory           | 308 ++++++++++++++++++++++++++--------------------------
+ Amazon/Startup.bash |   2 +-
+ Amazon/nohup.out    |  15 +--
+ 3 files changed, 160 insertions(+), 165 deletions(-)
+Switched to a new branch 'i-e9cb7634'

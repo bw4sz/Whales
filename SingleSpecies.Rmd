@@ -56,7 +56,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -294,7 +294,6 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-
 ```{r,comment=NA}
 #source model
 source("Bayesian/MultiSpecies.R")
@@ -310,7 +309,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=3000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=6000,n.burnin=5000,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -470,7 +469,7 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 
 ```{r,fig.height=10}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Animal),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
 
 ##Behavioral description
