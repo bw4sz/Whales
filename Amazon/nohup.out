@@ -1206,6 +1206,7 @@ Fast-forward
  create mode 100644 test.html
 Switched to a new branch 'i-4d09ba90'
 Connection reset by 50.112.9.219
+<<<<<<< HEAD
 Warning: Permanently added 'ec2-52-38-52-46.us-west-2.compute.amazonaws.com,52.38.52.46' (ECDSA) to the list of known hosts.
 /home/ubuntu/Job.bash: line 2: $'\r': command not found
 /home/ubuntu/Job.bash: line 4: cd: Whales: No such file or directory
@@ -1482,3 +1483,5 @@ Fast-forward
  create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-32-1.png
  create mode 100644 run.txt
 Switched to a new branch 'i-301caeed'
+=======
+>>>>>>> 9a3c5207ff394d8c65d3d63332f704bf48a6435d
