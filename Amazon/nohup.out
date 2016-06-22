@@ -8,3 +8,93 @@ Fast-forward
  Amazon/nohup.out    |  15 +--
  3 files changed, 160 insertions(+), 165 deletions(-)
 Switched to a new branch 'i-e9cb7634'
+Warning: Permanently added 'ec2-52-41-117-92.us-west-2.compute.amazonaws.com,52.41.117.92' (ECDSA) to the list of known hosts.
+From github.com:bw4sz/Whales
+   fe36223..b1230fd  master     -> origin/master
+Updating fe36223..b1230fd
+Fast-forward
+ .Rhistory                                          | 512 ---------------------
+ Amazon/Startup.bash                                |   2 +-
+ Amazon/nohup.out                                   |  21 +-
+ Bayesian/MultiSpecies.R                            |   3 +-
+ Bayesian/Multi_RW.jags                             |   3 +-
+ SingleSpecies.Rmd                                  |   7 +-
+ SingleSpecies.html                                 | 252 +++-------
+ SingleSpecies.md                                   | 418 ++---------------
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 300315 -> 298032 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 5064 -> 6048 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 5321 -> 5276 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 367782 -> 359471 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 18422 -> 17529 bytes
+ .../figure-html/unnamed-chunk-19-1.png             | Bin 49475 -> 48093 bytes
+ .../figure-html/unnamed-chunk-20-1.png             | Bin 19832 -> 22166 bytes
+ .../figure-html/unnamed-chunk-22-1.png             | Bin 265944 -> 236477 bytes
+ .../figure-html/unnamed-chunk-22-2.png             | Bin 280806 -> 239143 bytes
+ .../figure-html/unnamed-chunk-22-3.png             | Bin 263047 -> 237772 bytes
+ .../figure-html/unnamed-chunk-22-4.png             | Bin 281737 -> 237399 bytes
+ .../figure-html/unnamed-chunk-22-5.png             | Bin 261168 -> 237534 bytes
+ .../figure-html/unnamed-chunk-22-6.png             | Bin 261518 -> 237487 bytes
+ .../figure-html/unnamed-chunk-22-7.png             | Bin 262677 -> 238147 bytes
+ .../figure-html/unnamed-chunk-22-8.png             | Bin 262269 -> 236648 bytes
+ .../figure-html/unnamed-chunk-22-9.png             | Bin 264848 -> 236877 bytes
+ .../figure-html/unnamed-chunk-23-1.png             | Bin 1197683 -> 20792 bytes
+ .../figure-html/unnamed-chunk-24-1.png             | Bin 22356 -> 126137 bytes
+ .../figure-html/unnamed-chunk-25-1.png             | Bin 100448 -> 21804 bytes
+ .../figure-html/unnamed-chunk-26-1.png             | Bin 19997 -> 6978 bytes
+ .../figure-html/unnamed-chunk-28-1.png             | Bin 7173 -> 289962 bytes
+ .../figure-html/unnamed-chunk-29-1.png             | Bin 267475 -> 9509 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 303353 -> 301728 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 9411 -> 10200 bytes
+ .../figure-html/unnamed-chunk-7-1.png              | Bin 7968 -> 7444 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 9268 -> 9310 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 5505 -> 5438 bytes
+ run.txt                                            | 313 +++----------
+ 36 files changed, 198 insertions(+), 1333 deletions(-)
+ delete mode 100644 .Rhistory
+Switched to a new branch 'i-1cb10cc1'
+Connection reset by 50.112.16.82
+Connection reset by 52.41.117.92
+Warning: Permanently added 'ec2-52-37-22-1.us-west-2.compute.amazonaws.com,52.37.22.1' (ECDSA) to the list of known hosts.
+From github.com:bw4sz/Whales
+   fe36223..b1230fd  master     -> origin/master
+Updating fe36223..b1230fd
+Fast-forward
+ .Rhistory                                          | 512 ---------------------
+ Amazon/Startup.bash                                |   2 +-
+ Amazon/nohup.out                                   |  21 +-
+ Bayesian/MultiSpecies.R                            |   3 +-
+ Bayesian/Multi_RW.jags                             |   3 +-
+ SingleSpecies.Rmd                                  |   7 +-
+ SingleSpecies.html                                 | 252 +++-------
+ SingleSpecies.md                                   | 418 ++---------------
+ .../figure-html/unnamed-chunk-13-1.png             | Bin 300315 -> 298032 bytes
+ .../figure-html/unnamed-chunk-14-1.png             | Bin 5064 -> 6048 bytes
+ .../figure-html/unnamed-chunk-14-2.png             | Bin 5321 -> 5276 bytes
+ .../figure-html/unnamed-chunk-17-1.png             | Bin 367782 -> 359471 bytes
+ .../figure-html/unnamed-chunk-18-1.png             | Bin 18422 -> 17529 bytes
+ .../figure-html/unnamed-chunk-19-1.png             | Bin 49475 -> 48093 bytes
+ .../figure-html/unnamed-chunk-20-1.png             | Bin 19832 -> 22166 bytes
+ .../figure-html/unnamed-chunk-22-1.png             | Bin 265944 -> 236477 bytes
+ .../figure-html/unnamed-chunk-22-2.png             | Bin 280806 -> 239143 bytes
+ .../figure-html/unnamed-chunk-22-3.png             | Bin 263047 -> 237772 bytes
+ .../figure-html/unnamed-chunk-22-4.png             | Bin 281737 -> 237399 bytes
+ .../figure-html/unnamed-chunk-22-5.png             | Bin 261168 -> 237534 bytes
+ .../figure-html/unnamed-chunk-22-6.png             | Bin 261518 -> 237487 bytes
+ .../figure-html/unnamed-chunk-22-7.png             | Bin 262677 -> 238147 bytes
+ .../figure-html/unnamed-chunk-22-8.png             | Bin 262269 -> 236648 bytes
+ .../figure-html/unnamed-chunk-22-9.png             | Bin 264848 -> 236877 bytes
+ .../figure-html/unnamed-chunk-23-1.png             | Bin 1197683 -> 20792 bytes
+ .../figure-html/unnamed-chunk-24-1.png             | Bin 22356 -> 126137 bytes
+ .../figure-html/unnamed-chunk-25-1.png             | Bin 100448 -> 21804 bytes
+ .../figure-html/unnamed-chunk-26-1.png             | Bin 19997 -> 6978 bytes
+ .../figure-html/unnamed-chunk-28-1.png             | Bin 7173 -> 289962 bytes
+ .../figure-html/unnamed-chunk-29-1.png             | Bin 267475 -> 9509 bytes
+ .../figure-html/unnamed-chunk-5-1.png              | Bin 303353 -> 301728 bytes
+ .../figure-html/unnamed-chunk-6-1.png              | Bin 9411 -> 10200 bytes
+ .../figure-html/unnamed-chunk-7-1.png              | Bin 7968 -> 7444 bytes
+ .../figure-html/unnamed-chunk-8-1.png              | Bin 9268 -> 9310 bytes
+ .../figure-html/unnamed-chunk-9-1.png              | Bin 5505 -> 5438 bytes
+ run.txt                                            | 313 +++----------
+ 36 files changed, 198 insertions(+), 1333 deletions(-)
+ delete mode 100644 .Rhistory
+Switched to a new branch 'i-185ce1c5'

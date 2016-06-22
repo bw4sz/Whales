@@ -84,7 +84,7 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```{r}
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
@@ -285,7 +285,7 @@ How did the filter change the extent of tracks?
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
@@ -452,7 +452,7 @@ rm(behav_chains)
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=4,source="google",scale=1,maptype="satellite")
+  m <- get_map(location=pp,zoom=5,source="google",scale=1,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
 spp
