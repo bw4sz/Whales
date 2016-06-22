@@ -1,0 +1,23 @@
+---
+title: "Untitled"
+author: "Ben Weinstein"
+date: "June 22, 2016"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+text
+
+```{r}
+#source model
+source("Bayesian/MultiSpecies.R")
+print.noquote(readLines("Bayesian/MultiSpecies.R"))
+```
+
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
+```
+
+```{r}
+1+1
+```

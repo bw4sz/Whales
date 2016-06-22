@@ -78,7 +78,6 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 ```{r}
 #no distance to coast,elevation
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
-
 ```
 
 ```{r}
@@ -294,13 +293,13 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,comment=NA}
-#source model
-source("Bayesian/MultiSpecies.R")
-print.noquote(readLines("Bayesian/MultiSpecies.R"))
+```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
 ```{r,eval=T}
+#source jags file
+source("Bayesian/MultiSpecies.R")
+
 #prior cov shape
 R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
@@ -309,7 +308,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=6000,n.burnin=5000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -460,14 +459,14 @@ spp
 ```
 
 ##Log Odds of Feeding
-```{r}
+```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal)
+ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4)
 ```
 
 ##Autocorrelation in behavior
 
-```{r,fig.height=10}
+```{r,fig.height=20}
 #create proper time stamp
 ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
@@ -475,7 +474,7 @@ ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(gr
 ##Behavioral description
 
 ## Predicted behavior duration
-```{r}
+```{r,fig.height=5,fig.width=14}
 runf<-function(x){
   #arrange by step
   #calculate run length
@@ -518,7 +517,7 @@ Global Plotting
 msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
 
 r<-raster(msp,ext=extent(c(-70,-55,-66,-58)))
-res(r)<-0.5
+res(r)<-0.25
 
 m<-rasterize(x=msp,y=r,field="phi")
 
@@ -531,8 +530,6 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 ```
 
 ###Proportional Hazards
-
-TODO: NEEDS TO ACCOUNT FOR CENSORED DATA! 
 
 Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
 
@@ -566,7 +563,6 @@ feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behav
 
 #survival analysis for just feeding
 tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~feedr$Animal)
-summary(tf)
 plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
 ```
 
