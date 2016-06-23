@@ -56,7 +56,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -293,7 +293,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=T}
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
 ```{r,eval=T}
@@ -308,7 +308,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=12000,n.burnin=11000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -397,26 +397,11 @@ rm(allp)
 
 ```{r}
 #get the posterior estimates of the env function
-predp<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% group_by(par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95)) %>% melt()
 
-predp<-dcast(predp,...~par)
-
-postplot<-list()
-for(x in 1:nrow(predp)){
-  postplot[[x]]<-dplot(a1=as.numeric(predp[x,c("lalpha_mu[1]","lalpha_mu[2]")]),beta=as.numeric(predp[x,c("lbeta_mu[1]","lbeta_mu[2]")]),x=mxy$ocean)
-}
-names(postplot)<-predp$variable
-
-postplot<-lapply(postplot,function(x){
-  x$ID<-1:nrow(x)
-  return(x)
-})
-postplot<-melt(postplot,id.vars=colnames(postplot[[1]]))
-
-dsum<-dcast(postplot,ID+x+State+Begin~L1,value.var="y")
+postplot<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'lalpha_mu[1]',.$'lalpha_mu[2]'),beta=c(.$'lbeta_mu[1]',.$'lbeta_mu[2]'),x=mxy$ocean)) %>% group_by(x=x,Draw,chain,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(dsum[,]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
 
 #Behavioral Prediction
