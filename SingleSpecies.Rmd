@@ -94,8 +94,8 @@ moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longl
 dstat<-melt(move::distanceSummary(moved))
 
 dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
-levels(dstat$variable)<-c("Total Distance (km)","Average Distance Between Points","Farthest Distance Between Points")
-ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free")
+levels(dstat$variable)<-c("Total Distance","Average Distance Between Points","Farthest Distance Between Points")
+ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free") + labs(x="Kilometers")
 ```
 
 ##Time 
@@ -288,7 +288,7 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
 ```
 
-```{r,fig.height=4,fig.width=6}
+```{r,fig.height=3,fig.width=5}
 ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
@@ -308,7 +308,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
 pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=12000,n.burnin=11000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -436,7 +436,7 @@ rm(behav_chains)
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=5,source="google",scale=1,maptype="satellite")
+  m <- get_map(location=pp,zoom=6,source="google",scale=1,maptype="satellite")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
 })
 spp
@@ -451,7 +451,7 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 
 ##Autocorrelation in behavior
 
-```{r,fig.height=20}
+```{r,fig.height=20,fig.width=13}
 #create proper time stamp
 ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=2,scales="free") + ylim(0,1)
 ```
