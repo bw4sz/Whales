@@ -398,7 +398,7 @@ rm(allp)
 ```{r}
 #get the posterior estimates of the env function
 
-postplot<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'lalpha_mu[1]',.$'lalpha_mu[2]'),beta=c(.$'lbeta_mu[1]',.$'lbeta_mu[2]'),x=mxy$ocean)) %>% group_by(x=x,Draw,chain,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+postplot<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'lalpha_mu[1]',.$'lalpha_mu[2]'),beta=c(.$'lbeta_mu[1]',.$'lbeta_mu[2]'),x=mxy$ocean)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
