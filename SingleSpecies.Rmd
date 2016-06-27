@@ -508,7 +508,6 @@ r<-raster(msp)
 res(r)<-1
 
 m<-rasterize(x=msp,y=r,field="phi")
-
 ```
 
 Global Plotting
@@ -564,6 +563,19 @@ feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behav
 #survival analysis for just feeding
 tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~feedr$Animal)
 plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
+```
+
+#Krill Fishery
+```{r}
+krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
+# krill<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointDegreeLat),data=krill)
+# 
+# k<-points2grid(krill)
+# r<-rasterize(krill,raster(k),"C1KRIcatchKG")
+
+#as data frames
+
+ggplot() + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.8) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,col=log(C1KRIcatchKG))) + theme_minimal() + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + ylim(-70,-60) + xlim(-50,-70) + labs(col="Krill Catch (log(KG))",fill="Probability of Feeding") 
 ```
 
 ```{r}
