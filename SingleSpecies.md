@@ -94,8 +94,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##     user   system  elapsed 
-##   15.626    0.446 8888.338
+##      user    system   elapsed 
+##    15.889     0.826 10408.522
 ```
 
 ##Chains
@@ -227,7 +227,7 @@ $$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
 
 
 ```
-##             used   (Mb) gc trigger   (Mb)   max used   (Mb)
-## Ncells   1707181   91.2    4677176  249.8   34847686 1861.1
-## Vcells 224631324 1713.9 1023680532 7810.1 1279093690 9758.8
+##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1842953  98.5   27854852 1487.7  43523207 2324.4
+## Vcells 128192733 978.1  968765433 7391.1 901491842 6877.9
 ```
