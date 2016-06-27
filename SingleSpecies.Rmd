@@ -48,6 +48,8 @@ mdat<-read.csv("InputData/FullData-550793189439001813.csv")
 #Create a oceandepth in km 
 mdat$ocean<-mdat$ETOPO1.Elevation * -1 /1000
 
+mdat$coast<-mdat$NASA.Distance.to.Coast
+
 #standardize column names to match the simulation
 #Create an animal tag.
 mxy <- as(mdat, "data.frame")
@@ -56,9 +58,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
+mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #crop by extent
@@ -186,7 +188,6 @@ dplot<-function(a1,beta,x){
 }
 ```
 
-
 ##Continious tracks
 
 The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than three days.
@@ -262,6 +263,9 @@ idx<-acast(data=idx,Animal~Track~Step)
 #make ocean a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
 oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 
+#make coast a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
+coast<-acast(mxy,Animal~Track~Step,value.var="coast",fun.aggregate = mean)
+
 #Individuals
 ind=length(unique(mxy$Animal))
 
@@ -302,13 +306,13 @@ source("Bayesian/MultiSpecies.R")
 
 #prior cov shape
 R <- diag(c(1,1))
-data=list(argos=obs,steps=steps,R=R,ocean=oc,ind=ind,j=j,idx=idx,tracks=tracks)
+data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks)
 
 #paramters to track
-pt<-c("theta","gamma","phi","lalpha_mu","lbeta_mu","state")
+pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=12000,n.burnin=10000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -326,7 +330,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("lalpha_mu","lbeta_mu","gamma","theta")]<-lapply(splitpc[c("lalpha_mu","lbeta_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","beta_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -371,13 +375,13 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),parameter='lalpha_mu',Behavior=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='lalpha_mu',Behavior=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='lbeta_mu',Behavior=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='lbeta_mu',Behavior=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
@@ -395,13 +399,24 @@ rm(allp)
 
 ##Prediction - environmental function
 
+### Ocean Depth
 ```{r}
 #get the posterior estimates of the env function
 
-postplot<-pc %>% filter(parameter %in% c('lbeta_mu','lalpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'lalpha_mu[1]',.$'lalpha_mu[2]'),beta=c(.$'lbeta_mu[1]',.$'lbeta_mu[2]'),x=mxy$ocean)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=mxy$ocean)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+```
+
+### Distance to Coast
+```{r}
+#get the posterior estimates of the env function
+
+postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),x=mxy$coast)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+#mean env estimate
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
 
 #Behavioral Prediction

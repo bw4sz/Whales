@@ -31,7 +31,7 @@ cat("
         for(t in 2:(steps[i,g]-1)){
         
         #Behavioral State at time T
-        logit(phi[i,g,t,1]) <- lalpha[i,state[i,g,t-1]] + lbeta[i,state[i,g,t-1]] * ocean[i,g,t]
+        logit(phi[i,g,t,1]) <- alpha[i,state[i,g,t-1]] + beta[i,state[i,g,t-1]] * ocean[i,g,t] + beta2[i,state[i,g,t-1]] * coast[i,g,t]
         phi[i,g,t,2] <- 1-phi[i,g,t,1]
         state[i,g,t] ~ dcat(phi[i,g,t,])
             
@@ -50,7 +50,7 @@ cat("
       }
 
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- lalpha[i,state[i,g,steps[i,g]-1]] + lbeta[i,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- alpha[i,state[i,g,steps[i,g]-1]] + beta[i,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[i,state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -98,40 +98,52 @@ cat("
     
     #Hierarchical structure
     #Intercepts
-    lalpha_mu[1] ~ dnorm(0,0.386)
-    lalpha_mu[2] ~ dnorm(0,0.386)
+    alpha_mu[1] ~ dnorm(0,0.386)
+    alpha_mu[2] ~ dnorm(0,0.386)
 
     #Variance
-    lalpha_tau[1] ~ dt(0,1,1)I(0,)
-    lalpha_tau[2] ~ dt(0,1,1)I(0,)
+    alpha_tau[1] ~ dt(0,1,1)I(0,)
+    alpha_tau[2] ~ dt(0,1,1)I(0,)
 
     #Slopes
-    lbeta_mu[1] ~ dnorm(0,0.386)
-    lbeta_mu[2] ~ dnorm(0,0.386)
+    ## Ocean Depth
+    beta_mu[1] ~ dnorm(0,0.386)
+    beta_mu[2] ~ dnorm(0,0.386)
+
+    # Distance coast
+    beta2_mu[1] ~ dnorm(0,0.386)
+    beta2_mu[2] ~ dnorm(0,0.386)
 
     #Variance
-    lbeta_tau[1] ~ dt(0,1,1)I(0,)
-    lbeta_tau[2] ~ dt(0,1,1)I(0,)
+    #Ocean
+    beta_tau[1] ~ dt(0,1,1)I(0,)
+    beta_tau[2] ~ dt(0,1,1)I(0,)
+    
+    #Coast
+    beta2_tau[1] ~ dt(0,1,1)I(0,)
+    beta2_tau[2] ~ dt(0,1,1)I(0,)
     
     #For each individual
     for(i in 1:ind){
       # prob of being in state 1 at t, given in state 1 at t-1    
       #Individual Intercept
-      lalpha[i,1] ~ dnorm(lalpha_mu[1],lalpha_tau[1])
-      logit(alpha[i,1]) <- lalpha[i,1]
+      alpha[i,1] ~ dnorm(alpha_mu[1],alpha_tau[1])
       
       #effect of ocean on traveling -> traveling
-      lbeta[i,1] ~ dnorm(lbeta_mu[1],lbeta_tau[1])
-      logit(beta[i,1]) <- lbeta[i,1]
-  
-      #Prob of transition to state 1 given state 2 at t-1
-      lalpha[i,2] ~ dnorm(lalpha_mu[2],lalpha_tau[2])
-      logit(alpha[i,2]) <- lalpha[i,2]
+      beta[i,1] ~ dnorm(beta_mu[1],beta_tau[1])
       
+      #effect of coast on traveling -> traveling
+      beta2[i,1] ~ dnorm(beta2_mu[1],beta2_tau[1])
+    
+      #Prob of transition to state 1 given state 2 at t-1
+      alpha[i,2] ~ dnorm(alpha_mu[2],alpha_tau[2])
+
       #effect of ocean on feeding -> traveling
-      lbeta[i,2] ~ dnorm(lbeta_mu[2],lbeta_tau[2])
-      logit(beta[i,2]) <- lbeta[i,2]
-  
+      beta[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
+
+      #effect of dist to coast on feeding -> traveling
+      beta2[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
+    
     }
     
     #Probability of behavior switching 
