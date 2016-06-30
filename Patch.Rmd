@@ -128,7 +128,6 @@ tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~1)
 fit<-survfit(tf)
 ```
 
-
 ## Survival
 
 ```{r}
@@ -144,6 +143,13 @@ ggplot(splot2,aes(x=x,y=surv,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon
 hplot2<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
 ggplot(hplot2,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
 ```
+
+Zoom and compare to random foraging
+
+```{r}
+#plot
+ggplot(hplot2,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard") + geom_abline(linetype="dashed",slope=1) + xlim(0,100)
+``` 
 
 #Comparison
 
@@ -165,3 +171,48 @@ hazards<-melt(hazards,id.vars=colnames(hplot1))
 ggplot(hazards,aes(x=x,y=chaz,ymin=lower,ymax=upper,col=L1,fill=L1)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Proportion stil feeding") + labs(col="Data",fill="Data")
 ```
 
+# Zoom in
+
+```{r}
+ggplot(survival,aes(x=x,y=surv,ymin=lower,ymax=upper,col=L1,fill=L1)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard") + labs(col="Data",fill="Data") + xlim(0,25)
+```
+
+
+# The Weibull Distribution
+
+The Weibull distribution with shape parameter a and scale parameter b has density given by
+
+$$f(x) = \frac{a}{b} * \frac{x}{b}^(a-1) \exp{-\frac{x}{b}^a}$$
+
+The cumulative hazard function at time t is $$H(t) = \frac{t}{b}^a$$
+
+The Weibull collapses to the expontential distribution with parameters (shape=1,scale=1)
+
+```{r}
+expo<-rexp(1000)
+webo<-rweibull(1000,shape=1,scale=1)
+vals<-melt(list(exponential=expo,weibull=webo))
+ggplot(vals) + geom_density(aes(x=value,fill=L1),alpha=0.3) + labs(fill="Distribution")
+```
+
+The shape parameter 
+
+```{r}
+dat<-lapply(seq(0,2,0.01),function(x){
+  a<-data.frame(x=seq(1,10,.1),y=dweibull(seq(1,10,.1),shape=x,scale=1),shape=x,scale=1)  
+})
+dat<-rbind_all(dat)
+
+ggplot(dat,aes(x=x,y=-log(y),col=shape,group=shape)) + geom_line() + geom_line(aes(x=x,y=-log(dexp(x))),col="black",size=1,linetype='dashed') + scale_color_continuous(low='blue',high='red') + ylab("Cumualtive Hazard") + xlab("Time")
+```
+
+The scale parameter
+
+```{r}
+dat<-lapply(seq(1,2,0.01),function(x){
+  a<-data.frame(x=seq(1,10,.1),y=dweibull(seq(1,10,.1),shape=1,scale=x),shape=1,scale=x)  
+})
+dat<-rbind_all(dat)
+
+ggplot(dat,aes(x=x,y=-log(y),col=scale,group=scale)) + geom_line() + geom_line(aes(x=x,y=-log(dexp(x))),col="black",size=1,linetype='dashed') + scale_color_continuous(low='blue',high='red') + ylab("Cumualtive Hazard") + xlab("Time")
+```

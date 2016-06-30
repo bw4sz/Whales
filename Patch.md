@@ -56,7 +56,6 @@ $$\text{Cumulative Hazard} = -log(Survival)$$
 
 
 
-
 ## Survival
 
 <img src="Patch_files/figure-html/unnamed-chunk-9-1.png" title="" alt="" style="display: block; margin: auto;" />
@@ -65,13 +64,41 @@ $$\text{Cumulative Hazard} = -log(Survival)$$
 
 <img src="Patch_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" style="display: block; margin: auto;" />
 
+Zoom and compare to random foraging
+
+<img src="Patch_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 #Comparison
 
 ## Survival
 
-<img src="Patch_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="Patch_files/figure-html/unnamed-chunk-12-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 ## Hazards
 
-<img src="Patch_files/figure-html/unnamed-chunk-12-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="Patch_files/figure-html/unnamed-chunk-13-1.png" title="" alt="" style="display: block; margin: auto;" />
 
+# Zoom in
+
+<img src="Patch_files/figure-html/unnamed-chunk-14-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+
+# The Weibull Distribution
+
+The Weibull distribution with shape parameter a and scale parameter b has density given by
+
+$$f(x) = \frac{a}{b} * \frac{x}{b}^(a-1) \exp{-\frac{x}{b}^a}$$
+
+The cumulative hazard function at time t is $$H(t) = \frac{t}{b}^a$$
+
+The Weibull collapses to the expontential distribution with parameters (shape=1,scale=1)
+
+<img src="Patch_files/figure-html/unnamed-chunk-15-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+The shape parameter 
+
+<img src="Patch_files/figure-html/unnamed-chunk-16-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+The scale parameter
+
+<img src="Patch_files/figure-html/unnamed-chunk-17-1.png" title="" alt="" style="display: block; margin: auto;" />
