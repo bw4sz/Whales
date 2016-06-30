@@ -297,7 +297,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=F}
+```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
 ```{r,eval=T}

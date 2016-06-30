@@ -15,7 +15,7 @@ output:
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
-opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 6,fig.height = 4,fig.align='center')
 library(boot)
 library(raster)
 library(reshape2)
@@ -24,18 +24,15 @@ library(survival)
 library(MASS)
 library(ggmap)
 library(dplyr)
-library(chron)
-library(gridExtra)
-library(stringr)
 ```
 
 ```{r,eval=T}
 #Load in data
-feedr<-read.csv(runs,"OutData/Runs.csv")
+feedr<-read.csv("OutData/Runs.csv")
 ```
 
 
-###Proportional Hazards
+#Proportional Hazards
 
 Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
 
@@ -78,13 +75,12 @@ endtrack<-function(x){
 
 If behavioral states were distributed at random, what would the survival and hazard functions look like?
 
-##Create random runs
 
 ```{r}
-random_forage<-data.frame(Time=runs$hours)
+##Create random runs
 
 #total number of hours
-th<-sum(runs$hours)
+th<-sum(feedr$hours)
 #
 random_draw<-rbinom(th,1,0.5)
 random_run<-runf(random_draw)
@@ -94,25 +90,78 @@ random_run$status<-1
 random_run<-endtrack(random_run)
 ```
 
-##Fit Cox Regression
 
 ```{r}
+##Fit Cox Regression
+
 #survival analysis for just feeding
-rf<-coxph(Surv(time=random_run$hours,event=feedr$status,type="right")~1)
+rf<-coxph(Surv(time=random_run$runs,event=random_run$status,type="right")~1)
 rfit<-survfit(rf)
+```
+
+
+```{r}
+##Survival Curve
 
 #plot
-hplot<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
-ggplot(hplot,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+splot1<-data.frame(x=rfit$time,surv=rfit$surv,lower=rfit$lower,upper=rfit$upper)
+
+ggplot(splot1,aes(x=x,y=surv,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Proportion still feeding") + ggtitle("Random Foraging")
 ```
+
+## Hazard function
+
+$$\text{Cumulative Hazard} = -log(Survival)$$
+
+```{r}
+hplot1<-data.frame(x=rfit$time,chaz=-log(rfit$surv),lower=-log(rfit$lower),upper=-log(rfit$upper))
+
+ggplot(hplot1,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+```
+
+# Observed Data
+
 
 ```{r}
 #survival analysis for just feeding
 tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~1)
 fit<-survfit(tf)
+```
 
+
+## Survival
+
+```{r}
 #plot
-hplot<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
-ggplot(hplot,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+splot2<-data.frame(x=fit$time,surv=fit$surv,lower=fit$lower,upper=fit$upper)
+ggplot(splot2,aes(x=x,y=surv,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Proportion still feeding")
+```
+
+## Cumulative Hazard
+
+```{r}
+#plot
+hplot2<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
+ggplot(hplot2,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+```
+
+#Comparison
+
+## Survival
+
+```{r}
+survival<-list(splot1,splot2)
+names(survival)<-c("Random","Observed")
+survival<-melt(survival,id.vars=colnames(splot1))
+ggplot(survival,aes(x=x,y=surv,ymin=lower,ymax=upper,col=L1,fill=L1)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard") + labs(col="Data",fill="Data")
+```
+
+## Hazards
+
+```{r}
+hazards<-list(hplot1,hplot2)
+names(hazards)<-c("Random","Observed")
+hazards<-melt(hazards,id.vars=colnames(hplot1))
+ggplot(hazards,aes(x=x,y=chaz,ymin=lower,ymax=upper,col=L1,fill=L1)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Proportion stil feeding") + labs(col="Data",fill="Data")
 ```
 
