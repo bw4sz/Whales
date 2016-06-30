@@ -497,6 +497,20 @@ ggplot(runs,aes(x=as.numeric(hours),fill=Behavior)) + geom_histogram(position='d
 ```{r,fig.height=3,fig.with=3.5}
 mr<-runs %>% group_by(Behavior) %>% summarize(mean=mean(hours),lower=quantile(runs,0.05),upper=quantile(runs,0.95))
 ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2) + theme_bw() + ggtitle("Average Duration of Behavior") + labs(y="Hours")
+
+#Every run eventually ends in a switch (that's what makes it a run)
+runs$status<-1
+
+endtrack<-function(x){
+  x[nrow(x),"status"]<-0
+  return(x)
+}
+
+#if track ends, status is 0 not 1
+feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behavior=="Feeding")
+
+#save runs to file
+write.csv(feedr,"OutData/Runs.csv")
 ```
 
 ##Location of Behavior
@@ -528,42 +542,6 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite")
 ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.8) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
-###Proportional Hazards
-
-Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
-
-Let T represent survival time.
-
-$$ P(t) = Pr(T<t)$$ 
-with a pdf
-$$p(t) = \frac{dP(t)}{dt}$$
-
-The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
-
-$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\Delta t}$$
-
-with covariates:
-$$log (h_i(t)) = \alpha + \beta_i *x$$
-
-The cox model has no intercept, making it semi-parametric
-$$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
-
-```{r,eval=T}
-#Every run eventually ends in a switch (that's what makes it a run)
-runs$status<-1
-
-endtrack<-function(x){
-  x[nrow(x),"status"]<-0
-  return(x)
-}
-
-#if track ends, status is 0 not 1
-feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behavior=="Feeding")
-
-#survival analysis for just feeding
-tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~feedr$Animal)
-plot(survfit(tf),ylab="Proportion still feeding",xlab="Duration (hours)")
-```
 
 #Krill Fishery
 ```{r}

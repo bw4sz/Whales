@@ -1,0 +1,118 @@
+---
+title: "Antarctic Whale Project: Patch Dynamics"
+author: "Ben Weinstein"
+date: "`r Sys.time()`"
+output: 
+  html_document:
+    keep_md: true
+    number_sections: true
+    toc: true
+    theme: spacelab
+---
+
+#Aim
+
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5)
+library(boot)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(survival)
+library(MASS)
+library(ggmap)
+library(dplyr)
+library(chron)
+library(gridExtra)
+library(stringr)
+```
+
+```{r,eval=T}
+#Load in data
+feedr<-read.csv(runs,"OutData/Runs.csv")
+```
+
+
+###Proportional Hazards
+
+Survival analysis typically examines the relationship between time to death as a function of covariates. From this we can get the instantaneous rate of death at time t f(t), which is the cumulative distribution of the likelihood of death.
+
+Let T represent survival time.
+
+$$ P(t) = Pr(T<t)$$ 
+with a pdf
+$$p(t) = \frac{dP(t)}{dt}$$
+
+The instantaneous risk of death at time t (h(t)), conditional on survival to that time:
+
+$$ h(t) = \lim{\Delta_t\to 0} \frac{Pr[(t<T<t + \Delta_t)]|T>t}{\Delta t}$$
+
+with covariates:
+$$log (h_i(t)) = \alpha + \beta_i *x$$
+
+The cox model has no intercept, making it semi-parametric
+$$ log(h_i(t)) = h_0(t) + \beta_1 * x$$
+
+```{r}
+#run functions
+runf<-function(x){
+  #arrange by step
+  #calculate run length
+  state_change<-rle(as.numeric(x))
+  runl<-data.frame(runs=state_change$lengths,Behavior=state_change$values)
+  runl$Behavior<-as.factor(runl$Behavior)
+  levels(runl$Behavior)<-c("Traveling","Feeding")
+  
+  return(runl)
+}
+
+endtrack<-function(x){
+  x[nrow(x),"status"]<-0
+  return(x)
+}
+```
+
+#Random foraging.
+
+If behavioral states were distributed at random, what would the survival and hazard functions look like?
+
+##Create random runs
+
+```{r}
+random_forage<-data.frame(Time=runs$hours)
+
+#total number of hours
+th<-sum(runs$hours)
+#
+random_draw<-rbinom(th,1,0.5)
+random_run<-runf(random_draw)
+random_run$status<-1
+
+#last track is censored
+random_run<-endtrack(random_run)
+```
+
+##Fit Cox Regression
+
+```{r}
+#survival analysis for just feeding
+rf<-coxph(Surv(time=random_run$hours,event=feedr$status,type="right")~1)
+rfit<-survfit(rf)
+
+#plot
+hplot<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
+ggplot(hplot,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+```
+
+```{r}
+#survival analysis for just feeding
+tf<-coxph(Surv(time=feedr$hours,event=feedr$status,type="right")~1)
+fit<-survfit(tf)
+
+#plot
+hplot<-data.frame(x=fit$time,chaz=-log(fit$surv),lower=-log(fit$lower),upper=-log(fit$upper))
+ggplot(hplot,aes(x=x,y=chaz,ymin=lower,ymax=upper)) + geom_step() + geom_ribbon(alpha=0.3) + theme_bw() + labs(x="Time",y="Cumulative Hazard")
+```
+
