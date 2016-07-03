@@ -1,7 +1,7 @@
 #!/bin/bash 
 
-#cd into whales
-cd Whales
+#cd into whales, if directory doesn't exist, kill the run.
+cd Whales||sudo halt
 
 #git pull to make sure we are at HEAD
 git pull

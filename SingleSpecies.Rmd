@@ -58,9 +58,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
 
-mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
+#mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #crop by extent
@@ -312,7 +312,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -537,7 +537,7 @@ m<-rasterize(x=msp,y=r,field="phi")
 #plotting
 feedmap <- data.frame(rasterToPoints(m))
 
-temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite")
+temp <- get_map(location=bbox(m),source="google",zoom=6,maptype="satellite")
 
 ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.8) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
