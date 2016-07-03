@@ -691,3 +691,21 @@ Fast-forward
  create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-30.png
  create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-31.png
 Switched to a new branch 'i-8566eb58'
+Warning: Permanently added 'ec2-52-41-40-83.us-west-2.compute.amazonaws.com,52.41.40.83' (ECDSA) to the list of known hosts.
+/home/ubuntu/Job.bash: line 2: $'\r': command not found
+/home/ubuntu/Job.bash: line 4: cd: Whales: No such file or directory
+/home/ubuntu/Job.bash: line 5: $'\r': command not found
+git: 'pull' is not a git command. See 'git --help'.
+
+Did you mean this?
+	pull
+/home/ubuntu/Job.bash: line 8: $'\r': command not found
+/home/ubuntu/Job.bash: line 12: $'\r': command not found
+fatal: Not a git repository (or any of the parent directories): .git
+/home/ubuntu/Job.bash: line 14: $'\r': command not found
+/home/ubuntu/Job.bash: line 17: $'\r': command not found
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+/home/ubuntu/Job.bash: line 22: $'\r': command not found
+sudo: halt: command not found
