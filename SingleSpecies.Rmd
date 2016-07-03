@@ -28,10 +28,10 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-TRUE
+newModel<-F
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -297,7 +297,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=T}
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
 ```{r,eval=T}
@@ -553,7 +553,7 @@ krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
 #as data frames
 
-ggplot() + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.8) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,col=log(C1KRIcatchKG))) + theme_minimal() + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + ylim(-70,-60) + xlim(-50,-70) + labs(col="Krill Catch (log(KG))",fill="Probability of Feeding") 
+ggmap(temp,darken=0.2) +  geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch") + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + scale_size_continuous(range=c(0,8)) 
 ```
 
 ```{r}
