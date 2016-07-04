@@ -259,8 +259,8 @@ sink()
 
 
 ```
-##    user  system elapsed 
-##    1.11    0.13   77.94
+##      user    system   elapsed 
+##    16.050     0.791 17316.957
 ```
 
 ##Chains
@@ -308,6 +308,48 @@ sink()
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
 
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-8.png)<!-- -->
+
+```
+## 
+## $`9`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-9.png)<!-- -->
+
 ##Log Odds of Feeding
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
@@ -336,7 +378,7 @@ Global Plotting
 
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1502991 80.3    2637877 140.9  2637877 140.9
-## Vcells 7584160 57.9   21940639 167.4 27424992 209.3
+##             used  (Mb) gc trigger   (Mb)   max used   (Mb)
+## Ncells   1556039  83.2   32145108 1716.8   50226733 2682.4
+## Vcells 126534874 965.4  969011838 7393.0 1171835194 8940.4
 ```
