@@ -58,7 +58,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144"),]
 
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -171,17 +171,17 @@ $$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 ```{r,fig.height=3,fig.width=3.5}
-dplot<-function(a1,beta,x){
-  y<-inv.logit(a1[1]+beta[1]*x)
+dplot<-function(a1,beta,beta2=0,x,coast=0){
+  y<-inv.logit(a1[1]+beta[1]*x + beta2*coast)
   d11<-data.frame(x,y,State="Traveling",Begin="Traveling")
   
-  y<-1-inv.logit(a1[1]+beta[1]*x)
+  y<-1-inv.logit(a1[1]+beta[1]*x+ beta2*coast)
   d12<-data.frame(x,y,State="Feeding",Begin="Traveling")
 
-  y<-inv.logit(a1[2]+beta[2]*x)
+  y<-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
   d21<-data.frame(x,y,State="Traveling",Begin="Feeding")
   
-  y<-1-inv.logit(a1[2]+beta[2]*x)
+  y<-1-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
   d22<-data.frame(x,y,State="Feeding",Begin="Feeding")
   
   d<-rbind_all(list(d11,d12,d21,d22))
@@ -472,6 +472,29 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 ```{r,fig.height=10}
 #phi and ocean plot
 ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4)
+```
+
+###Interaction
+
+No estimate of uncertainty.
+```{r}
+coastx<-seq(0,quantile(mxy$coast,0.95),quantile(mxy$coast,0.95)/20)
+oceanx<-seq(0,quantile(mxy$ocean,0.95),quantile(mxy$ocean,0.95)/20)
+allx<-expand.grid(coastx,oceanx)
+colnames(allx)<-c("coast","ocean")
+allx$ID<-1:nrow(allx)
+allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta1<-filter(pc,par %in% 'beta_mu[2]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta2<-filter(pc,par %in% 'beta2_mu[2]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+
+traj<-function(ocean,coast,alpha,beta1,beta2){
+  p<-inv.logit(alpha + beta1*ocean + beta2*coast)
+  data.frame(ocean,coast,phi=p)
+}
+
+intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
+
+ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Feeding when Traveling")
 ```
 
 ##Autocorrelation in behavior
