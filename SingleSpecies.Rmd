@@ -383,11 +383,15 @@ beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),pa
 
 beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
 
+beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
+
+beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
+
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
 gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,5),parameter='gamma',Behavior=2,Estimate="Prior")
 
-prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,gamma1prior,gamma2prior))
+prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
 prs$Behavior<-as.factor(prs$Behavior)
 
