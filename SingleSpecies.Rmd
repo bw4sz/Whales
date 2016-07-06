@@ -312,7 +312,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=4,DIC=FALSE))
 }
 save.image("SingleSpecies.RData")
 ```
@@ -426,6 +426,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 #Behavioral Prediction
 
 ```{r}
+dsadsasd
 #We just need Feeding behavior
 behav_chains<-pc[pc$Behavior == 2 & pc$parameter %in% "phi",]
 
