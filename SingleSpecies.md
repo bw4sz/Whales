@@ -259,8 +259,8 @@ sink()
 
 
 ```
-##      user    system   elapsed 
-##    16.050     0.791 17316.957
+##    user  system elapsed 
+##   82.49    4.61  960.83
 ```
 
 ##Chains
@@ -350,35 +350,57 @@ sink()
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-9.png)<!-- -->
 
+```
+## 
+## $`10`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-10.png)<!-- -->
+
+```
+## 
+## $`11`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-11.png)<!-- -->
+
 ##Log Odds of Feeding
+
+### Ocean Depth
+
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+### Distance From Coast
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
+###Interaction
+
+No estimate of uncertainty.
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
-
-##Location of Behavior
-
-
-
-Global Plotting
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
+##Location of Behavior
 
-#Krill Fishery
 ![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 
+#Krill Fishery
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+
+
 ```
-##             used  (Mb) gc trigger   (Mb)   max used   (Mb)
-## Ncells   1556039  83.2   32145108 1716.8   50226733 2682.4
-## Vcells 126534874 965.4  969011838 7393.0 1171835194 8940.4
+##            used  (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1554986  83.1    4703850 251.3  4703850 251.3
+## Vcells 27280000 208.2   76773043 585.8 76772898 585.8
 ```
