@@ -1,0 +1,7 @@
+Warning: Permanently added 'ec2-52-40-154-85.us-west-2.compute.amazonaws.com,52.40.154.85' (ECDSA) to the list of known hosts.
+Warning: Permanently added the RSA host key for IP address '192.30.253.112' to the list of known hosts.
+From github.com:bw4sz/Whales
+   fe36223..46f5d97  master     -> origin/master
+Updating fe36223..46f5d97
+Fast-forward
+Connection to ec2-52-40-154-85.us-west-2.compute.amazonaws.com closed by remote host.
