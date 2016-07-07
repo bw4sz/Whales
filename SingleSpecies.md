@@ -259,8 +259,8 @@ sink()
 
 
 ```
-##    user  system elapsed 
-##   82.49    4.61  960.83
+##      user    system   elapsed 
+##    21.807     1.041 10631.736
 ```
 
 ##Chains
@@ -400,7 +400,7 @@ No estimate of uncertainty.
 
 
 ```
-##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1554986  83.1    4703850 251.3  4703850 251.3
-## Vcells 27280000 208.2   76773043 585.8 76772898 585.8
+##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1573749   84.1    6379917  340.8   9968622  532.4
+## Vcells 133489636 1018.5  423644878 3232.2 375043533 2861.4
 ```
