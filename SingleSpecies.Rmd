@@ -528,11 +528,10 @@ runs<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% do(r
 
 #turn steps to hours
 runs$hours<-runs$runs*step_length
-ggplot(runs,aes(x=as.numeric(hours),fill=Behavior)) + geom_histogram(position='dodge') + scale_x_continuous(breaks=seq(0,max(runs$hours),by=48)) + labs(x="Hours") + ggtitle("Predicted Behavior Duration") + theme_bw()
 ```
 
-```{r,fig.height=3,fig.with=3.5}
-mr<-runs %>% group_by(Behavior) %>% summarize(mean=mean(hours),lower=quantile(runs,0.05),upper=quantile(runs,0.95))
+```{r,fig.height=4}
+mr<-runs %>% group_by(Behavior) %>% summarize(mean=mean(hours),lower=quantile(hours,0.05),upper=quantile(hours,0.95))
 ggplot(mr,aes(x=Behavior,y=mean,ymin=lower,ymax=upper)) + geom_pointrange(size=2) + theme_bw() + ggtitle("Average Duration of Behavior") + labs(y="Hours")
 
 #Every run eventually ends in a switch (that's what makes it a run)
