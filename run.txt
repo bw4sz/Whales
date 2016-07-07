@@ -97,7 +97,7 @@ label: unnamed-chunk-4
 
   |                                                                         |..........                                                       |  16%
 label: unnamed-chunk-5
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.968192,-61.924596&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.96893,-61.919387&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |...........                                                      |  17%
   ordinary text without R code
 
@@ -106,6 +106,7 @@ label: unnamed-chunk-6 (with options)
 List of 1
  $ fig.height: num 3
 
+No id variables; using all as measure variables
 No id variables; using all as measure variables
 No id variables; using all as measure variables
 No id variables; using all as measure variables
@@ -325,15 +326,13 @@ List of 2
  $ fig.height: num 5
  $ fig.width : num 14
 
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
   |                                                                         |..........................................................       |  89%
   ordinary text without R code
 
   |                                                                         |...........................................................      |  91%
 label: unnamed-chunk-29 (with options) 
-List of 2
- $ fig.height: num 3
- $ fig.with  : num 3.5
+List of 1
+ $ fig.height: num 4
 
   |                                                                         |............................................................     |  92%
   ordinary text without R code
@@ -342,7 +341,7 @@ List of 2
 label: unnamed-chunk-30
 Warning: bounding box given to google - spatial extent only approximate.
 converting bounding box to center/zoom specification. (experimental)
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62,-62.5&zoom=6&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-62,-62.5&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |..............................................................   |  95%
   ordinary text without R code
 
@@ -356,7 +355,7 @@ label: unnamed-chunk-32
 
 output file: SingleSpecies.knit.md
 
-/usr/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/Rtmp5Hr7Kb/rmarkdown-str5a85b20952f.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+/usr/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpHZVLaB/rmarkdown-str5a6394e90cb.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
 
 Output created: SingleSpecies.html
 There were 50 or more warnings (use warnings() to see the first 50)

@@ -260,7 +260,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##    21.807     1.041 10631.736
+##    22.301     1.048 21976.079
 ```
 
 ##Chains
@@ -386,7 +386,7 @@ No estimate of uncertainty.
 ##Behavioral description
 
 ## Predicted behavior duration
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
@@ -401,6 +401,6 @@ No estimate of uncertainty.
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1573749   84.1    6379917  340.8   9968622  532.4
-## Vcells 133489636 1018.5  423644878 3232.2 375043533 2861.4
+## Ncells   1573724   84.1    5103933  272.6   9968622  532.4
+## Vcells 133665529 1019.8  370915076 2829.9 370083422 2823.6
 ```
