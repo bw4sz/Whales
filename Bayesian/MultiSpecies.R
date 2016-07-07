@@ -88,10 +88,10 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(5,2)
+    gamma[1] ~ dbeta(6,2)
     
     # prior for gamma in state 2
-    gamma[2] ~ dbeta(2,5)
+    gamma[2] ~ dbeta(2,6)
     
     ##Behavioral States
     # Following lunn 2012 p85
