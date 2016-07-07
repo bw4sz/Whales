@@ -48,7 +48,7 @@ mdat<-read.csv("InputData/FullData-550793189439001813.csv")
 #Create a oceandepth in km 
 mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 
-mdat$coast<-round(mdat$NASA.Distance.to.Coast/1000,3)
+mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -58,7 +58,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144"),]
+mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186"),]
 
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -410,7 +410,7 @@ rm(allp)
 postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.95))
 ```
 
 ### Distance to Coast
@@ -420,7 +420,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),x=unique(mxy$coast))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.95))
 ```
 
 #Behavioral Prediction
@@ -572,12 +572,6 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 #Krill Fishery
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
-# krill<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointDegreeLat),data=krill)
-# 
-# k<-points2grid(krill)
-# r<-rasterize(krill,raster(k),"C1KRIcatchKG")
-
-#as data frames
 
 ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch") + scale_size_continuous(range=c(0,8)) 
 ```
