@@ -41,7 +41,7 @@ newModel<-F
 #Abstract
 
 ```{r}
-mdat<-read.csv("InputData/FullData-550793189439001813.csv")
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -4891681668380779355.csv")
 
 ##need to look into making into a movebank object.
 
@@ -58,7 +58,7 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186"),]
 
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
@@ -288,8 +288,8 @@ How did the filter change the extent of tracks?
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
 ```{r,fig.height=3,fig.width=5}
@@ -312,7 +312,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=25000,n.burnin=23000,n.thin=4,DIC=FALSE))
 }
 save.image("SingleSpecies.RData")
 ```
@@ -455,8 +455,8 @@ rm(behav_chains)
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=6,source="google",scale=1,maptype="satellite")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_bw()
+  m <- get_map(location=pp,zoom=6,source="google",scale=2,maptype="satellite",color="bw")
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_inset()
 })
 spp
 
@@ -572,7 +572,7 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
-ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch") + scale_size_continuous(range=c(0,8)) 
+ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) 
 ```
 
 ```{r}
