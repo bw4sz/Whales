@@ -180,10 +180,10 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(5,2)
+    gamma[1] ~ dbeta(6,2)
     
     # prior for gamma in state 2
-    gamma[2] ~ dbeta(2,5)
+    gamma[2] ~ dbeta(2,6)
     
     ##Behavioral States
     # Following lunn 2012 p85
@@ -260,7 +260,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##    22.301     1.048 21976.079
+##    22.279     0.963 21278.078
 ```
 
 ##Chains
@@ -401,6 +401,6 @@ No estimate of uncertainty.
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1573724   84.1    5103933  272.6   9968622  532.4
-## Vcells 133665529 1019.8  370915076 2829.9 370083422 2823.6
+## Ncells   1573620   84.1    5103933  272.6   9968622  532.4
+## Vcells 133549643 1019.0  370915076 2829.9 370083422 2823.6
 ```
