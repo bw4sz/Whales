@@ -260,7 +260,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##    22.279     0.963 21278.078
+##    29.828     1.286 52066.983
 ```
 
 ##Chains
@@ -364,6 +364,20 @@ sink()
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-11.png)<!-- -->
 
+```
+## 
+## $`12`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-12.png)<!-- -->
+
+```
+## 
+## $`13`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-13.png)<!-- -->
+
 ##Log Odds of Feeding
 
 ### Ocean Depth
@@ -401,6 +415,6 @@ No estimate of uncertainty.
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1573620   84.1    5103933  272.6   9968622  532.4
-## Vcells 133549643 1019.0  370915076 2829.9 370083422 2823.6
+## Ncells   1587161   84.8    4938147  263.8   9644821  515.1
+## Vcells 171069808 1305.2  414640977 3163.5 414392348 3161.6
 ```
