@@ -63,6 +63,9 @@ mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132"
 #mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
+#empty coordinates
+mxy<-mxy[!is.na(mxy$x),]
+
 #crop by extent
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
@@ -85,8 +88,8 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```{r}
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
 ##Distance
