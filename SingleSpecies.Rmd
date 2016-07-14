@@ -77,6 +77,9 @@ mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
 
 #remove empty timestamps
 mxy<-mxy[!is.na(mxy$timestamp),]
+
+#remove duplicates
+mxy<-mxy[duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 ```
 
 #Descriptive Statistics
