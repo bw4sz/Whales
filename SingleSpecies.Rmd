@@ -320,7 +320,7 @@ inl<-function(){
 }
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu")
+pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
   system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",inits=inl,data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=4,DIC=FALSE))
@@ -347,6 +347,13 @@ splitpc[c("alpha_mu","beta_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","b
     return(pc)
 })
 
+#State index
+splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
+    #As matrices
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
+    colnames(sv)<-c("Animal","Track","step")
+    pc<-data.frame(x,sv)
+})
 
 #Three index
 splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
@@ -361,13 +368,13 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 #plot all but phi and state
-ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 
 ```
 
 ```{r,fig.width=11}
 #Plot
-ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters")
+ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
 ###Compare to priors
@@ -399,7 +406,7 @@ prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prio
 
 prs$Behavior<-as.factor(prs$Behavior)
 
-allp<-rbind_all(list(pc[!pc$parameter %in% c("phi"),],prs))
+allp<-rbind_all(list(pc[!pc$parameter %in% c("phi","state"),],prs))
 
 ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parameter,scale="free")
 rm(allp)
