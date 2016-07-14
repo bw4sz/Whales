@@ -316,14 +316,14 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 
 #inits
 inl<-function(){
-  list(gamma=list(0.729,0.02766),theta=list(0.0127,3.2779),beta_mu=list(-0.84124841,0.17825950),beta2_mu=list(0.04406852,-0.10138258),alpha=list(-0.22775441,-2.16712564))
+  list(gamma=c(0.729,0.02766),theta=c(0.0127,3.2779),beta_mu=c(-0.84124841,0.17825950),beta2_mu=c(0.04406852,-0.10138258),alpha_mu=c(-0.2277,-2.1671))
 }
 
 #paramters to track
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",inits=inl,data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",inits=inl,data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=4,DIC=FALSE))
 }
 save.image("SingleSpecies.RData")
 ```
