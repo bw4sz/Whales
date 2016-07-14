@@ -316,7 +316,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 
 #inits
 inl<-function(){
-  list(gamma=c(0.729,0.02766),theta=c(0.0127,3.2779),beta_mu=c(-0.84124841,0.17825950),beta2_mu=c(0.04406852,-0.10138258),alpha=c(-0.22775441,-2.16712564))
+  list(gamma=list(0.729,0.02766),theta=list(0.0127,3.2779),beta_mu=list(-0.84124841,0.17825950),beta2_mu=list(0.04406852,-0.10138258),alpha=list(-0.22775441,-2.16712564))
 }
 
 #paramters to track
@@ -581,7 +581,7 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
-ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) 
+ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) + theme_inset()
 ```
 
 ```{r}
