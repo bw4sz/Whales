@@ -315,7 +315,7 @@ R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks)
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
+pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu")
 
 if(newModel){
   system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=40000,n.burnin=38000,n.thin=4,DIC=FALSE))
@@ -342,13 +342,6 @@ splitpc[c("alpha_mu","beta_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","b
     return(pc)
 })
 
-#State index
-splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
-    #As matrices
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
-    colnames(sv)<-c("Animal","Track","step")
-    pc<-data.frame(x,sv)
-})
 
 #Three index
 splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
@@ -363,13 +356,13 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 #plot all but phi and state
-ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 
 ```
 
 ```{r,fig.width=11}
 #Plot
-ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters")
+ggplot(data=pc[!pc$parameter %in% c("phi"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
 ###Compare to priors
@@ -405,6 +398,11 @@ allp<-rbind_all(list(pc[!pc$parameter %in% c("phi"),],prs))
 
 ggplot(allp,aes(x=Behavior,y=value,fill=Estimate)) + geom_violin() + facet_wrap(~parameter,scale="free")
 rm(allp)
+```
+
+## Parameter Summary
+```{r}
+pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(par) %>% summarize(mean=mean(value))
 ```
 
 ##Prediction - environmental function

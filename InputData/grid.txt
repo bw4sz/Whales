@@ -1,0 +1,8 @@
+oceancolor.gsfc.nasa.gov/DistFromCoast/dist2coast
+etopo1/ETOPO1_Ice_g_geotiff
+modis-ocean/MODIST/Mapped/Annual/4km/CHL_chlor_a/l3m_data
+orca.science.oregonstate.edu/data/1x2/monthly/vgpm.r2013.m.chl.m.sst4/npp
+orca.science.oregonstate.edu/data/1x2/monthly/vgpm.r2014.m.chl.m.sst4/npp
+
+
+
