@@ -338,7 +338,7 @@ inl<-function(){
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",inits=inl,data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=29000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",inits=inl,data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=4,DIC=FALSE))
 }
 ```
 
@@ -614,7 +614,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
-feeddf<-data.frame(rasterToPoints(feedpar))
+feedf<-data.frame(rasterToPoints(feedpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-69,59)
 
