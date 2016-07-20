@@ -41,14 +41,22 @@ newModel<-F
 #Abstract
 
 ```{r}
-mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -4891681668380779355.csv")
+
+#raster layers
+ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
+ice<-round(ice*-1/1000,3)
+rice<-aggregate(ice,fact=0.1/res(ice))
+
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -1133643618235885002.csv")
 
 ##need to look into making into a movebank object.
 
+#name env columns
 #Create a oceandepth in km 
 mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
-
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
+mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
+mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -58,20 +66,19 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131132","131156","121211"),]
+mxy<-mxy[mxy$Animal %in% c("131144","131159","123224"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
-#crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
 d<-crop(d,y=extent(c(-70,-55,-66,-58)))
-
 mxy<-as.data.frame(d)
+
 #set datestamp
 mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
 
@@ -93,6 +100,14 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
+```
+
+View env variables
+
+```{r}
+ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(SST)),alpha=0.3)
+ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(ChloroA)),alpha=0.3)
+ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(OSU.Ocean.NPP.0.17deg.Monthly.NPP)),alpha=0.3)
 ```
 
 ##Distance
@@ -316,7 +331,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 
 #inits
 inl<-function(){
-  list(gamma=c(0.729,0.02766),theta=c(0.0127,3.2779),beta_mu=c(-0.84124841,0.17825950),beta2_mu=c(0.04406852,-0.10138258),alpha_mu=c(-0.2277,-2.1671))
+  list(gamma=c(0.729,0.02766),beta_mu=c(-0.84124841,0.17825950),beta2_mu=c(0.04406852,-0.10138258),alpha_mu=c(-0.2277,-2.1671))
 }
 
 #paramters to track
@@ -398,9 +413,9 @@ beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),
 
 beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,6,2),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,4,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,6),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,7),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
@@ -426,7 +441,7 @@ pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(par) %>% summarize(
 postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.95))
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.98))
 ```
 
 ### Distance to Coast
@@ -436,7 +451,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),x=unique(mxy$coast))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.95))
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.99))
 ```
 
 #Behavioral Prediction
@@ -583,6 +598,29 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
+#Environmental Prediction
+
+```{r}
+meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
+
+#remove non-water areas
+rice[rice<0]<-NA
+
+#Traveling
+travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
+travdf<-data.frame(rasterToPoints(travpar))
+
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-69,59)
+
+
+#Feeding
+feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+feeddf<-data.frame(rasterToPoints(feedpar))
+
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-69,59)
+
+```
+
 
 #Krill Fishery
 ```{r}
@@ -590,6 +628,7 @@ krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
 ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + scale_color_continuous(low="white",high="black") + labs(fill="Probability of Feeding", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) + theme_inset()
 ```
+
 
 ```{r}
 #notify end of run

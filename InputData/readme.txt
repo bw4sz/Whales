@@ -9,8 +9,8 @@ Contact: support@movebank.org
 Annotated data for the following Movebank entities are contained in this file:
 Movebank study name: Antarctic Humpback overlap with krill fisheries 
 Annotated Animal IDs: 131127, 131130, 131136, 131132, 131133, 131128, 131134, 112692, 112699, 112701, 112703, 112704, 112705, 112737, 112738, 112746, 121207, 121208, 121210, 121211, 121212, 123224, 123231, 123232, 123236, 131141, 131143, 131144, 131146, 131147, 131151, and more ...
-Requested on Wed Jul 13 01:57:50 CEST 2016
-Access key: 4891681668380779355
+Requested on Tue Jul 19 18:11:29 CEST 2016
+Access key: 1133643618235885002
 Requested by: Ben Weinstein
 
 ---------------------------
@@ -49,73 +49,50 @@ Algorithm Marked Outlier
 Locations are the the geographic coordinates of locations along an animal track as estimated by the processed sensor data.
 
 Attributes from annotated environmental data:
+Name: OSU Ocean NPP 0.17deg Monthly NPP
+Description: Net primary productivity in the ocean; the net rate at which carbon from the atmosphere is taken up by plants. Negative values indicate net carbon release to the atmosphere.
+Unit: mgC m^-2 day^-1
+No data values: -9999 (provider), NaN (interpolated)
+Interpolation: inverse-distance-weighted
+
 Name: ETOPO1 Elevation
 Description: Elevation of the land surface over land and the ocean floor over ocean. Over the Antarctic and Greenland ice sheets values indicate the elevation of the top of the ice sheets.
 Unit: m amsl
 No data values: -32768 (provider), NaN (interpolated)
-Interpolation: bilinear
-
-Name: MODIS Ocean Aqua OceanColor 4km Daily Chlorophyll A
-Description: Chlorophyll A mass concentration near the surface of the ocean. See Hu et al. (2012) doi:10.1029/2011JC007395.
-Unit: mg m^-3
-No data values: -32767.0f (provider), NaN (interpolated)
-Interpolation: bilinear
+Interpolation: inverse-distance-weighted
 
 Name: NASA Distance to Coast
 Description: The distance to the nearest ocean coastline. Note: Incorrected coastline is found in some fjords of southern Chile and northern Greenland. 1 km uncertainty may lead to 2 km distance being adjacent to the coastline.
 Unit: km
 No data values: NaN (provider), NaN (interpolated)
-Interpolation: bilinear
+Interpolation: inverse-distance-weighted
 
-Name: ECMWF Interim Full Daily SFC Sea Ice Cover
-Description: Fraction of model grid box that is covered with sea ice.
-Unit: (0-1)
-No data values: NaN (interpolated)
-Interpolation: bilinear
-
-Name: OSU Ocean NPP 0.083deg 8d NPP
-Description: Net primary productivity in the ocean; the net rate at which carbon from the atmosphere is taken up by plants. Negative values indicate net carbon release to the atmosphere.
-Unit: mgC m^-2 day^-1
-No data values: -9999 (provider), NaN (interpolated)
-Interpolation: bilinear
-
-Name: MODIS Ocean Aqua OceanColor 4km Daily IPAR
-Description: Instantaneous photosynthetically available radiation. Downwelling photosynthetic photon radiance in sea water. The spectral range of solar radiation that organisms can use for photosynthesis at the time of the satellite observation.
-Unit: Einstien m^-2 s^-1
-No data values: -32767S (provider), NaN (interpolated)
-Interpolation: bilinear
-
-Name: MODIS Ocean Aqua OceanColor 4km Daily Daytime SST
+Name: MODIS Ocean Aqua OceanColor 4km Monthly Daytime SST
 Description: Daytime water temperature near the ocean's surface computed from MODIS bands 31 and 32
 Unit: deg C
 No data values: -1 (provider), NaN (interpolated)
-Interpolation: bilinear
+Interpolation: inverse-distance-weighted
+
+Name: MODIS Ocean Aqua OceanColor 4km Monthly Chlorophyll A
+Description: Chlorophyll A mass concentration near the surface of the ocean. See Hu et al. (2012) doi:10.1029/2011JC007395.
+Unit: mg m^-3
+No data values: -32767.0f (provider), NaN (interpolated)
+Interpolation: inverse-distance-weighted
 
 ---------------------------
 
 Environmental data services
 
-Service: Oregon State Ocean Productivity Reanalysis/MODIS-based 0.083-deg 8-day
-Provider: Oregon State University
+Service: MODIS Ocean/Aqua Mapped OceanColor 4-km Monthly
+Provider: NASA
 Datum: N/A
 Projection: N/A
-Spatial granularity: 1/12 degree
+Spatial granularity: 4.64 km
 Spatial range (long x lat): E: 180.0    W: -180.0 x N: 90    S: -90
-Temporal granularity: 8 day
-Temporal range: 2002 to 2015
-Source link: http://orca.science.oregonstate.edu/data/2x4/8day/vgpm.r2014.m.chl.m.sst/hdf/
-Terms of use: http://orca.science.oregonstate.edu/2160.by.4320.8day.hdf.vgpm.m.chl.m.sst.php
-
-Service: ECMWF Global Atmospheric Reanalysis/Interim Full Daily at Surface
-Provider: European Centre for Medium-Range Weather Forecasts
-Datum: N/A
-Projection: N/A
-Spatial granularity: 0.75 degrees
-Spatial range (long x lat): E: 180.0    W: -180.0 x N: 89.463    S: -89.463
-Temporal granularity: 6 hourly
-Temporal range: 1979-01-01 to present
-Source link: http://apps.ecmwf.int/datasets/data/interim_full_daily/?levtype=sfc
-Terms of use: http://data-portal.ecmwf.int/data/d/license/interim_full/
+Temporal granularity: monthly
+Temporal range: 2002 to present
+Source link: http://oceandata.sci.gsfc.nasa.gov/MODIS-Aqua/Mapped/Monthly/4km
+Terms of use: http://oceancolor.gsfc.nasa.gov/cms/citations, http://oceancolor.gsfc.nasa.gov/forum/oceancolor/topic_show.pl?tid=474
 
 Service: NASA Distance to the Nearest Coast
 Provider: NASA Ocean Biology Processing Group
@@ -139,15 +116,15 @@ Temporal range: N/A
 Source link: http://www.ngdc.noaa.gov/mgg/global/
 Terms of use: http://www.ngdc.noaa.gov/mgg/global/
 
-Service: MODIS Ocean/Aqua Mapped OceanColor 4-km Daily
-Provider: NASA
+Service: Oregon State Ocean Productivity Reanalysis/MODIS-based 0.17-deg Monthly
+Provider: Oregon State University
 Datum: N/A
 Projection: N/A
-Spatial granularity: 4.64 km
+Spatial granularity: 1/6 degree
 Spatial range (long x lat): E: 180.0    W: -180.0 x N: 90    S: -90
-Temporal granularity: daily
-Temporal range: 2002 to present
-Source link: http://oceandata.sci.gsfc.nasa.gov/MODIS-Aqua/Mapped/Daily/4km
-Terms of use: http://oceancolor.gsfc.nasa.gov/cms/citations, http://oceancolor.gsfc.nasa.gov/forum/oceancolor/topic_show.pl?tid=474
+Temporal granularity: monthly
+Temporal range: 2002 to 2015
+Source link: http://orca.science.oregonstate.edu/data/1x2/monthly/vgpm.r2014.m.chl.m.sst/hdf/
+Terms of use: http://orca.science.oregonstate.edu/1080.by.2160.monthly.hdf.vgpm.m.chl.m.sst.php
 
 Dodge, S., Bohrer, G., Weinzierl, R., Davidson, S.C., Kays, R., Douglas, D., Cruz, S., Han, J., Brandes, D., and Wikelski, M., 2013, The Environmental-Data Automated Track Annotation (Env-DATA) System: Linking animal tracks with environmental data: Movement Ecology, v. 1:3. doi:10.1186/2051-3933-1-3.
