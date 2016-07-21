@@ -88,18 +88,18 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(6,2)
+    gamma[1] ~ dbeta(4,2)
     
     # prior for gamma in state 2
-    gamma[2] ~ dbeta(2,6)
+    gamma[2] ~ dbeta(2,7)
     
     ##Behavioral States
     # Following lunn 2012 p85
     
     #Hierarchical structure
     #Intercepts
-    alpha_mu[1] ~ dnorm(0,0.386)
-    alpha_mu[2] ~ dnorm(0,0.386)
+    alpha_mu[1] ~ dnorm(0.5,0.386)
+    alpha_mu[2] ~ dnorm(0.5,0.386)
 
     #Variance
     alpha_tau[1] ~ dt(0,1,1)I(0,)
@@ -107,12 +107,12 @@ cat("
 
     #Slopes
     ## Ocean Depth
-    beta_mu[1] ~ dnorm(0,0.386)
-    beta_mu[2] ~ dnorm(0,0.386)
+    beta_mu[1] ~ dnorm(-0.5,0.386)
+    beta_mu[2] ~ dnorm(-0.5,0.386)
 
     # Distance coast
-    beta2_mu[1] ~ dnorm(0,0.386)
-    beta2_mu[2] ~ dnorm(0,0.386)
+    beta2_mu[1] ~ dnorm(-0.5,0.386)
+    beta2_mu[2] ~ dnorm(-0.5,0.386)
 
     #Variance
     #Ocean
