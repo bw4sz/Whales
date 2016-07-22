@@ -95,6 +95,10 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```
 
 ```{r}
+
+#hold copy of orig
+oxy<-mxy
+
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
@@ -310,6 +314,10 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
+```{r}
+ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~Animal,scales="free",ncol=4)
+```
+
 ```{r,fig.height=3,fig.width=5}
 ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
@@ -326,13 +334,15 @@ source("Bayesian/MultiSpecies.R")
 R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks)
 
-
 #paramters to track
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=3,DIC=FALSE))
 }
+
+save.image("SingleSpecies.RData")
+
 ```
 
 ##Chains
