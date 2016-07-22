@@ -107,12 +107,12 @@ cat("
 
     #Slopes
     ## Ocean Depth
-    beta_mu[1] ~ dnorm(-0.5,0.386)
-    beta_mu[2] ~ dnorm(-0.5,0.386)
+    beta_mu[1] ~ dnorm(-1,0.386)
+    beta_mu[2] ~ dnorm(-1,0.386)
 
     # Distance coast
-    beta2_mu[1] ~ dnorm(-0.5,0.386)
-    beta2_mu[2] ~ dnorm(-0.5,0.386)
+    beta2_mu[1] ~ dnorm(-1,0.386)
+    beta2_mu[2] ~ dnorm(-1,0.386)
 
     #Variance
     #Ocean

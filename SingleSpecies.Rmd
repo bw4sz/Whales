@@ -39,7 +39,6 @@ newModel<-F
 ```
 
 #Abstract
-
 ```{r}
 
 #raster layers
@@ -66,9 +65,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("131134","131144"),]
+#mxy<-mxy[mxy$Animal %in% c("131151","131144"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -215,7 +214,6 @@ The transmitter will often go dark for 10 to 12 hours, due to weather, right in 
 Specify a duration, calculate the number of tracks and the number of removed points. Iteratively.
 
 ```{r}
-
 ##Time is the beginning of the first point.
 step_length=6
 
@@ -236,8 +234,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="days")) %>% filter(mt>=2) %>% .$Track
-
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="days")) %>% filter(mt>=1) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -252,7 +249,7 @@ sxy<-lapply(sxy,timed,step_length=6)
 mxy<-rbind_all(sxy)
 
 ######recode whales
-mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+#mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
@@ -318,7 +315,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=T}
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
 ```{r,eval=T}
@@ -334,7 +331,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=1,DIC=FALSE))
 }
 ```
 
@@ -351,7 +348,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","beta_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -400,13 +397,13 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0.5,1.67),pa
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0.5,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,-0.5,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,-0.5,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
 
-beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,-0.5,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
+beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
 
-beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,-0.5,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
+beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,4,2),parameter='gamma',Behavior=1,Estimate="Prior")
 
@@ -424,7 +421,10 @@ rm(allp)
 
 ## Parameter Summary
 ```{r}
-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(par) %>% summarize(mean=mean(value))
+psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
+
+psum
+ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free")
 ```
 
 ##Prediction - environmental function
@@ -434,6 +434,8 @@ pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(par) %>% summarize(
 #get the posterior estimates of the env function
 
 postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.5))
 
 #mean env estimate
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.98))
@@ -446,7 +448,10 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),x=unique(mxy$coast))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.99))
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.5))
+
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+
 ```
 
 #Behavioral Prediction
@@ -605,14 +610,16 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-69,-59)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
 
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-69,-59)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) + theme_inset()
+
+#both together
 
 ```
 
