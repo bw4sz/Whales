@@ -9,25 +9,28 @@ Ben Weinstein
 #Abstract
 
 
-
 #Descriptive Statistics
 
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
+View env variables
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-6-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
+
 ##Distance
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
-
-##Time 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-##Velocity
+##Time 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+##Velocity
+![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ##Angles
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 #Correlated random walk
 
@@ -85,200 +88,58 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 How did the filter change the extent of tracks?
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
 
 
-sink("Bayesian/Multi_RW.jags")
-cat("
-    model{
-    
-    #Constants
-    pi <- 3.141592653589
-    
-    ##argos observation error##
-    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
-    
-    #Constructing the covariance matrix
-    argos_cov[1,1] <- 1
-    argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    argos_cov[2,1] <- sqrt(argos_alpha) * rho
-    argos_cov[2,2] <- argos_alpha
-    
-    for(i in 1:ind){
-      for(g in 1:tracks[i]){
-
-        ## Priors for first true location
-        #for lat long
-        y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec)
-
-        #First movement - random walk.
-        y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
-        
-        ###First Behavioral State###
-        state[i,g,1] ~ dcat(lambda[]) ## assign state for first obs
-        
-        #Process Model for movement
-        for(t in 2:(steps[i,g]-1)){
-        
-        #Behavioral State at time T
-        logit(phi[i,g,t,1]) <- alpha[i,state[i,g,t-1]] + beta[i,state[i,g,t-1]] * ocean[i,g,t] + beta2[i,state[i,g,t-1]] * coast[i,g,t]
-        phi[i,g,t,2] <- 1-phi[i,g,t,1]
-        state[i,g,t] ~ dcat(phi[i,g,t,])
-            
-        #Turning covariate
-        #Transition Matrix for turning angles
-        T[i,g,t,1,1] <- cos(theta[state[i,g,t]])
-        T[i,g,t,1,2] <- (-sin(theta[state[i,g,t]]))
-        T[i,g,t,2,1] <- sin(theta[state[i,g,t]])
-        T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
-        
-        #Correlation in movement change
-        d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
-        
-        #Gaussian Displacement
-        y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
-      }
-
-    #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha[i,state[i,g,steps[i,g]-1]] + beta[i,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[i,state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
-    phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
-    state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
-    
-    ##	Measurement equation - irregular observations
-    # loops over regular time intervals (t)    
-    
-    for(t in 2:steps[i,g]){
-    
-    # loops over observed locations within interval t
-    for(u in 1:idx[i,g,t]){ 
-      zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
-
-        #for each lat and long
-          #argos error
-          argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
-          }
-        }
-      }
-    }
-    ###Priors###
-
-    #Process Variance
-    iSigma ~ dwish(R,2)
-    Sigma <- inverse(iSigma)
-    
-    ##Mean Angle
-    tmp[1] ~ dbeta(10, 10)
-    tmp[2] ~ dbeta(10, 10)
-    
-    # prior for theta in 'traveling state'
-    theta[1] <- (2 * tmp[1] - 1) * pi
-    
-    # prior for theta in 'foraging state'    
-    theta[2] <- (tmp[2] * pi * 2)
-    
-    ##Move persistance
-    # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(6,2)
-    
-    # prior for gamma in state 2
-    gamma[2] ~ dbeta(2,6)
-    
-    ##Behavioral States
-    # Following lunn 2012 p85
-    
-    #Hierarchical structure
-    #Intercepts
-    alpha_mu[1] ~ dnorm(0,0.386)
-    alpha_mu[2] ~ dnorm(0,0.386)
-
-    #Variance
-    alpha_tau[1] ~ dt(0,1,1)I(0,)
-    alpha_tau[2] ~ dt(0,1,1)I(0,)
-
-    #Slopes
-    ## Ocean Depth
-    beta_mu[1] ~ dnorm(0,0.386)
-    beta_mu[2] ~ dnorm(0,0.386)
-
-    # Distance coast
-    beta2_mu[1] ~ dnorm(0,0.386)
-    beta2_mu[2] ~ dnorm(0,0.386)
-
-    #Variance
-    #Ocean
-    beta_tau[1] ~ dt(0,1,1)I(0,)
-    beta_tau[2] ~ dt(0,1,1)I(0,)
-    
-    #Coast
-    beta2_tau[1] ~ dt(0,1,1)I(0,)
-    beta2_tau[2] ~ dt(0,1,1)I(0,)
-    
-    #For each individual
-    for(i in 1:ind){
-      # prob of being in state 1 at t, given in state 1 at t-1    
-      #Individual Intercept
-      alpha[i,1] ~ dnorm(alpha_mu[1],alpha_tau[1])
-      
-      #effect of ocean on traveling -> traveling
-      beta[i,1] ~ dnorm(beta_mu[1],beta_tau[1])
-      
-      #effect of coast on traveling -> traveling
-      beta2[i,1] ~ dnorm(beta2_mu[1],beta2_tau[1])
-    
-      #Prob of transition to state 1 given state 2 at t-1
-      alpha[i,2] ~ dnorm(alpha_mu[2],alpha_tau[2])
-
-      #effect of ocean on feeding -> traveling
-      beta[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
-
-      #effect of dist to coast on feeding -> traveling
-      beta2[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
-    
-    }
-    
-    #Probability of behavior switching 
-    lambda[1] ~ dbeta(1,1)
-    lambda[2] <- 1 - lambda[1]
-
-    ##Argos priors##
-    #longitudinal argos error
-    argos_sigma ~ dunif(0,10)
-    
-    #latitidunal argos error
-    argos_alpha~dunif(0,10)
-    
-    #correlation in argos error
-    rho ~ dunif(-1, 1)
-    
-
-    }"
-    ,fill=TRUE)
-sink()
 
 
 ```
-##      user    system   elapsed 
-##    29.828     1.286 52066.983
+##       user     system    elapsed 
+##     72.206      1.404 140164.128
 ```
 
 ##Chains
-![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+
+## Parameter Summary
+
+```
+## Source: local data frame [10 x 5]
+## Groups: parameter [?]
+## 
+##    parameter         par        mean       lower     upper
+##       (fctr)      (fctr)       (dbl)       (dbl)     (dbl)
+## 1   alpha_mu alpha_mu[1]  3.56132392  1.40130189 4.8778091
+## 2   alpha_mu alpha_mu[2]  1.32284059  0.16354829 2.4581401
+## 3   beta2_mu beta2_mu[1] -0.14457126 -0.43928825 0.1739572
+## 4   beta2_mu beta2_mu[2] -1.05899881 -3.73492066 1.6844570
+## 5    beta_mu  beta_mu[1] -0.92768743 -2.44118518 0.8896919
+## 6    beta_mu  beta_mu[2]  0.05006696 -0.16740745 0.5363841
+## 7      gamma    gamma[1]  0.17950355  0.13326095 0.2276694
+## 8      gamma    gamma[2]  0.85382415  0.81331822 0.8974981
+## 9      theta    theta[1]  0.16239142  0.02469553 0.3071141
+## 10     theta    theta[2]  6.18664371  6.15436767 6.2162254
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 ##Prediction - environmental function
 
 ### Ocean Depth
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
 
 ### Distance to Coast
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -289,132 +150,116 @@ sink()
 ### Per Animal
 
 ```
-## $`1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
-
-```
-## 
-## $`2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
-
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-4.png)<!-- -->
-
-```
-## 
 ## $`5`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-5.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ```
 ## 
 ## $`6`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-6.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
 
 ```
 ## 
 ## $`7`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-7.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
 
 ```
 ## 
 ## $`8`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-8.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
 
 ```
 ## 
 ## $`9`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-9.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-5.png)<!-- -->
 
 ```
 ## 
 ## $`10`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-10.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-6.png)<!-- -->
 
 ```
 ## 
 ## $`11`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-11.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-7.png)<!-- -->
 
 ```
 ## 
 ## $`12`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-12.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-8.png)<!-- -->
 
 ```
 ## 
-## $`13`
+## $`14`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-13.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-9.png)<!-- -->
+
+```
+## 
+## $`15`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-10.png)<!-- -->
 
 ##Log Odds of Feeding
 
 ### Ocean Depth
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ### Distance From Coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ###Interaction
 
 No estimate of uncertainty.
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+
+#Environmental Prediction
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
 
 
 #Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+
 
 
 ```
-##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1587161   84.8    4938147  263.8   9644821  515.1
-## Vcells 171069808 1305.2  414640977 3163.5 414392348 3161.6
+##             used   (Mb) gc trigger (Mb)  max used   (Mb)
+## Ncells   1668289   89.1    6177917  330   7722397  412.5
+## Vcells 195284740 1490.0  392287202 2993 390660067 2980.5
 ```
