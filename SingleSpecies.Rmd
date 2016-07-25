@@ -253,7 +253,8 @@ sxy<-lapply(sxy,timed,step_length=6)
 mxy<-rbind_all(sxy)
 
 ######recode whales
-#mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+mxy$OAnimal<-mxy$Animal
+mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
@@ -315,7 +316,8 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ```
 
 ```{r,fig.height=15}
-ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~Animal,scales="free",ncol=4)
+oxy$OAnimal<-oxy$Animal
+ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~OAnimal,scales="free",ncol=4)
 ```
 
 ```{r,fig.height=3,fig.width=5}
