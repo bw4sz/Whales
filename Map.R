@@ -49,4 +49,17 @@ m <- get_googlemap(center=c(-61,-64),source="google",zoom=6,scale=2,maptype="sat
 ggmap(m)+geom_path(data=live[live$x > -65,], aes(x=x, y=y,col=as.factor(Animal)),size=.5) + labs(col="Whale") + scale_color_discrete(guide="none") + facet_wrap(~Animal) + theme_inset()
 ggsave("Figures/LiveTags.jpeg",dpi=600,height=6,width=7)
 
+krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
+
+
+r<-raster(ext=extent(c(-70,-55,-67,-54)))
+temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
+
+krill$catch<-krill$C1KRIcatchKG/1000
+p<-ggmap(temp) 
+p<-p + geom_path(data=mxy, aes(x=x, y=y,group=Animal),size=.3,col="springgreen4",alpha=0.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=catch)) + scale_size(range=c(1,10))
+p<-p +  labs(size="Krill Catch (Metric Tons)") 
+p
+ggsave("Figures/KrillTracks.jpeg",dpi=600,height=5,width=5)
+
 #mxy<-as.data.frame(d)
