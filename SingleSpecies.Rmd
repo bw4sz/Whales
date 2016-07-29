@@ -40,7 +40,6 @@ newModel<-F
 
 #Abstract
 ```{r}
-
 #raster layers
 #bathymetry
 ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
@@ -77,7 +76,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131151","131144"),]
+#mxy<-mxy[mxy$Animal %in% c("121211","123224","154186"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -192,7 +191,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=3
+step_length=4
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -211,7 +210,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=0) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=4) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -220,7 +219,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=3)
+sxy<-lapply(sxy,timed,step_length=4)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -233,7 +232,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"3 hours"))
+x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
 return(x)
 })
 
@@ -636,14 +635,14 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
 
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) + theme_inset()
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
 ```
 
 ##Distance to Coast
@@ -656,13 +655,13 @@ meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(pa
 travpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
 
 #Feeding
 feedpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) + theme_inset()
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) 
 ```
 
 ##All variables
@@ -674,16 +673,16 @@ meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% g
 s<-stack(rice,distc)
 
 #Traveling
-travpar<-calc(s,function(x,y){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x + meanpar$`beta2_mu[1]` * y)})
+travpar<-calc(s,function(x,y){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
 
 #Feeding
-feedpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+feedpar<-calc(s,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[1]` * x[2] )})
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) + theme_inset()
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) 
 ```
 
 
