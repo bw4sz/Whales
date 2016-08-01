@@ -83,3 +83,6 @@ temp <- get_map(location=bbox(e),source="google",zoom=3,maptype="satellite",colo
 ggmap(temp) + labs(fill="Month")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),linetype="dashed",alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted("blue"),mid="red",high=muted("blue"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
 ggsave("Figures/SeaIceYear.jpeg",dpi=400,height=7,width=10)
 write.csv(sf.df,"InputData/SeaIce_AllYears.csv")
+
+ggmap(temp) + labs(fill="Year")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Year),linetype="dashed",alpha=0.5) + facet_wrap(~Month) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
+
