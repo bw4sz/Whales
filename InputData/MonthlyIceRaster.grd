@@ -1,0 +1,25 @@
+[general]
+creator=R package 'raster'
+created=2016-08-01 15:05:25
+[georeference]
+nrows=362
+ncols=238
+xmin=-90.4235289723963
+ymin=-84.5101860138013
+xmax=-17.5955289723963
+ymax=-51.8939860138013
+projection=+proj=longlat +ellps=WGS84
+[data]
+datatype=FLT8S
+byteorder=little
+nbands=55
+bandorder=BIL
+minvalue=1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1
+maxvalue=1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1
+nodatavalue=-1.7e+308
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=Jan_2012:Feb_2012:Mar_2012:Apr_2012:May_2012:Jun_2012:Jul_2012:Aug_2012:Sep_2012:Oct_2012:Nov_2012:Dec_2012:Jan_2013:Feb_2013:Mar_2013:Apr_2013:May_2013:Jun_2013:Jul_2013:Aug_2013:Sep_2013:Oct_2013:Nov_2013:Dec_2013:Jan_2014:Feb_2014:Mar_2014:Apr_2014:May_2014:Jun_2014:Jul_2014:Aug_2014:Sep_2014:Oct_2014:Nov_2014:Dec_2014:Jan_2015:Feb_2015:Mar_2015:Apr_2015:May_2015:Jun_2015:Jul_2015:Aug_2015:Sep_2015:Oct_2015:Nov_2015:Dec_2015:Jan_2016:Feb_2016:Mar_2016:Apr_2016:May_2016:Jun_2016:Jul_2016

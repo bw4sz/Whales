@@ -74,9 +74,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("121211","123224","154186"),]
+mxy<-mxy[mxy$Animal %in% c("121211","123224","112699"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -114,12 +114,10 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
-View env variables
-
 ```{r}
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(SST)),alpha=0.3)
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(ChloroA)),alpha=0.3)
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(OSU.Ocean.NPP.0.17deg.Monthly.NPP)),alpha=0.3)
+#ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(SST)),alpha=0.3)
+#ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(ChloroA)),alpha=0.3)
+#ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(OSU.Ocean.NPP.0.17deg.Monthly.NPP)),alpha=0.3)
 ```
 
 
@@ -350,10 +348,8 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100000,n.burnin=99000,n.thin=3,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=0,DIC=FALSE))
 }
-
-save.image("SingleSpecies.RData")
 
 ```
 
@@ -421,15 +417,11 @@ a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0.5,1.67),pa
 
 beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
-
 beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
 
-beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,4,2),parameter='gamma',Behavior=1,Estimate="Prior")
-
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,7),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,0,0.5),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
@@ -621,10 +613,16 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 ```
 
 #Environmental Prediction
+
+Cut by sea ice cover.
+
+```{r}
+mice<-stack("InputData/MonthlyIceRaster.grd")
+```
+
 ## Bathymetry
 ```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
 
 ##Bathymetry
 
@@ -684,7 +682,6 @@ feedf<-data.frame(rasterToPoints(feedpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) 
 ```
-
 
 #Krill Fishery
 ```{r}
