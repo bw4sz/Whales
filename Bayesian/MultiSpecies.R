@@ -107,17 +107,21 @@ cat("
 
     #Slopes
     ## Ocean Depth
-    beta_mu[1] ~ dnorm(-1,0.386)
+    beta_mu[1] ~ dnorm(0,0.386)
+    beta_mu[2] ~ dnorm(0,0.386)
 
     # Distance coast
-    beta2_mu[1] ~ dnorm(-1,0.386)
+    beta2_mu[1] ~ dnorm(0,0.386)
+    beta2_mu[2] ~ dnorm(0,0.386)
 
     #Variance
     #Ocean
     beta_tau[1] ~ dt(0,1,1)I(0,)
+    beta_tau[2] ~ dt(0,1,1)I(0,)
 
     #Coast
     beta2_tau[1] ~ dt(0,1,1)I(0,)
+    beta2_tau[2] ~ dt(0,1,1)I(0,)
 
     #For each individual
     for(i in 1:ind){
