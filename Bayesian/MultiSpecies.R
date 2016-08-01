@@ -61,14 +61,14 @@ cat("
     
     # loops over observed locations within interval t
     for(u in 1:idx[i,g,t]){ 
-    zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
-    
-    #for each lat and long
-    #argos error
-    argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
-    }
-    }
-    }
+      zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
+      
+      #for each lat and long
+      #argos error
+      argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
+          }
+        }
+      }
     }
     ###Priors###
     
@@ -92,18 +92,11 @@ cat("
     
     # prior for gamma in state 2
     gamma[2] ~ dunif(0,0.5)
-    
-    ##Behavioral States
-    # Following lunn 2012 p85
-    
+
     #Hierarchical structure
     #Intercepts
-    alpha_mu[1] ~ dnorm(0.5,0.386)
-    alpha_mu[2] ~ dnorm(0.5,0.386)
-    
-    #Variance
-    alpha_tau[1] ~ dt(0,1,1)I(0,)
-    alpha_tau[2] ~ dt(0,1,1)I(0,)
+    alpha_mu[1] ~ dnorm(0,0.386)
+    alpha_mu[2] ~ dnorm(0,0.386)
     
     #Slopes
     ## Ocean Depth
@@ -111,13 +104,6 @@ cat("
 
     # Distance coast
     beta2_mu ~ dnorm(0,0.386)
-
-    #Variance
-    #Ocean
-    beta_tau ~ dt(0,1,1)I(0,)
-
-    #Coast
-    beta2_tau ~ dt(0,1,1)I(0,)
 
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
