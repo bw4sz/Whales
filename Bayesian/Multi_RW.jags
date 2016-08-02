@@ -30,7 +30,7 @@
         for(t in 2:(steps[i,g]-1)){
         
         #Behavioral State at time T
-        logit(phi[i,g,t,1]) <- alpha[i,state[i,g,t-1]] + beta[i,state[i,g,t-1]] * ocean[i,g,t] + beta2[i,state[i,g,t-1]] * coast[i,g,t]
+        logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta_mu[state[i,g,t-1]] * ocean[i,g,t] + beta2_mu[state[i,g,t-1]] * coast[i,g,t]
         phi[i,g,t,2] <- 1-phi[i,g,t,1]
         state[i,g,t] ~ dcat(phi[i,g,t,])
             
@@ -49,7 +49,7 @@
       }
 
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha[i,state[i,g,steps[i,g]-1]] + beta[i,state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[i,state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta_mu[state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2_mu[state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -87,18 +87,18 @@
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(4,2)
+    gamma[1] ~ dbeta(0.5,1)
     
     # prior for gamma in state 2
-    gamma[2] ~ dbeta(2,7)
+    gamma[2] ~ dunif(0,0.5)
     
     ##Behavioral States
     # Following lunn 2012 p85
     
     #Hierarchical structure
     #Intercepts
-    alpha_mu[1] ~ dnorm(0.5,0.386)
-    alpha_mu[2] ~ dnorm(0.5,0.386)
+    alpha_mu[1] ~ dnorm(0,0.386)
+    alpha_mu[2] ~ dnorm(0,0.386)
 
     #Variance
     alpha_tau[1] ~ dt(0,1,1)I(0,)
@@ -121,29 +121,7 @@
     #Coast
     beta2_tau[1] ~ dt(0,1,1)I(0,)
     beta2_tau[2] ~ dt(0,1,1)I(0,)
-
-    #For each individual
-    for(i in 1:ind){
-      # prob of being in state 1 at t, given in state 1 at t-1    
-      #Individual Intercept
-      alpha[i,1] ~ dnorm(alpha_mu[1],alpha_tau[1])
-      
-      #effect of ocean on traveling -> traveling
-      beta[i,1] ~ dnorm(beta_mu[1],beta_tau[1])
-      
-      #effect of coast on traveling -> traveling
-      beta2[i,1] ~ dnorm(beta2_mu[1],beta2_tau[1])
     
-      #Prob of transition to state 1 given state 2 at t-1
-      alpha[i,2] ~ dnorm(alpha_mu[2],alpha_tau[2])
-
-      #effect of ocean on feeding -> traveling
-      beta[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
-
-      #effect of dist to coast on feeding -> traveling
-      beta2[i,2] ~ dnorm(beta_mu[2],beta_tau[2])
-    
-    }
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)

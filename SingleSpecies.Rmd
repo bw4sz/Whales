@@ -33,31 +33,22 @@ newModel<-T
 
 ```{r,eval=F}
 #Load in data
-#load("SingleSpecies.RData")
+load("SingleSpecies.RData")
 #jags$recompile()
 newModel<-F
 ```
 
 #Abstract
 ```{r}
+
 #raster layers
-#bathymetry
 ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
 ice<-round(ice*-1/1000,3)
 rice<-aggregate(ice,fact=0.1/res(ice))
 
-#distance to coast
-distc<-raster("InputData/DistancetoCoast.tif")
-
-#remove non-water areas
-rice[rice<0]<-NA
-distc[is.na(rice)]<-NA
-```
-
-```{r}
-
-#read in data
 mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -1133643618235885002.csv")
+
+##need to look into making into a movebank object.
 
 #name env columns
 #Create a oceandepth in km 
@@ -76,7 +67,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("121211","123224","154186"),]
+mxy<-mxy[mxy$Animal %in% c("131151","131144"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -114,14 +105,43 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
-View env variables
+##Distance
 
-```{r}
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(SST)),alpha=0.3)
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(ChloroA)),alpha=0.3)
-ggmap(m) + geom_point(data=mxy,aes(x=x,y=y,col=is.na(OSU.Ocean.NPP.0.17deg.Monthly.NPP)),alpha=0.3)
+```{r,fig.height=3}
+moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
+dstat<-melt(move::distanceSummary(moved))
+
+dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
+levels(dstat$variable)<-c("Total Distance","Average Distance Between Points","Farthest Distance Between Points")
+ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free") + labs(x="Kilometers")
 ```
 
+##Time 
+```{r,fig.height=3}
+tstat<-move::timeSummary(moved)
+tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
+tstat<-droplevels(tstat[tstat$variable %in% c("Duration","AverDur"),])
+levels(tstat$variable)<-c("Total Time (Hours)","Average Time Between Points (Hours)")
+ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
+```
+
+##Velocity
+```{r,fig.height=3}
+vstat<-move::speedSummary(moved)
+vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
+levels(vstat$variable)<-c("Average Speed (m/s)","Variance in Speed (m/s)","Max Speed (m/s)")
+ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
+```
+
+##Angles
+
+```{r,fig.height=2}
+astat<-move::angleSummary(moved)
+astat<-melt(astat,measure.vars=colnames(astat[[1]]))
+astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
+levels(astat$variable)<-"Turning Angle (degrees)"
+ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
+```
 
 #Correlated random walk
 
@@ -225,8 +245,7 @@ sxy<-lapply(sxy,timed,step_length=4)
 mxy<-rbind_all(sxy)
 
 ######recode whales
-mxy$OAnimal<-mxy$Animal
-mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+#mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
@@ -288,51 +307,12 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ```
 
 ```{r,fig.height=15}
-oxy$OAnimal<-oxy$Animal
-ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~OAnimal,scales="free",ncol=4)
+ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~Animal,scales="free",ncol=4)
 ```
 
 ```{r,fig.height=3,fig.width=5}
 ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
-```
-
-##Distance
-
-```{r,fig.height=3}
-moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
-dstat<-melt(move::distanceSummary(moved))
-
-dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
-levels(dstat$variable)<-c("Total Distance","Average Distance Between Points","Farthest Distance Between Points")
-ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free") + labs(x="Kilometers")
-```
-
-##Time 
-```{r,fig.height=3}
-tstat<-move::timeSummary(moved)
-tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
-tstat<-droplevels(tstat[tstat$variable %in% c("Duration","AverDur"),])
-levels(tstat$variable)<-c("Total Time (Hours)","Average Time Between Points (Hours)")
-ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-```
-
-##Velocity
-```{r,fig.height=3}
-vstat<-move::speedSummary(moved)
-vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
-levels(vstat$variable)<-c("Average Speed (m/s)","Variance in Speed (m/s)","Max Speed (m/s)")
-ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-```
-
-##Angles
-
-```{r,fig.height=2}
-astat<-move::angleSummary(moved)
-astat<-melt(astat,measure.vars=colnames(astat[[1]]))
-astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
-levels(astat$variable)<-"Turning Angle (degrees)"
-ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
 ```
 
 ```{r,child="Bayesian/MultiSpecies.R",eval=F}
@@ -350,10 +330,10 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=0,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=48000,n.thin=1,DIC=FALSE))
 }
 
-save.image("SingleSpecies.RData")
+#save.image("SingleSpecies.RData")
 
 ```
 
@@ -415,21 +395,21 @@ pc$Estimate<-"Posterior"
 
 #add priors
 #alpha
-a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0.5,1.67),parameter='alpha_mu',Behavior=1,Estimate="Prior")
+a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=1,Estimate="Prior")
 
-a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0.5,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
+a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
 
-beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
+beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
 
-beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
+beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,4,2),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,7),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=runif(todraw,0,0.5),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
@@ -528,7 +508,7 @@ ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth"
 
 ```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4)
+ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
 
 ###Interaction
@@ -621,12 +601,13 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 ```
 
 #Environmental Prediction
-## Bathymetry
+
+```{r}
+mice<-stack("InputData/MonthlyIceRaster.grd")
+```
+
 ```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-
-##Bathymetry
 
 #remove non-water areas
 rice[rice<0]<-NA
@@ -635,54 +616,19 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-68,-49) + ylim(-66.5,-61)+ geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.7,fill='snow2') + ggtitle("Feb 2013")
 
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-68,-49) + ylim(-66.5,-61)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.7,fill='snow2') + ggtitle("Jul 2013")
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+
+#Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
-```
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-68,-49) + ylim(-66.5,-61)+ geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.7,fill='snow2') + ggtitle("Feb 2013")
 
-##Distance to Coast
-```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-##Bathymetry
-
-#Traveling
-travpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
-travdf<-data.frame(rasterToPoints(travpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
-
-#Feeding
-feedpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
-feedf<-data.frame(rasterToPoints(feedpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) 
-```
-
-##All variables
-
-```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-##Bathymetry
-s<-stack(rice,distc)
-
-#Traveling
-travpar<-calc(s,function(x,y){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
-travdf<-data.frame(rasterToPoints(travpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
-
-#Feeding
-feedpar<-calc(s,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[1]` * x[2] )})
-feedf<-data.frame(rasterToPoints(feedpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) 
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-68,-49) + ylim(-66.5,-61)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.7,fill='snow2') + ggtitle("July 2013")
 ```
 
 
@@ -695,6 +641,7 @@ ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_
 
 
 ```{r}
+#notify end of run
 #size of the run
 gc()
 save.image("SingleSpecies.RData")

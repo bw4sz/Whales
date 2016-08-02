@@ -9,6 +9,7 @@ library(ggmap)
 library(scales)
 library(broom)
 library(sp)
+library(rgeos)
 
 #Build the url
 pols<-list()
@@ -43,46 +44,41 @@ shp<-list.files("InputData/SeaIce",pattern=".shp",full.names=T)
 pols<-list()
 for(a in 1:length(shp)){
 
-  r<-readShapePoly(shp[[a]])
+  rp<-readShapePoly(shp[[a]])
   #define projection
-  stere <- "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +datum=WGS84 +units=m"
-  proj4string(r)<-stere
-  rp <- spTransform(r, CRS("+proj=longlat +ellps=WGS84"))
+  stere <- "+proj=stere +lat_0=-90 +lat_ts=70 +lon_0=0 +datum=WGS84 +units=m"
+  proj4string(rp)<-stere
+
+  #0 width buffer
+  #rp <- gBuffer(rp, byid=TRUE, width=0)
+  #crop
+  e<-extent(-3455516,-757334.6,66739.71,2200756)*1
+  rmask<-raster(rp,ext=e)
+  rmask<-disaggregate(rmask,10)
+  rasP<-rasterize(rp,rmask)
+  #presence of ice
+  rasP <- projectRaster(rasP,crs=CRS("+proj=longlat +ellps=WGS84"))
+  rasP<-rasP>0
+  pols[[a]]<-rasP
   
+  #name the layers
   #get naming structure
   s<-str_match(shp[[a]],"S_(\\d+)_")[,2]
   yr<-as.numeric(substring(s,0,4))
   mn<-as.numeric(substring(s,5,6))
-  rp$Combo<-paste(yr,mn,sep="_")
-  rp$Year<-yr
-  rp$Month<-mn
-  pols[[a]]<-rp
+  names(pols[[a]])<-paste(month.abb[mn],yr,sep="_")
 }
+spols<-stack(pols)
+#writeindividaul raster
+writeRaster(spols,"InputData/MonthlyIceRaster",overwrite=T)
 
-#super ugly code to replace duplicate IDs.
-v=1
-npols<-list()
-for(x in 1:length(pols)){
-  tid<-spChFIDs(pols[[x]],as.character(v:(v+nrow(pols[[x]]@data)-1)))
-  tid@data$id<-rownames(tid@data)
-  npols[[x]]<-tid
-  v=v+nrow(pols[[x]]@data)
-}
+#temp <- get_map(location=bbox(e),source="google",zoom=3,maptype="satellite",color = "bw",scale = 2)
+#ggmap(temp) + labs(fill="Month")+ geom_tile(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted("blue"),mid="red",high=muted("blue"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
 
-bpols<-do.call(rbind,npols)
+#ggmap(temp) + labs(fill="Month")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted("blue"),mid="red",high=muted("blue"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
+#ggmap(temp) + labs(fill="Year")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Year),alpha=0.5) + facet_wrap(~Month) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
 
-#turn to data.frame and bind
-rpf<-tidy(bpols)
-sf.df <- merge(rpf, bpols@data, by="id")
+#ggsave("Figures/SeaIceYear.jpeg",dpi=400,height=7,width=10)
+#write.csv(sf.df,"InputData/SeaIce_AllYears.csv")
 
-#overlay
-e<-raster(ext=extent(c(-70,-55,-66,-58)))
-
-temp <- get_map(location=bbox(e),source="google",zoom=3,maptype="satellite",color = "bw",scale = 2)
-
-ggmap(temp) + labs(fill="Month")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),linetype="dashed",alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted("blue"),mid="red",high=muted("blue"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
-ggsave("Figures/SeaIceYear.jpeg",dpi=400,height=7,width=10)
-write.csv(sf.df,"InputData/SeaIce_AllYears.csv")
-
-ggmap(temp) + labs(fill="Year")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Year),linetype="dashed",alpha=0.5) + facet_wrap(~Month) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x="",y="")
 
