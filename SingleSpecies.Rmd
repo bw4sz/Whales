@@ -399,17 +399,17 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0.5,1.67),pa
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0.5,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
+beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,-1,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
+beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
 
-beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
+beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
 
-beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,-1,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
+beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,4,2),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,2,7),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=runif(todraw,0,0.5),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
@@ -501,14 +501,14 @@ spp
 
 ```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4)
+ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
 
 ### Distance From Coast
 
 ```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4)
+ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
 
 ###Interaction
@@ -603,6 +603,10 @@ ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x
 #Environmental Prediction
 
 ```{r}
+mice<-stack("InputData/MonthlyIceRaster.grd")
+```
+
+```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
 #remove non-water areas
@@ -612,16 +616,15 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)
-
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[5]])),aes(x=x,y=y,fill=May_2012),alpha=0.4,fill='smoke') + ggtitle("May 2012")
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+
+#Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) + theme_inset()
-
-#both together
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)  + geom_tile(data=data.frame(rasterToPoints(mice[[5]])),aes(x=x,y=y,fill=May_2012),alpha=0.7,fill='snow2') + ggtitle("May 2012") + theme()
 
 ```
 
