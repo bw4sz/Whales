@@ -65,9 +65,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("131151","131144"),]
+#mxy<-mxy[mxy$Animal %in% c("131151","131144"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -616,9 +616,9 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.7,fill='snow2') + ggtitle("Feb 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.7,fill='snow2') + ggtitle("Jul 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("Jul 2013")
 
 #Feeding
 feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
@@ -626,9 +626,9 @@ feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.7,fill='snow2') + ggtitle("Feb 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.7,fill='snow2') + ggtitle("July 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013")
 ```
 
 
