@@ -42,10 +42,17 @@ newModel<-F
 ```{r}
 
 #raster layers
+#ice
 ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
 ice<-round(ice*-1/1000,3)
 rice<-aggregate(ice,fact=0.1/res(ice))
 
+#coast
+distc<-raster("InputData/DistancetoCoast.tif")
+rice[rice<0]<-NA
+distc[is.na(rice)]<-NA
+
+#read data
 mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -1133643618235885002.csv")
 
 ##need to look into making into a movebank object.
@@ -95,7 +102,6 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```
 
 ```{r}
-
 #hold copy of orig
 oxy<-mxy
 
@@ -429,7 +435,7 @@ psum
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free")
 ```
 
-##Prediction - environmental function
+##Behavior and environment
 
 ### Ocean Depth
 ```{r}
@@ -455,6 +461,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 
 ```
+
 
 #Behavioral Prediction
 
@@ -626,11 +633,31 @@ feedpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013")
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ```
 
+##All variables
+
+```{r}
+meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
+
+##Bathymetry
+s<-stack(rice,distc)
+
+#Traveling
+travpar<-calc(s,function(x,y){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
+travdf<-data.frame(rasterToPoints(travpar))
+
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
+
+#Feeding
+feedpar<-calc(s,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[1]` * x[2] )})
+feedf<-data.frame(rasterToPoints(feedpar))
+
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())  + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
+```
 
 #Krill Fishery
 ```{r}
