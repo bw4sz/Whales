@@ -3,6 +3,10 @@
 #cd into whales, if directory doesn't exist, kill the run.
 cd Whales||sudo halt
 
+git fetch
+
+git checkout i-39bac7e4
+
 #git pull to make sure we are at HEAD
 git pull
 
