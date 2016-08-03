@@ -52,7 +52,7 @@ for(a in 1:length(shp)){
   #0 width buffer
   #rp <- gBuffer(rp, byid=TRUE, width=0)
   #crop
-  e<-extent(-3455516,-757334.6,66739.71,2200756)*1
+  e<-extent(-3455516,-757334.6,66739.71,2200756)*1.1
   rmask<-raster(rp,ext=e)
   rmask<-disaggregate(rmask,10)
   rasP<-rasterize(rp,rmask)

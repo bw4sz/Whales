@@ -1,13 +1,13 @@
 [general]
 creator=R package 'raster'
-created=2016-08-01 20:50:02
+created=2016-08-03 10:23:55
 [georeference]
-nrows=362
-ncols=238
-xmin=-90.4235289723963
-ymin=-84.5101860138013
-xmax=-17.5955289723963
-ymax=-51.8939860138013
+nrows=359
+ncols=243
+xmin=-95.2731568129644
+ymin=-85.9282053679227
+xmax=-13.3821568129644
+ymax=-50.3154053679227
 projection=+proj=longlat +ellps=WGS84
 [data]
 datatype=FLT8S
