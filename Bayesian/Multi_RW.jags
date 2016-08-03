@@ -117,7 +117,7 @@
     #Ocean
     beta_tau[1] ~ dt(0,1,1)I(0,)
     beta_tau[2] ~ dt(0,1,1)I(0,)
-
+    
     #Coast
     beta2_tau[1] ~ dt(0,1,1)I(0,)
     beta2_tau[2] ~ dt(0,1,1)I(0,)

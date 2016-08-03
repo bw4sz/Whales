@@ -14,23 +14,19 @@ Ben Weinstein
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-View env variables
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-6-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
-
 ##Distance
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ##Time 
-![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ##Velocity
-![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ##Angles
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 #Correlated random walk
 
@@ -88,28 +84,28 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 How did the filter change the extent of tracks?
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
 ![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
 
 
 
 
 ```
-##       user     system    elapsed 
-##     72.206      1.404 140164.128
+##    user  system elapsed 
+##   0.825   0.063 161.905
 ```
 
 ##Chains
-![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ## Parameter Summary
 
@@ -117,29 +113,30 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par        mean       lower     upper
-##       (fctr)      (fctr)       (dbl)       (dbl)     (dbl)
-## 1   alpha_mu alpha_mu[1]  3.56132392  1.40130189 4.8778091
-## 2   alpha_mu alpha_mu[2]  1.32284059  0.16354829 2.4581401
-## 3   beta2_mu beta2_mu[1] -0.14457126 -0.43928825 0.1739572
-## 4   beta2_mu beta2_mu[2] -1.05899881 -3.73492066 1.6844570
-## 5    beta_mu  beta_mu[1] -0.92768743 -2.44118518 0.8896919
-## 6    beta_mu  beta_mu[2]  0.05006696 -0.16740745 0.5363841
-## 7      gamma    gamma[1]  0.17950355  0.13326095 0.2276694
-## 8      gamma    gamma[2]  0.85382415  0.81331822 0.8974981
-## 9      theta    theta[1]  0.16239142  0.02469553 0.3071141
-## 10     theta    theta[2]  6.18664371  6.15436767 6.2162254
+##    parameter         par         mean        lower     upper
+##       (fctr)      (fctr)        (dbl)        (dbl)     (dbl)
+## 1   alpha_mu alpha_mu[1] -1.319927065 -3.615871279 1.5844430
+## 2   alpha_mu alpha_mu[2] -0.542317399 -3.008551557 2.0375351
+## 3   beta2_mu beta2_mu[1]  1.092386382  0.346337720 1.6057942
+## 4   beta2_mu beta2_mu[2] -0.199392678 -2.919389283 1.9056233
+## 5    beta_mu  beta_mu[1] -0.243896209 -2.754632988 2.3640180
+## 6    beta_mu  beta_mu[2]  0.007229111 -2.654331964 2.6277480
+## 7      gamma    gamma[1]  0.625646602  0.477451953 0.7786056
+## 8      gamma    gamma[2]  0.168168031  0.006455851 0.4551335
+## 9      theta    theta[1]  0.004505143 -0.141787336 0.1439087
+## 10     theta    theta[2]  3.149378833  2.079660200 4.2457594
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
-##Prediction - environmental function
+##Behavior and environment
 
 ### Ocean Depth
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
 
 ### Distance to Coast
-![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+
 
 #Behavioral Prediction
 
@@ -150,116 +147,72 @@ How did the filter change the extent of tracks?
 ### Per Animal
 
 ```
-## $`5`
+## $`1`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 ```
 ## 
-## $`7`
+## $`2`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
-
-```
-## 
-## $`8`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
 
 ```
 ## 
-## $`9`
+## $`3`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-5.png)<!-- -->
-
-```
-## 
-## $`10`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-6.png)<!-- -->
-
-```
-## 
-## $`11`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-7.png)<!-- -->
-
-```
-## 
-## $`12`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-8.png)<!-- -->
-
-```
-## 
-## $`14`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-9.png)<!-- -->
-
-```
-## 
-## $`15`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-10.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-3.png)<!-- -->
 
 ##Log Odds of Feeding
 
 ### Ocean Depth
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ### Distance From Coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ###Interaction
 
 No estimate of uncertainty.
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 #Environmental Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
 
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-3.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
+
+##All variables
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
 
 #Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 
 
 ```
-##             used   (Mb) gc trigger (Mb)  max used   (Mb)
-## Ncells   1668289   89.1    6177917  330   7722397  412.5
-## Vcells 195284740 1490.0  392287202 2993 390660067 2980.5
+##            used  (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1576193  84.2    6379917 340.8  9968622 532.4
+## Vcells 36816356 280.9   96619254 737.2 96534352 736.5
 ```
