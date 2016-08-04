@@ -4501,3 +4501,5 @@ Switched to a new branch 'i-39bac7e4'
 To git@github.com:bw4sz/Whales.git
  * [new branch]      i-39bac7e4 -> i-39bac7e4
 Branch i-39bac7e4 set up to track remote branch i-39bac7e4 from origin.
+Warning: Permanently added 'ec2-52-11-122-145.us-west-2.compute.amazonaws.com,52.11.122.145' (ECDSA) to the list of known hosts.
+/bin/bash: : No such file or directory
