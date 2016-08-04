@@ -74,7 +74,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("131144","154186","123224","131132","112737","131156"),]
+mxy<-mxy[mxy$Animal %in% c("131144","154186","123224","131132","112737","131156","131134","131141"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -336,7 +336,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=2000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1000,n.thin=4,DIC=FALSE))
 }
 
 #save.image("SingleSpecies.RData")
@@ -521,8 +521,8 @@ ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to 
 
 No estimate of uncertainty.
 ```{r}
-coastx<-seq(0,quantile(mxy$coast,0.95),quantile(mxy$coast,0.95)/20)
-oceanx<-seq(0,quantile(mxy$ocean,0.95),quantile(mxy$ocean,0.95)/20)
+coastx<-seq(0,quantile(mxy$coast,0.98),quantile(mxy$coast,0.98)/20)
+oceanx<-seq(0,quantile(mxy$ocean,0.98),quantile(mxy$ocean,0.98)/20)
 allx<-expand.grid(coastx,oceanx)
 colnames(allx)<-c("coast","ocean")
 allx$ID<-1:nrow(allx)
@@ -606,7 +606,7 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
-#Environmental Prediction
+#Environmental Prediction - Probability of feeding
 
 ```{r}
 mice<-stack("InputData/MonthlyIceRaster.grd")
@@ -622,7 +622,7 @@ meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par
 rice[rice<0]<-NA
 
 #Traveling
-travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
+travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
 travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+geom_polygon(data=frp,aes(x=long,y=lat,group=group),alpha=0.8,fill="snow2") 
@@ -634,7 +634,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes
 
 ```{r}
 #Feeding
-feedpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+feedpar<-calc(distc,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x))})
 
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
@@ -648,13 +648,13 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(
 
 ### When traveling
 ```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
+meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
 #remove non-water areas
 rice[rice<0]<-NA
 
 #Traveling
-travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
+travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x))})
 travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
@@ -664,7 +664,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes
 
 ```{r}
 #Feeding
-feedpar<-calc(distc,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
+feedpar<-calc(distc,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta2_mu[2]` * x))})
 
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
@@ -683,13 +683,13 @@ meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% g
 s<-stack(rice,distc)
 
 #Traveling
-travpar<-calc(s,function(x,y){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
+travpar<-calc(s,function(x,y){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2]))})
 travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
 
 #Feeding
-feedpar<-calc(s,function(x){ inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[1]` * x[2] )})
+feedpar<-calc(s,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[2]` * x[2] ))})
 feedf<-data.frame(rasterToPoints(feedpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())  + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
