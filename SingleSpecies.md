@@ -94,8 +94,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##     user   system  elapsed 
-##   12.599    0.378 1288.301
+##    user  system elapsed 
+##    7.59    1.98  721.53
 ```
 
 ##Chains
@@ -113,18 +113,18 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par        mean         lower      upper
-##       (fctr)      (fctr)       (dbl)         (dbl)      (dbl)
-## 1   alpha_mu alpha_mu[1]  0.47009503 -1.759452e-01 1.12446435
-## 2   alpha_mu alpha_mu[2] -1.28836788 -2.701981e+00 0.32728383
-## 3   beta2_mu beta2_mu[1]  0.01956080 -2.766208e-05 0.06116065
-## 4   beta2_mu beta2_mu[2]  0.01787094 -4.148090e-02 0.08652583
-## 5    beta_mu  beta_mu[1] -0.05569571 -9.779193e-01 0.84142033
-## 6    beta_mu  beta_mu[2] -0.55018572 -3.023076e+00 1.70939639
-## 7      gamma    gamma[1]  0.79448475  7.095603e-01 0.86720750
-## 8      gamma    gamma[2]  0.06532400  4.717733e-03 0.16022830
-## 9      theta    theta[1]  0.01509419 -3.961243e-02 0.07146050
-## 10     theta    theta[2]  2.84515765  1.673628e+00 3.97146631
+##    parameter         par        mean        lower     upper
+##       (fctr)      (fctr)       (dbl)        (dbl)     (dbl)
+## 1   alpha_mu alpha_mu[1] -0.44303551 -1.423679364 0.5805069
+## 2   alpha_mu alpha_mu[2] -1.14376315 -2.672146881 0.6464894
+## 3    beta_mu  beta_mu[1]  1.41583867  0.007649658 3.1736136
+## 4    beta_mu  beta_mu[2] -0.84532843 -3.007136813 1.2617881
+## 5   beta2_mu beta2_mu[1]  0.01204272 -0.010428040 0.0413007
+## 6   beta2_mu beta2_mu[2]  0.24417297  0.009622728 1.5948765
+## 7      gamma    gamma[1]  0.76683668  0.673227895 0.8725330
+## 8      gamma    gamma[2]  0.08570841  0.006092957 0.2397559
+## 9      theta    theta[1]  0.03464441 -0.044631522 0.1112320
+## 10     theta    theta[2]  2.98914301  2.024057146 4.1284917
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -136,7 +136,6 @@ How did the filter change the extent of tracks?
 
 ### Distance to Coast
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
-
 
 #Behavioral Prediction
 
@@ -165,27 +164,6 @@ How did the filter change the extent of tracks?
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-4.png)<!-- -->
-
-```
-## 
-## $`5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-6.png)<!-- -->
 
 ##Log Odds of Feeding
 
@@ -217,7 +195,7 @@ No estimate of uncertainty.
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
-#Environmental Prediction
+#Environmental Prediction - Probability of feeding
 
 
 
@@ -249,7 +227,7 @@ No estimate of uncertainty.
 
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1608937  86.0    4936189  263.7   7992498  426.9
-## Vcells 79692928 608.1  185257271 1413.5 184918541 1410.9
+##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
+## Ncells  1593267  85.1    6177917 330.0   7722397 412.5
+## Vcells 54181255 413.4  116950954 892.3 115361949 880.2
 ```
