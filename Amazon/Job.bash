@@ -1,10 +1,10 @@
 #!/bin/bash 
 
 #cd into whales, if directory doesn't exist, kill the run.
-cd Whales||sudo halt
 
-#git pull to make sure we are at HEAD
-git pull
+git clone  git@github.com:bw4sz/Whales.git --depth 1
+
+cd Whales||sudo halt
 
 #make new branch
 #name it the instance ID
