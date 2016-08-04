@@ -527,8 +527,8 @@ allx<-expand.grid(coastx,oceanx)
 colnames(allx)<-c("coast","ocean")
 allx$ID<-1:nrow(allx)
 allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta1<-filter(pc,par %in% 'beta_mu[2]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta2<-filter(pc,par %in% 'beta2_mu[2]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 
 traj<-function(ocean,coast,alpha,beta1,beta2){
   p<-inv.logit(alpha + beta1*ocean + beta2*coast)
@@ -632,7 +632,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes
 
 ```{r}
 #Feeding
-feedpar<-calc(distc,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x))})
+feedpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
 
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
@@ -652,7 +652,7 @@ meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(pa
 rice[rice<0]<-NA
 
 #Traveling
-travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x))})
+travpar<-calc(rice,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
@@ -662,7 +662,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes
 
 ```{r}
 #Feeding
-feedpar<-calc(distc,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta2_mu[2]` * x))})
+feedpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta2_mu[2]` * x)})
 
 #Cut by ice
 feedf<-data.frame(rasterToPoints(feedpar))
@@ -681,13 +681,13 @@ meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% g
 s<-stack(rice,distc)
 
 #Traveling
-travpar<-calc(s,function(x,y){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2]))})
+travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
 travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
 
 #Feeding
-feedpar<-calc(s,function(x){ inv.logit(1-(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[2]` * x[2] ))})
+feedpar<-calc(s,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[2]` * x[2])})
 feedf<-data.frame(rasterToPoints(feedpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())  + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
