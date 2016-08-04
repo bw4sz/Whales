@@ -1,0 +1,18 @@
+{
+    "contents" : "#Download sea ice data\n\n#Readme: https://nsidc.org/data/seaice_index/more-about-monthly.html\nlibrary(stringr)\nlibrary(rgdal)\nlibrary(maptools)\nlibrary(raster)\nlibrary(ggmap)\nlibrary(scales)\nlibrary(broom)\nlibrary(sp)\nlibrary(rgeos)\n\n#Build the url\npols<-list()\n\nMonths<-month.abb\nMonthNums=c(\"01\",\"02\",\"03\",\"04\",\"05\",\"06\",\"07\",\"08\",\"09\",\"10\",\"11\",'12')\nYears=seq(2012,2016,1)\n\n#construct urls\nurls<-list()\nfor(y in 1:length(Years)){\n  yearurls<-list()\n  for(x in 1:length(Months)){\n    yearurls[[x]]<-paste('ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/shapefiles/',Months[x],'/shp_extent/extent_S_',paste(Years[y],MonthNums[x],sep=\"\"),'_polygon_v2.zip',sep=\"\")\n  }\n  urls[[y]]<-yearurls\n}\nurls<-unlist(urls)\n\n\nfor(x in 1:length(urls)){\n\nfl<-paste(\"InputData/SeaIce/\",str_match(urls[[x]],\"extent_S_(\\\\d+)\")[,2],sep=\"\")\ndownload.file(urls[[x]],destfile=paste(fl,\".zip\",sep=\"\"))\n\n#unzip\nunzip(zipfile=paste(fl,\".zip\",sep=\"\"),exdir=\"./InputData/SeaIce\")\n}\n\n#read\nshp<-list.files(\"InputData/SeaIce\",pattern=\".shp\",full.names=T)\npols<-list()\nfor(a in 1:length(shp)){\n\n  rp<-readShapePoly(shp[[a]])\n  #define projection\n  stere <- \"+proj=stere +lat_0=-90 +lat_ts=70 +lon_0=0 +datum=WGS84 +units=m\"\n  proj4string(rp)<-stere\n\n  #0 width buffer\n  #rp <- gBuffer(rp, byid=TRUE, width=0)\n  #crop\n  e<-extent(-3455516,-757334.6,66739.71,2200756)*1.1\n  rmask<-raster(rp,ext=e)\n  rmask<-disaggregate(rmask,10)\n  rasP<-rasterize(rp,rmask)\n  #presence of ice\n  rasP <- projectRaster(rasP,crs=CRS(\"+proj=longlat +ellps=WGS84\"))\n  rasP<-rasP>0\n  pols[[a]]<-rasP\n  \n  #name the layers\n  #get naming structure\n  s<-str_match(shp[[a]],\"S_(\\\\d+)_\")[,2]\n  yr<-as.numeric(substring(s,0,4))\n  mn<-as.numeric(substring(s,5,6))\n  names(pols[[a]])<-paste(month.abb[mn],yr,sep=\"_\")\n}\nspols<-stack(pols)\n#writeindividaul raster\nwriteRaster(spols,\"InputData/MonthlyIceRaster\",overwrite=T)\n\n#temp <- get_map(location=bbox(e),source=\"google\",zoom=3,maptype=\"satellite\",color = \"bw\",scale = 2)\n#ggmap(temp) + labs(fill=\"Month\")+ geom_tile(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted(\"blue\"),mid=\"red\",high=muted(\"blue\"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x=\"\",y=\"\")\n\n#ggmap(temp) + labs(fill=\"Month\")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Month),alpha=0.5) + facet_wrap(~Year) + scale_fill_gradient2(low=muted(\"blue\"),mid=\"red\",high=muted(\"blue\"),midpoint=6,breaks=seq(0,12,3)) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x=\"\",y=\"\")\n#ggmap(temp) + labs(fill=\"Year\")+ geom_polygon(data=sf.df,aes(x=long,y=lat,group=group,fill=Year),alpha=0.5) + facet_wrap(~Month) + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + labs(x=\"\",y=\"\")\n\n#ggsave(\"Figures/SeaIceYear.jpeg\",dpi=400,height=7,width=10)\n#write.csv(sf.df,\"InputData/SeaIce_AllYears.csv\")\n\n\n",
+    "created" : 1469201638159.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "396611631",
+    "id" : "242EC4B0",
+    "lastKnownWriteTime" : 1470321388,
+    "path" : "~/Whales/DownloadIce.R",
+    "project_path" : "DownloadIce.R",
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

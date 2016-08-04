@@ -1,0 +1,9 @@
+{
+    "path" : "~/Whales/InputData",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
