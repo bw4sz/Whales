@@ -94,8 +94,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##    user  system elapsed 
-##   0.825   0.063 161.905
+##     user   system  elapsed 
+##   12.599    0.378 1288.301
 ```
 
 ##Chains
@@ -113,18 +113,18 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par         mean        lower     upper
-##       (fctr)      (fctr)        (dbl)        (dbl)     (dbl)
-## 1   alpha_mu alpha_mu[1] -1.319927065 -3.615871279 1.5844430
-## 2   alpha_mu alpha_mu[2] -0.542317399 -3.008551557 2.0375351
-## 3   beta2_mu beta2_mu[1]  1.092386382  0.346337720 1.6057942
-## 4   beta2_mu beta2_mu[2] -0.199392678 -2.919389283 1.9056233
-## 5    beta_mu  beta_mu[1] -0.243896209 -2.754632988 2.3640180
-## 6    beta_mu  beta_mu[2]  0.007229111 -2.654331964 2.6277480
-## 7      gamma    gamma[1]  0.625646602  0.477451953 0.7786056
-## 8      gamma    gamma[2]  0.168168031  0.006455851 0.4551335
-## 9      theta    theta[1]  0.004505143 -0.141787336 0.1439087
-## 10     theta    theta[2]  3.149378833  2.079660200 4.2457594
+##    parameter         par        mean         lower      upper
+##       (fctr)      (fctr)       (dbl)         (dbl)      (dbl)
+## 1   alpha_mu alpha_mu[1]  0.47009503 -1.759452e-01 1.12446435
+## 2   alpha_mu alpha_mu[2] -1.28836788 -2.701981e+00 0.32728383
+## 3   beta2_mu beta2_mu[1]  0.01956080 -2.766208e-05 0.06116065
+## 4   beta2_mu beta2_mu[2]  0.01787094 -4.148090e-02 0.08652583
+## 5    beta_mu  beta_mu[1] -0.05569571 -9.779193e-01 0.84142033
+## 6    beta_mu  beta_mu[2] -0.55018572 -3.023076e+00 1.70939639
+## 7      gamma    gamma[1]  0.79448475  7.095603e-01 0.86720750
+## 8      gamma    gamma[2]  0.06532400  4.717733e-03 0.16022830
+## 9      theta    theta[1]  0.01509419 -3.961243e-02 0.07146050
+## 10     theta    theta[2]  2.84515765  1.673628e+00 3.97146631
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -166,6 +166,27 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-3.png)<!-- -->
 
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-6.png)<!-- -->
+
 ##Log Odds of Feeding
 
 ### Ocean Depth
@@ -200,19 +221,35 @@ No estimate of uncertainty.
 
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-3.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
+## Bathymetry
 
-##All variables
+### When traveling
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+
+### When Feeding
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
 
-#Krill Fishery
+## Distance to coast
+
+### When traveling
 ![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+
+### When Feeding
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
+
+##All variables
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
+
+#Krill Fishery
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
 
 
 ```
-##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1576193  84.2    6379917 340.8  9968622 532.4
-## Vcells 36816356 280.9   96619254 737.2 96534352 736.5
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1608937  86.0    4936189  263.7   7992498  426.9
+## Vcells 79692928 608.1  185257271 1413.5 184918541 1410.9
 ```
