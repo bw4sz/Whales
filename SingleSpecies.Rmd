@@ -462,7 +462,6 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 
 ```
 
-
 #Behavioral Prediction
 
 ```{r}
@@ -626,6 +625,8 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
+ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+geom_polygon(data=frp,aes(x=long,y=lat,group=group),alpha=0.8,fill="snow2") 
+  
 ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
 
