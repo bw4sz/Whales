@@ -1,5 +1,2 @@
-ssh: connect to host ec2-52-35-190-112.us-west-2.compute.amazonaws.com port 22: Connection timed out
-Warning: Permanently added 'ec2-52-42-203-128.us-west-2.compute.amazonaws.com,52.42.203.128' (ECDSA) to the list of known hosts.
-Cloning into 'Whales'...
-Warning: Permanently added the RSA host key for IP address '192.30.253.113' to the list of known hosts.
-Switched to a new branch 'i-60f788bd'
+Warning: Permanently added 'ec2-52-35-133-3.us-west-2.compute.amazonaws.com,52.35.133.3' (ECDSA) to the list of known hosts.
+/bin/bash: : No such file or directory
