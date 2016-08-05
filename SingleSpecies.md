@@ -94,8 +94,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##    user  system elapsed 
-##   9.521   0.304 420.018
+##     user   system  elapsed 
+##  185.853    1.665 4446.114
 ```
 
 ##Chains
@@ -113,18 +113,18 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par         mean       lower       upper
-##       (fctr)      (fctr)        (dbl)       (dbl)       (dbl)
-## 1   alpha_mu alpha_mu[1] -0.143339568 -1.26593804  1.12615215
-## 2   alpha_mu alpha_mu[2] -2.402947634 -3.97798180 -1.02152722
-## 3   beta2_mu beta2_mu[1]  0.007351241 -0.01277060  0.02897555
-## 4   beta2_mu beta2_mu[2]  0.053303170  0.01244383  0.09803691
-## 5    beta_mu  beta_mu[1]  1.343410269  0.15331990  2.90833944
-## 6    beta_mu  beta_mu[2] -0.241963211 -2.38313408  1.89243562
-## 7      gamma    gamma[1]  0.820102246  0.73239549  0.90176750
-## 8      gamma    gamma[2]  0.091625744  0.01132272  0.21291345
-## 9      theta    theta[1]  0.035645019 -0.02732971  0.10023338
-## 10     theta    theta[2]  2.941348786  2.10081687  3.83340973
+##    parameter         par         mean        lower       upper
+##       (fctr)      (fctr)        (dbl)        (dbl)       (dbl)
+## 1   alpha_mu alpha_mu[1]  0.295752386 -0.077994884  0.68299928
+## 2   alpha_mu alpha_mu[2] -2.950209620 -3.927166862 -1.96463148
+## 3   beta2_mu beta2_mu[1]  0.009279016  0.002804037  0.01619441
+## 4   beta2_mu beta2_mu[2]  0.078048746  0.030022905  0.13278422
+## 5    beta_mu  beta_mu[1] -0.210254323 -0.550021125  0.14748289
+## 6    beta_mu  beta_mu[2]  0.191177368 -1.263279788  1.86878821
+## 7      gamma    gamma[1]  0.878659240  0.828548931  0.92228178
+## 8      gamma    gamma[2]  0.021375643  0.001179254  0.05638890
+## 9      theta    theta[1]  0.006188225 -0.024730445  0.03673972
+## 10     theta    theta[2]  3.333184187  2.319680743  4.33301305
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -146,38 +146,115 @@ How did the filter change the extent of tracks?
 ### Per Animal
 
 ```
-## $`1`
+## $`2`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 ```
 ## 
-## $`2`
+## $`3`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
 
 ```
 ## 
-## $`3`
+## $`5`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-3.png)<!-- -->
 
 ```
 ## 
-## $`4`
+## $`6`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-4.png)<!-- -->
 
 ```
 ## 
-## $`5`
+## $`7`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-6.png)<!-- -->
+
+```
+## 
+## $`9`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-7.png)<!-- -->
+
+```
+## 
+## $`10`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-8.png)<!-- -->
+
+```
+## 
+## $`11`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-9.png)<!-- -->
+
+```
+## 
+## $`12`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-10.png)<!-- -->
+
+```
+## 
+## $`13`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-11.png)<!-- -->
+
+```
+## 
+## $`14`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-12.png)<!-- -->
+
+```
+## 
+## $`15`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-13.png)<!-- -->
+
+```
+## 
+## $`16`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-14.png)<!-- -->
+
+```
+## 
+## $`17`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-15.png)<!-- -->
+
+```
+## 
+## $`18`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-16.png)<!-- -->
 
 ##Log Odds of Feeding
 
@@ -233,15 +310,21 @@ No estimate of uncertainty.
 
 ##All variables
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
+##When traveling
+
+
+
+###When Feeding
+
+
 
 #Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
 
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1601369  85.6    6170237  329.6   7992498  426.9
-## Vcells 69713661 531.9  139966856 1067.9 139554534 1064.8
+##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1729958   92.4    6619081  353.5   8273852  441.9
+## Vcells 231495535 1766.2  383001470 2922.1 382850603 2921.0
 ```
