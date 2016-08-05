@@ -336,7 +336,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=19000,n.thin=4,DIC=FALSE))
 }
 
 #save.image("SingleSpecies.RData")
@@ -707,7 +707,7 @@ feedf<-data.frame(rasterToPoints(feedpar))
 months<-25:30
 pall2<-list()
 for(mn in 1:length(months)){
-pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
+pall2[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
 }
 pall2
 ```
