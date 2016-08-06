@@ -72,9 +72,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131132","112737","131156","112703","121211","131132","112737"),]
+mxy<-mxy[mxy$Animal %in% c(" 131132","112737"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -336,7 +336,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=40000,n.burnin=39000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -464,7 +464,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 
 ```{r}
 #We just need Feeding behavior
-behav_chains<-pc[pc$Behavior == 2 & pc$parameter %in% "phi",]
+behav_chains<-pc[pc$parameter %in% "phi" & pc$Behavior==2,]
 
 #arrange by time - capitalize
 behav_chains$Step<-as.numeric(as.character(behav_chains$step))
@@ -474,7 +474,6 @@ behav_chains<-behav_chains %>% arrange(Step)
 behav_chains$Behavior<-as.factor(behav_chains$Behavior)
 levels(behav_chains$Behavior)<-c("Traveling","Feeding")
 
-#average phi
 mean_phi<-behav_chains %>% group_by(Animal,Track,Step) %>% summarize(phi=mean(value))
 
 mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
@@ -483,6 +482,17 @@ mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 rm(behav_chains)
+```
+
+###Correlation in posterior switching and state
+
+```{r}
+a<-pc %>% filter(!Behavior==1|is.na(Behavior)) %>% filter(parameter %in% c("phi","state")) 
+a<-dcast(a,Draw+chain+Animal+Track+step~parameter)
+ggplot(a,aes(x=phi,y=state-1)) + geom_point() + geom_smooth(method="glm",method.args=list(family="binomial"))
+
+ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_bw() + labs(fill="Current Behavior",x="Probability of Switching to Feeding") + scale_fill_manual(labels=c("Traveling","Feeding"),values=c("blue","red"))
+
 ```
 
 ##Spatial Prediction
