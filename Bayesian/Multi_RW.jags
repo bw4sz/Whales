@@ -87,10 +87,10 @@
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(0.5,1)
+    gamma[1] ~ dunif(0.3,1)
     
     # prior for gamma in state 2
-    gamma[2] ~ dunif(0,0.5)
+    gamma[2] ~ dunif(0,0.3)
     
     ##Behavioral States
     # Following lunn 2012 p85
