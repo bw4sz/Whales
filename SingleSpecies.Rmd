@@ -339,8 +339,6 @@ if(newModel){
   system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=40000,n.burnin=39000,n.thin=4,DIC=FALSE))
 }
 
-#save.image("SingleSpecies.RData")
-
 ```
 
 ##Chains
@@ -413,9 +411,9 @@ beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),
 
 beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.3,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=runif(todraw,0,0.5),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=runif(todraw,0,0.3),parameter='gamma',Behavior=2,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
 
@@ -494,8 +492,8 @@ rm(behav_chains)
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=6,source="google",scale=2,maptype="satellite",color="bw")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~Animal) + theme_inset()
+  m <- get_map(location=pp,zoom=7,source="google",scale=2,maptype="satellite",color="bw")
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~individual.local.identifier) + theme_inset()
 })
 spp
 

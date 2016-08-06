@@ -395,6 +395,9 @@ bb<-bbox(cbind(mxy$x,mxy$y))
 crop_habitat<-crop(habitat,bb*2)
 habitatdf<-as.data.frame(crop_habitat,xy=TRUE)
 
+
+ggplot(mxy,aes(x=x,y=y)) + theme_bw()  + geom_path(aes(col=State,group=Animal),size=1) + facet_wrap(~Animal,scales='free')
+
 ggplot(mxy,aes(x=x,y=y)) + theme_bw() + coord_cartesian(xlim=bb[1,],ylim=bb[2,]) +  geom_raster(data=habitatdf,aes(x=x,y=y,fill=layer)) + scale_fill_continuous("Ocean Depth",low='grey90',high='black')    + geom_path(aes(col=State,group=Animal),size=1) + facet_wrap(~Animal,scales='free')
 
 ggplot(mxy,aes(x=ocean,y=as.numeric(State)-1)) + geom_point() + stat_smooth(method="glm",method.args = list(family="binomial"),alpha=0.1) + scale_y_continuous(breaks=c(0,0.5,1),labels=c("Traveling","0.5","Feeding")) + ylab("Probability") + xlab("Ocean Depth") + theme_bw() + stat_bin_2d() + scale_fill_continuous(low='blue',high='red')
