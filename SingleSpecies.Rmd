@@ -74,7 +74,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c(" 131132","112737"),]
+mxy<-mxy[mxy$Animal %in% c(" 131132","131144","154186"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -336,7 +336,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -695,7 +695,7 @@ travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta
 travdf<-data.frame(rasterToPoints(travpar))
 
 #plot for all months between jan and july.
-months<-25:30
+months<-25:26
 pall1<-list()
 for(mn in 1:length(months)){
 
@@ -712,7 +712,7 @@ feedpar<-calc(s,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_m
 feedf<-data.frame(rasterToPoints(feedpar))
 
 #plot for all months between jan and july.
-months<-25:30
+months<-25:26
 pall2<-list()
 for(mn in 1:length(months)){
 pall2[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")

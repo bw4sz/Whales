@@ -94,8 +94,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##      user    system   elapsed 
-##   191.033     2.010 54261.061
+##    user  system elapsed 
+##    1.11    0.14 2213.41
 ```
 
 ##Chains
@@ -113,18 +113,18 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par         mean        lower       upper
-##       (fctr)      (fctr)        (dbl)        (dbl)       (dbl)
-## 1   alpha_mu alpha_mu[1]  0.154851383 -0.312184179  0.64179678
-## 2   alpha_mu alpha_mu[2] -2.573509702 -3.472531881 -1.66659014
-## 3   beta2_mu beta2_mu[1]  0.012593678  0.004049216  0.02323134
-## 4   beta2_mu beta2_mu[2]  0.048961383 -0.010272735  0.13109656
-## 5    beta_mu  beta_mu[1] -0.264739011 -0.590654305  0.03883451
-## 6    beta_mu  beta_mu[2]  0.431104758 -0.467382077  1.72332873
-## 7      gamma    gamma[1]  0.879806082  0.832382579  0.93061701
-## 8      gamma    gamma[2]  0.025357046  0.001438048  0.06500814
-## 9      theta    theta[1]  0.004732427 -0.027409095  0.03696734
-## 10     theta    theta[2]  3.360193567  2.255821065  4.36775051
+##    parameter         par         mean        lower      upper
+##       (fctr)      (fctr)        (dbl)        (dbl)      (dbl)
+## 1   alpha_mu alpha_mu[1]  0.008729954 -2.397233688 2.15088096
+## 2   alpha_mu alpha_mu[2]  0.060942448 -2.674183000 2.60080709
+## 3    beta_mu  beta_mu[1] -0.097506023 -2.594676778 2.47180253
+## 4    beta_mu  beta_mu[2]  0.037357429 -2.499994497 2.58559723
+## 5   beta2_mu beta2_mu[1]  1.377567730  0.228633300 3.14217821
+## 6   beta2_mu beta2_mu[2]  0.373473663 -2.321804490 2.71020464
+## 7      gamma    gamma[1]  0.676972927  0.550536084 0.80545701
+## 8      gamma    gamma[2]  0.024646238  0.002938009 0.04801053
+## 9      theta    theta[1]  0.036395297 -0.082255679 0.15844366
+## 10     theta    theta[2]  3.174629521  2.058101351 4.38494445
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -141,150 +141,56 @@ How did the filter change the extent of tracks?
 
 
 
+###Correlation in posterior switching and state
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
+
 ##Spatial Prediction
 
 ### Per Animal
 
 ```
+## $`1`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
+```
+## 
 ## $`2`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
-
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
-
-```
-## 
-## $`5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-3.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-4.png)<!-- -->
-
-```
-## 
-## $`7`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
-
-```
-## 
-## $`8`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-6.png)<!-- -->
-
-```
-## 
-## $`9`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-7.png)<!-- -->
-
-```
-## 
-## $`10`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-8.png)<!-- -->
-
-```
-## 
-## $`11`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-9.png)<!-- -->
-
-```
-## 
-## $`12`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-10.png)<!-- -->
-
-```
-## 
-## $`13`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-11.png)<!-- -->
-
-```
-## 
-## $`14`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-12.png)<!-- -->
-
-```
-## 
-## $`15`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-13.png)<!-- -->
-
-```
-## 
-## $`16`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-14.png)<!-- -->
-
-```
-## 
-## $`17`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-15.png)<!-- -->
-
-```
-## 
-## $`18`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-16.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
 
 ##Log Odds of Feeding
 
 ### Ocean Depth
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ### Distance From Coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ###Interaction
 
 No estimate of uncertainty.
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 #Environmental Prediction - Probability of feeding
 
@@ -293,68 +199,24 @@ No estimate of uncertainty.
 ## Bathymetry
 
 ### When traveling
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
 
 ### When Feeding
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
 
 ## Distance to coast
 
 ### When traveling
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 ### When Feeding
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 ##All variables
 
 ### When traveling
-
-
-```
-## [[1]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
-
-```
-## 
-## [[2]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
-
-```
-## 
-## [[3]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-3.png)<!-- -->
-
-```
-## 
-## [[4]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-4.png)<!-- -->
-
-```
-## 
-## [[5]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-5.png)<!-- -->
-
-```
-## 
-## [[6]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-6.png)<!-- -->
-
-###When Feeding
 
 
 ```
@@ -398,13 +260,57 @@ No estimate of uncertainty.
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-39-6.png)<!-- -->
 
-#Krill Fishery
+###When Feeding
+
+
+```
+## [[1]]
+```
+
 ![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
+
+```
+## 
+## [[2]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-2.png)<!-- -->
+
+```
+## 
+## [[3]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-3.png)<!-- -->
+
+```
+## 
+## [[4]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-4.png)<!-- -->
+
+```
+## 
+## [[5]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-5.png)<!-- -->
+
+```
+## 
+## [[6]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-6.png)<!-- -->
+
+#Krill Fishery
+![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
 
 
 
 ```
-##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1746763   93.3   10367271  553.7  13457386  718.8
-## Vcells 231962388 1769.8  459681814 3507.1 382850902 2921.0
+##            used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1609963   86    7179680 383.5  9306876 497.1
+## Vcells 33542565  256   96646200 737.4 77996171 595.1
 ```
