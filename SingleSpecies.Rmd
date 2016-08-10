@@ -81,7 +81,7 @@ mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
-d<-crop(d,y=extent(c(-70,-55,-66,-58)))
+d<-crop(d,y=extent(c(-75,-45,-75,-45)))
 mxy<-as.data.frame(d)
 
 #set datestamp
@@ -216,7 +216,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=4
+step_length=6
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -235,7 +235,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=8) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=12) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -244,7 +244,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=4)
+sxy<-lapply(sxy,timed,step_length=6)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -256,7 +256,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
+x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
 return(x)
 })
 
@@ -307,7 +307,7 @@ How did the filter change the extent of tracks?
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
