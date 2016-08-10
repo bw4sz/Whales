@@ -197,16 +197,16 @@ $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta,beta2=0,x,coast=0){
-  y<-inv.logit(a1[1]+beta[1]*x + beta2*coast)
+  y<-inv.logit(a1[1]+beta[1]*x + beta2[1]*coast)
   d11<-data.frame(x,y,State="Traveling",Begin="Traveling")
   
-  y<-1-inv.logit(a1[1]+beta[1]*x+ beta2*coast)
+  y<-1-inv.logit(a1[1]+beta[1]*x+ beta2[1]*coast)
   d12<-data.frame(x,y,State="Foraging",Begin="Traveling")
 
-  y<-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
+  y<-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
   d21<-data.frame(x,y,State="Traveling",Begin="Foraging")
   
-  y<-1-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
+  y<-1-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
   d22<-data.frame(x,y,State="Foraging",Begin="Foraging")
   
   d<-rbind_all(list(d11,d12,d21,d22))
@@ -441,10 +441,10 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 
 postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.5))
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$ocean,0.98))
+ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
 
 ### Distance to Coast
@@ -634,7 +634,6 @@ travdf<-data.frame(rasterToPoints(travpar))
   
 ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-70,-50) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
-
 
 ## Distance to coast
 
