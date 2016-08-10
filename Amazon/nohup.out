@@ -27,3 +27,5 @@ Connection reset by 52.42.163.21
 Connection reset by 52.24.148.191
 Warning: Permanently added 'ec2-52-38-199-193.us-west-2.compute.amazonaws.com,52.38.199.193' (ECDSA) to the list of known hosts.
 /bin/bash: : No such file or directory
+Warning: Permanently added 'ec2-52-43-158-218.us-west-2.compute.amazonaws.com,52.43.158.218' (ECDSA) to the list of known hosts.
+/bin/bash: : No such file or directory
