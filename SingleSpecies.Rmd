@@ -73,7 +73,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c(" 131132","131144","154186"),]
+mxy<-mxy[mxy$Animal %in% c("131134","131141","112701","131159","131142","131144","154186","123224"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -86,6 +86,10 @@ mxy<-as.data.frame(d)
 
 #set datestamp
 mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+
+#month and year columns
+mxy$Month<-months(mxy$timestamp)
+mxy$Year<-years(mxy$timestamp)
 
 #remove empty timestamps
 mxy<-mxy[!is.na(mxy$timestamp),]
@@ -173,7 +177,7 @@ $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
 $$ \alpha_{i,1,1} = \text{Probability of remaining traveling when traveling}$$
-$$\alpha_{i,2,1} = \text{Probability of switching from feeding to traveling}$$
+$$\alpha_{i,2,1} = \text{Probability of switching from Foraging to traveling}$$
 
 $$\begin{matrix}
   \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
@@ -197,13 +201,13 @@ dplot<-function(a1,beta,beta2=0,x,coast=0){
   d11<-data.frame(x,y,State="Traveling",Begin="Traveling")
   
   y<-1-inv.logit(a1[1]+beta[1]*x+ beta2*coast)
-  d12<-data.frame(x,y,State="Feeding",Begin="Traveling")
+  d12<-data.frame(x,y,State="Foraging",Begin="Traveling")
 
   y<-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
-  d21<-data.frame(x,y,State="Traveling",Begin="Feeding")
+  d21<-data.frame(x,y,State="Traveling",Begin="Foraging")
   
   y<-1-inv.logit(a1[2]+beta[2]*x+ beta2*coast)
-  d22<-data.frame(x,y,State="Feeding",Begin="Feeding")
+  d22<-data.frame(x,y,State="Foraging",Begin="Foraging")
   
   d<-rbind_all(list(d11,d12,d21,d22))
 }
@@ -320,7 +324,8 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=T}
+
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
 ```{r,eval=T}
@@ -335,7 +340,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=48000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=3000,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -404,17 +409,13 @@ a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),para
 
 beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
 
-beta2prior<-data.frame(Draw=1:todraw,par='beta[2]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=2,Estimate="Prior")
-
 beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
-
-beta22prior<-data.frame(Draw=1:todraw,par='beta2[2]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=2,Estimate="Prior")
 
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=runif(todraw,0.3,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
 gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=runif(todraw,0,0.3),parameter='gamma',Behavior=2,Estimate="Prior")
 
-prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta2prior,beta21prior,beta22prior,gamma1prior,gamma2prior))
+prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta21prior,gamma1prior,gamma2prior))
 
 prs$Behavior<-as.factor(prs$Behavior)
 
@@ -462,7 +463,7 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 #Behavioral Prediction
 
 ```{r}
-#We just need Feeding behavior
+#We just need Foraging behavior
 behav_chains<-pc[pc$parameter %in% "phi" & pc$Behavior==2,]
 
 #arrange by time - capitalize
@@ -471,7 +472,7 @@ behav_chains<-behav_chains %>% arrange(Step)
 
 #Label Behaviors
 behav_chains$Behavior<-as.factor(behav_chains$Behavior)
-levels(behav_chains$Behavior)<-c("Traveling","Feeding")
+levels(behav_chains$Behavior)<-c("Traveling","Foraging")
 
 mean_phi<-behav_chains %>% group_by(Animal,Track,Step) %>% summarize(phi=mean(value))
 
@@ -490,7 +491,7 @@ a<-pc %>% filter(!Behavior==1|is.na(Behavior)) %>% filter(parameter %in% c("phi"
 a<-dcast(a,Draw+chain+Animal+Track+step~parameter)
 ggplot(a,aes(x=phi,y=state-1)) + geom_point() + geom_smooth(method="glm",method.args=list(family="binomial"))
 
-ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_bw() + labs(fill="Current Behavior",x="Probability of Switching to Feeding") + scale_fill_manual(labels=c("Traveling","Feeding"),values=c("blue","red"))
+ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_bw() + labs(fill="Current Behavior",x="Probability of Switching to Foraging") + scale_fill_manual(labels=c("Traveling","Foraging"),values=c("blue","red"))
 
 ```
 
@@ -502,26 +503,26 @@ sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
   m <- get_map(location=pp,zoom=7,source="google",scale=2,maptype="satellite",color="bw")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Feeding") + facet_wrap(~individual.local.identifier) + theme_inset()
+  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
 })
 spp
 
 ```
 
-##Log Odds of Feeding
+##Log Odds of Foraging
 
 ### Ocean Depth
 
 ```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4,scales="free")
+ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
 
 ### Distance From Coast
 
 ```{r,fig.height=10}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Feeding") + facet_wrap(~Animal,ncol=4,scales="free")
+ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
 
 ###Interaction
@@ -544,14 +545,14 @@ traj<-function(ocean,coast,alpha,beta1,beta2){
 
 intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
 
-ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Feeding when Traveling")
+ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
 ```
 
 ##Autocorrelation in behavior
 
 ```{r,fig.height=20,fig.width=13}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Feeding") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Feeding") + facet_wrap(~Animal,ncol=3,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Foraging") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Foraging") + facet_wrap(~Animal,ncol=3,scales="free") + ylim(0,1)
 ```
 
 ##Behavioral description
@@ -564,7 +565,7 @@ runf<-function(x){
   state_change<-rle(as.numeric(x$value))
   runl<-data.frame(Animal=unique(x$Animal),runs=state_change$lengths,Behavior=state_change$values)
   runl$Behavior<-as.factor(runl$Behavior)
-  levels(runl$Behavior)<-c("Traveling","Feeding")
+  levels(runl$Behavior)<-c("Traveling","Foraging")
   
   return(runl)
 }
@@ -589,7 +590,7 @@ endtrack<-function(x){
 }
 
 #if track ends, status is 0 not 1
-feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behavior=="Feeding")
+feedr<-runs %>% group_by(Draw,chain,Animal) %>% do(endtrack(.)) %>% filter(Behavior=="Foraging")
 
 #save runs to file
 write.csv(feedr,"OutData/Runs.csv")
@@ -600,7 +601,7 @@ write.csv(feedr,"OutData/Runs.csv")
 ```{r}
 msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
 
-r<-raster(msp,ext=extent(c(-70,-55,-66,-58))*1.1)
+r<-raster(msp,ext=extent(c(-75,-50,-75,-50))*1.1)
 res(r)<-0.1
 
 m<-rasterize(x=msp,y=r,field="phi")
@@ -610,10 +611,10 @@ feedmap <- data.frame(rasterToPoints(m))
 
 temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-ggmap(temp) + labs(fill="Probabilty of Feeding")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
+ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
-#Environmental Prediction - Probability of feeding
+#Environmental Prediction - Probability of Foraging
 
 ```{r}
 mice<-stack("InputData/MonthlyIceRaster.grd")
@@ -621,7 +622,6 @@ mice<-stack("InputData/MonthlyIceRaster.grd")
 
 ## Bathymetry
 
-### When traveling
 ```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
@@ -632,26 +632,12 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
 travdf<-data.frame(rasterToPoints(travpar))
   
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-70,-50) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
 
-### When Feeding
-
-```{r}
-#Feeding
-feedpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x)})
-
-#Cut by ice
-feedf<-data.frame(rasterToPoints(feedpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-```
 
 ## Distance to coast
 
-### When traveling
 ```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
@@ -662,26 +648,11 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-70,-50) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
 
-### When Feeding
-
-```{r}
-#Feeding
-feedpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta2_mu[2]` * x)})
-
-#Cut by ice
-feedf<-data.frame(rasterToPoints(feedpar))
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ xlim(-70,-50) + ylim(-67.5,-60) + geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-
-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-67.5,-60)+ geom_tile(data=data.frame(rasterToPoints(mice[[19]])),aes(x=x,y=y,fill=Jul_2013),alpha=0.8,fill='snow2') + ggtitle("July 2013")+ theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-```
 
 ##All variables
-
-### When traveling
 
 ```{r}
 meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
@@ -698,32 +669,17 @@ months<-25:26
 pall1<-list()
 for(mn in 1:length(months)){
 
-pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
+pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-70,-50) + labs(x="",y="")
 }
 pall1
 ```
 
-###When Feeding
-
-```{r}
-#Feeding
-feedpar<-calc(s,function(x){ 1-inv.logit(meanpar$`alpha_mu[2]` + meanpar$`beta_mu[2]` * x[1] + meanpar$`beta2_mu[2]` * x[2])})
-feedf<-data.frame(rasterToPoints(feedpar))
-
-#plot for all months between jan and july.
-months<-25:26
-pall2<-list()
-for(mn in 1:length(months)){
-pall2[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Feeding")+ geom_tile(data=feedf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-67.5,-60) + labs(x="",y="")
-}
-pall2
-```
 
 #Krill Fishery
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
-ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Feeding", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
+ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
 ```
 
 
