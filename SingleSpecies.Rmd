@@ -340,7 +340,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=0,n.burnin=2000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -690,9 +690,9 @@ kdf<-data.frame(ksp,ksuit)
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 
 #important geographic points
-Areas<-data.frame(c("Gerlache Strait"))
-Lon<-c(-62.333)
-Lat<-c(-64.5)
+Areas<-data.frame(c("Gerlache Strait","Bransfield Strait"))
+Lon<-c(-62.333,-62.7880)
+Lat<-c(-64.5,-58.055)
 
 iarea<-SpatialPointsDataFrame(cbind(Lon,Lat),data=Areas)  
 plot(iarea,col='red',pch=13)
@@ -701,6 +701,10 @@ map(add=T)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 
+toname<-kdf %>% filter(ksuit>0.9)
+toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
+toname
+#ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
 ```
 
 
