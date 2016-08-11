@@ -196,20 +196,24 @@ $$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
 
 ```{r,fig.height=3,fig.width=3.5}
-dplot<-function(a1,beta,beta2=0,x,coast=0){
+dplot<-function(a1,beta=c(0,0),beta2=c(0,0),x=0,coast=0){
+
+  #Transition from traveling to traveling
   y<-inv.logit(a1[1]+beta[1]*x + beta2[1]*coast)
-  d11<-data.frame(x,y,State="Traveling",Begin="Traveling")
+  d11<-data.frame(x,coast,y,State="Traveling",Begin="Traveling")
   
+  #transition from Traveling to Foraging
   y<-1-inv.logit(a1[1]+beta[1]*x+ beta2[1]*coast)
-  d12<-data.frame(x,y,State="Foraging",Begin="Traveling")
+  d12<-data.frame(x,coast,y,State="Foraging",Begin="Traveling")
 
   y<-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
-  d21<-data.frame(x,y,State="Traveling",Begin="Foraging")
+  d21<-data.frame(x,coast,y,State="Traveling",Begin="Foraging")
   
   y<-1-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
-  d22<-data.frame(x,y,State="Foraging",Begin="Foraging")
+  d22<-data.frame(x,coast,y,State="Foraging",Begin="Foraging")
   
   d<-rbind_all(list(d11,d12,d21,d22))
+  return(d)
 }
 ```
 
@@ -340,7 +344,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=0,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -439,7 +443,7 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 ```{r}
 #get the posterior estimates of the env function
 
-postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
 
@@ -451,12 +455,12 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 ```{r}
 #get the posterior estimates of the env function
 
-postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),x=unique(mxy$coast))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta2=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),coast=unique(mxy$coast))) %>% group_by(coast,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.5))
+ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.5))
 
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 
 ```
 
@@ -688,16 +692,6 @@ ksuit<-extract(x=travpar,y=ksp)
 kdf<-data.frame(ksp,ksuit)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
-
-#important geographic points
-Areas<-data.frame(c("Gerlache Strait","Bransfield Strait"))
-Lon<-c(-62.333,-62.7880)
-Lat<-c(-64.5,-58.055)
-
-iarea<-SpatialPointsDataFrame(cbind(Lon,Lat),data=Areas)  
-plot(iarea,col='red',pch=13)
-plot(ksp,add=T)
-map(add=T)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 
