@@ -53,7 +53,7 @@ $$ Behavior_1 = \text{traveling}$$
 $$ Behavior_2 = \text{foraging}$$
 
 $$ \alpha_{i,1,1} = \text{Probability of remaining traveling when traveling}$$
-$$\alpha_{i,2,1} = \text{Probability of switching from feeding to traveling}$$
+$$\alpha_{i,2,1} = \text{Probability of switching from Foraging to traveling}$$
 
 $$\begin{matrix}
   \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
@@ -95,8 +95,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##    user  system elapsed 
-##    1.15    0.62   79.20
+##     user   system  elapsed 
+##   65.319    1.017 3016.548
 ```
 
 ##Chains
@@ -116,16 +116,16 @@ How did the filter change the extent of tracks?
 ## 
 ##    parameter         par        mean        lower       upper
 ##       (fctr)      (fctr)       (dbl)        (dbl)       (dbl)
-## 1   alpha_mu alpha_mu[1]  3.21104641  1.829392901 5.173322527
-## 2   alpha_mu alpha_mu[2]  0.03567477 -1.226486876 1.852088684
-## 3    beta_mu  beta_mu[1] -0.04421127 -2.518408784 2.389022259
-## 4    beta_mu  beta_mu[2]  0.00000000  0.000000000 0.000000000
-## 5   beta2_mu beta2_mu[1] -0.02259331 -0.045169691 0.002156786
-## 6   beta2_mu beta2_mu[2]  0.00000000  0.000000000 0.000000000
-## 7      gamma    gamma[1]  0.68679328  0.592639637 0.775137540
-## 8      gamma    gamma[2]  0.08213731  0.008922908 0.194484718
-## 9      theta    theta[1] -0.01049417 -0.096520280 0.067410221
-## 10     theta    theta[2]  2.84251990  1.995691190 3.920794840
+## 1   alpha_mu alpha_mu[1]  0.18686476 -0.477695553  0.84426024
+## 2   alpha_mu alpha_mu[2] -1.32560305 -2.196233546 -0.44821156
+## 3   beta2_mu beta2_mu[1]  0.03085365  0.006390853  0.07377277
+## 4   beta2_mu beta2_mu[2]  0.00000000  0.000000000  0.00000000
+## 5    beta_mu  beta_mu[1] -0.45799199 -1.579297335  0.60744608
+## 6    beta_mu  beta_mu[2]  0.00000000  0.000000000  0.00000000
+## 7      gamma    gamma[1]  0.82633463  0.764444270  0.88488753
+## 8      gamma    gamma[2]  0.03672513  0.002259508  0.09928076
+## 9      theta    theta[1] -0.07137679 -0.121370627 -0.02756943
+## 10     theta    theta[2]  3.54659271  2.334293211  4.53076393
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -163,7 +163,49 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
 
-##Log Odds of Feeding
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-8.png)<!-- -->
+
+##Log Odds of Foraging
 
 ### Ocean Depth
 
@@ -193,69 +235,45 @@ No estimate of uncertainty.
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
-#Environmental Prediction - Probability of feeding
+#Environmental Prediction - Probability of Foraging
 
 
 
 ## Bathymetry
 
-### When traveling
 ![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
-
-### When Feeding
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
 
 ## Distance to coast
 
-### When traveling
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
-### When Feeding
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 ##All variables
 
-### When traveling
-
 
 ```
 ## [[1]]
 ```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
+
+```
+## 
+## [[2]]
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
+
+
+#Krill Fishery
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
-```
-## 
-## [[2]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-2.png)<!-- -->
-
-###When Feeding
 
 
 ```
-## [[1]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
-
-```
-## 
-## [[2]]
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-2.png)<!-- -->
-
-#Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
-
-
-
-```
-##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1600602  85.5    4948733 264.3  6861544 366.5
-## Vcells 28359157 216.4   66993552 511.2 64057097 488.8
+##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1688630   90.2    7974897  426.0   9968622  532.4
+## Vcells 140300114 1070.5  267200524 2038.6 267080658 2037.7
 ```
