@@ -73,7 +73,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("131134","131141","112701","131159","131142","131144","154186","123224"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -81,7 +81,7 @@ mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
-d<-crop(d,y=extent(c(-75,-45,-75,-45)))
+d<-crop(d,y=extent(c(-75,-50,-70,-55)))
 mxy<-as.data.frame(d)
 
 #set datestamp
@@ -192,8 +192,14 @@ Behavioral states are a function of local environmental conditions. The first en
 It generally follows the form, conditional on behavior at t -1:
 
 $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
-$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
+
+With the probability of switching states:
+
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]} + \beta_2 * Coast_{y[t,]}$$
+
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
+
+Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
 
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta=c(0,0),beta2=c(0,0),x=0,coast=0){
@@ -315,7 +321,7 @@ How did the filter change the extent of tracks?
 mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color = "bw")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
@@ -605,7 +611,7 @@ write.csv(feedr,"OutData/Runs.csv")
 ```{r}
 msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
 
-r<-raster(msp,ext=extent(c(-75,-50,-75,-50))*1.1)
+r<-raster(msp,ext=extent(c(-75,-50,-70,-55))*1.1)
 res(r)<-0.1
 
 m<-rasterize(x=msp,y=r,field="phi")
@@ -636,7 +642,7 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
 travdf<-data.frame(rasterToPoints(travpar))
   
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-70,-50) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
 
 ## Distance to coast
@@ -651,7 +657,7 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-70,-50) + ylim(-70,-50) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
 
 
@@ -672,7 +678,7 @@ months<-25:26
 pall1<-list()
 for(mn in 1:length(months)){
 
-pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-70,-50) + ylim(-70,-50) + labs(x="",y="")
+pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="")
 }
 pall1
 ```
