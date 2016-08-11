@@ -693,11 +693,10 @@ kdf<-data.frame(ksp,ksuit)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 
-ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 
-toname<-kdf %>% filter(ksuit>0.9)
-toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
-toname
+#toname<-kdf %>% filter(ksuit>0.9)
+#toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
+#toname
 #ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
 ```
 

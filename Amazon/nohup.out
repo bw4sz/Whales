@@ -41,3 +41,51 @@ Warning: Permanently added the RSA host key for IP address '192.30.253.113' to t
 Switched to a new branch 'i-30e430a5'
 Connection reset by 52.38.208.47
 Connection reset by 52.43.18.183
+Warning: Permanently added 'ec2-52-41-180-183.us-west-2.compute.amazonaws.com,52.41.180.183' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Warning: Permanently added the RSA host key for IP address '192.30.253.113' to the list of known hosts.
+Switched to a new branch 'i-343ee9a1'
+[i-343ee9a1 416b4f2] ec2 run complete
+ 40 files changed, 5294 insertions(+), 1240 deletions(-)
+ rewrite OutData/Runs.csv (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-2.png (99%)
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-18-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-19-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-20-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-21-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-22-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-23-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-25-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-26-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-28-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-29-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-30-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-32-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-33-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-35-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-36-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-37-1.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-37-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-38-1.png
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (98%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (99%)
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      Branch i-343ee9a1 set up to track remote branch i-343ee9a1 from origin.
+i-343ee9a1 -> i-343ee9a1
