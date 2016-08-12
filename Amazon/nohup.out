@@ -92,3 +92,9 @@ i-343ee9a1 -> i-343ee9a1
 Warning: Permanently added 'ec2-52-42-179-230.us-west-2.compute.amazonaws.com,52.42.179.230' (ECDSA) to the list of known hosts.
 Cloning into 'Whales'...
 Switched to a new branch 'i-13afecce'
+Warning: Permanently added 'ec2-52-32-72-163.us-west-2.compute.amazonaws.com,52.32.72.163' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Warning: Permanently added the RSA host key for IP address '192.30.253.113' to the list of known hosts.
+Switched to a new branch 'i-ac6bbc39'
+Connection reset by 52.42.179.230
+Connection reset by 52.32.72.163
