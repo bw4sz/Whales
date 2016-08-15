@@ -38,7 +38,6 @@ load("SingleSpecies.RData")
 newModel<-F
 ```
 
-#Abstract
 ```{r}
 #raster layers
 #ice
@@ -249,7 +248,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=12) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=18) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -296,7 +295,7 @@ idx<-acast(data=idx,Animal~Track~Step)
 #make ocean a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
 oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 
-#make coast a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
+#make coast a matrix -> MEAN VALUE
 coast<-acast(mxy,Animal~Track~Step,value.var="coast",fun.aggregate = mean)
 
 #Individuals
@@ -311,7 +310,6 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~Step~jStep~variable)
-
 ```
 
 How did the filter change the extent of tracks?
@@ -611,7 +609,7 @@ write.csv(feedr,"OutData/Runs.csv")
 ```{r}
 msp<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy[,c("x","y","Animal","phi","timestamp")],proj=CRS("+proj=longlat +datum=WGS84"))
 
-r<-raster(msp,ext=extent(c(-75,-50,-70,-55))*1.1)
+r<-raster(msp,ext=extent(c(-75,-50,-70,-55)))
 res(r)<-0.1
 
 m<-rasterize(x=msp,y=r,field="phi")

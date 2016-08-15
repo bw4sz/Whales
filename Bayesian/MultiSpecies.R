@@ -6,13 +6,13 @@ cat("
     pi <- 3.141592653589
     
     ##argos observation error##
-    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    #argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
     
     #Constructing the covariance matrix
-    argos_cov[1,1] <- 1
-    argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    argos_cov[2,1] <- sqrt(argos_alpha) * rho
-    argos_cov[2,2] <- argos_alpha
+    #argos_cov[1,1] <- 1
+    #argos_cov[1,2] <- sqrt(argos_alpha) * rho
+    #argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    #argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
     for(g in 1:tracks[i]){
@@ -61,11 +61,11 @@ cat("
     
     # loops over observed locations within interval t
     for(u in 1:idx[i,g,t]){ 
-    zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
+    argos[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
     
     #for each lat and long
     #argos error
-    argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
+    #argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
     }
     }
     }
@@ -88,10 +88,10 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[1] ~ dbeta(10,5)
+    gamma[2] ~ dbeta(1.5, 5)		## gamma for state 1
+    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] <- gamma[2] + dev 		## gamma for state 2
     
-    # prior for gamma in state 2
-    gamma[2] ~ dbeta(1,10)
     
     ##Behavioral States
     # Following lunn 2012 p85

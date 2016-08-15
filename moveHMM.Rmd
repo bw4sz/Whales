@@ -1,0 +1,128 @@
+---
+title: "moveHMM"
+author: "Ben Weinstein"
+date: "August 15, 2016"
+output: html_document
+---
+
+#Format Data
+
+```{r}
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5)
+library(boot)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(survival)
+library(MASS)
+library(ggmap)
+library(dplyr)
+library(chron)
+library(gridExtra)
+library(stringr)
+library(R2jags)
+library(moveHMM)
+
+#New model to be run, flag turned off if just updating.
+newModel<-T
+```
+
+```{r,eval=F}
+#Load in data
+load("SingleSpecies.RData")
+#jags$recompile()
+newModel<-F
+```
+
+```{r}
+#raster layers
+#ice
+ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
+ice<-round(ice*-1/1000,3)
+rice<-aggregate(ice,fact=0.1/res(ice))
+
+#coast
+distc<-raster("InputData/DistancetoCoast.tif")
+rice[rice<0]<-NA
+distc[is.na(rice)]<-NA
+
+#read data
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -1133643618235885002.csv")
+
+##need to look into making into a movebank object.
+
+#name env columns
+#Create a oceandepth in km 
+mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
+mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
+mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
+mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
+
+#standardize column names to match the simulation
+#Create an animal tag.
+mxy <- as(mdat, "data.frame")
+mxy$Animal<-mxy$individual.local.identifier
+mxy$x<-mxy$location.long
+mxy$y<-mxy$location.lat
+
+#grab set of animals
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+
+#mxy<-mxy[mxy$Animal %in% c("131134","131141","112701","131159","131142","131144","154186","123224"),]
+mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+
+#empty coordinates
+mxy<-mxy[!is.na(mxy$x),]
+
+#crop by extent
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
+d<-crop(d,y=extent(c(-75,-50,-70,-55)))
+mxy<-as.data.frame(d)
+
+#set datestamp
+mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+
+#month and year columns
+mxy$Month<-months(mxy$timestamp)
+mxy$Year<-years(mxy$timestamp)
+
+#remove empty timestamps
+mxy<-mxy[!is.na(mxy$timestamp),]
+
+#remove duplicates
+mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
+```
+
+#Prep Data
+
+```{r}
+mh<-mxy %>% select(x=location.long,y=location.lat,ID=Animal,ocean,coast) %>% filter(ID %in% 1:10)
+prep<-prepData(mh,type="LL")
+head(prep)
+```
+
+#Fit Model
+
+```{r}
+## initial parameters for gamma and von Mises distributions
+mu0 <- c(0.1,1) # step mean (two parameters: one for each state)
+sigma0 <- c(0.1,1) # step SD
+zeromass0 <- c(0.1,0.05) # step zero-mass
+stepPar0 <- c(mu0,sigma0,zeromass0)
+angleMean0 <- c(pi,0) # angle mean
+kappa0 <- c(1,1) # angle concentration
+anglePar0 <- c(angleMean0,kappa0)
+
+m <- fitHMM(data=prep,nbStates=2,stepPar0=stepPar0,
+anglePar0=anglePar0,formula=~ocean)
+```
+
+#Plot Model
+
+```{r}
+par(ask=FALSE)
+devAskNewPage(ask = F)
+plot(m)
+```
