@@ -72,7 +72,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("131134","131141"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -229,7 +229,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=6
+step_length=8
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -257,7 +257,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=6)
+sxy<-lapply(sxy,timed,step_length=8)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -269,7 +269,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"8 hours"))
 return(x)
 })
 
