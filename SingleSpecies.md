@@ -6,7 +6,6 @@ Ben Weinstein
 
 
 
-#Abstract
 
 
 #Descriptive Statistics
@@ -68,8 +67,14 @@ Behavioral states are a function of local environmental conditions. The first en
 It generally follows the form, conditional on behavior at t -1:
 
 $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]}$$
-$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} + \beta_2 * Ocean_{y[t,]}$$
+
+With the probability of switching states:
+
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]} + \beta_2 * Coast_{y[t,]}$$
+
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
+
+Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
 
 
 
@@ -95,8 +100,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##     user   system  elapsed 
-##   65.319    1.017 3016.548
+##      user    system   elapsed 
+##  1376.814     5.762 63397.724
 ```
 
 ##Chains
@@ -114,18 +119,18 @@ How did the filter change the extent of tracks?
 ## Source: local data frame [10 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par        mean        lower       upper
-##       (fctr)      (fctr)       (dbl)        (dbl)       (dbl)
-## 1   alpha_mu alpha_mu[1]  0.18686476 -0.477695553  0.84426024
-## 2   alpha_mu alpha_mu[2] -1.32560305 -2.196233546 -0.44821156
-## 3   beta2_mu beta2_mu[1]  0.03085365  0.006390853  0.07377277
-## 4   beta2_mu beta2_mu[2]  0.00000000  0.000000000  0.00000000
-## 5    beta_mu  beta_mu[1] -0.45799199 -1.579297335  0.60744608
-## 6    beta_mu  beta_mu[2]  0.00000000  0.000000000  0.00000000
-## 7      gamma    gamma[1]  0.82633463  0.764444270  0.88488753
-## 8      gamma    gamma[2]  0.03672513  0.002259508  0.09928076
-## 9      theta    theta[1] -0.07137679 -0.121370627 -0.02756943
-## 10     theta    theta[2]  3.54659271  2.334293211  4.53076393
+##    parameter         par         mean        lower       upper
+##       (fctr)      (fctr)        (dbl)        (dbl)       (dbl)
+## 1   alpha_mu alpha_mu[1] -0.103215640 -0.490325435  0.29199978
+## 2   alpha_mu alpha_mu[2] -1.904981407 -2.248892795 -1.60045543
+## 3   beta2_mu beta2_mu[1]  0.013312685  0.006518188  0.02095765
+## 4   beta2_mu beta2_mu[2]  0.000000000  0.000000000  0.00000000
+## 5    beta_mu  beta_mu[1]  0.057361361 -0.280008251  0.42291913
+## 6    beta_mu  beta_mu[2]  0.000000000  0.000000000  0.00000000
+## 7      gamma    gamma[1]  0.918619110  0.883886602  0.95598347
+## 8      gamma    gamma[2]  0.156189282  0.114589957  0.19577542
+## 9      theta    theta[1] -0.005646154 -0.027453333  0.01590594
+## 10     theta    theta[2]  0.227316050  0.135579065  0.34660730
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -151,59 +156,234 @@ How did the filter change the extent of tracks?
 ### Per Animal
 
 ```
-## $`1`
+## $`7`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ```
 ## 
-## $`2`
+## $`8`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
 
 ```
 ## 
-## $`3`
+## $`9`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
 
 ```
 ## 
-## $`4`
+## $`10`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
 
 ```
 ## 
-## $`5`
+## $`11`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-5.png)<!-- -->
 
 ```
 ## 
-## $`6`
+## $`12`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-6.png)<!-- -->
 
 ```
 ## 
-## $`7`
+## $`13`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-7.png)<!-- -->
 
 ```
 ## 
-## $`8`
+## $`14`
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-8.png)<!-- -->
+
+```
+## 
+## $`15`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-9.png)<!-- -->
+
+```
+## 
+## $`16`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-10.png)<!-- -->
+
+```
+## 
+## $`17`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-11.png)<!-- -->
+
+```
+## 
+## $`18`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-12.png)<!-- -->
+
+```
+## 
+## $`19`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-13.png)<!-- -->
+
+```
+## 
+## $`20`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-14.png)<!-- -->
+
+```
+## 
+## $`21`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-15.png)<!-- -->
+
+```
+## 
+## $`22`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-16.png)<!-- -->
+
+```
+## 
+## $`23`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-17.png)<!-- -->
+
+```
+## 
+## $`24`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-18.png)<!-- -->
+
+```
+## 
+## $`25`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-19.png)<!-- -->
+
+```
+## 
+## $`26`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-20.png)<!-- -->
+
+```
+## 
+## $`27`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-21.png)<!-- -->
+
+```
+## 
+## $`28`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-22.png)<!-- -->
+
+```
+## 
+## $`29`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-23.png)<!-- -->
+
+```
+## 
+## $`30`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-24.png)<!-- -->
+
+```
+## 
+## $`31`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-25.png)<!-- -->
+
+```
+## 
+## $`32`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-26.png)<!-- -->
+
+```
+## 
+## $`33`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-27.png)<!-- -->
+
+```
+## 
+## $`34`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-28.png)<!-- -->
+
+```
+## 
+## $`35`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-29.png)<!-- -->
+
+```
+## 
+## $`36`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-30.png)<!-- -->
+
+```
+## 
+## $`37`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-31.png)<!-- -->
+
+```
+## 
+## $`38`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-32.png)<!-- -->
+
+```
+## 
+## $`39`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-33.png)<!-- -->
 
 ##Log Odds of Foraging
 
@@ -274,6 +454,6 @@ No estimate of uncertainty.
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1688630   90.2    7974897  426.0   9968622  532.4
-## Vcells 140300114 1070.5  267200524 2038.6 267080658 2037.7
+## Ncells   1985536  106.1    7420064  396.3   9968622  532.4
+## Vcells 529111814 4036.9  924841272 7056.0 924671971 7054.7
 ```

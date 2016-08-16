@@ -5,13 +5,13 @@
     pi <- 3.141592653589
     
     ##argos observation error##
-    #argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
     
     #Constructing the covariance matrix
-    #argos_cov[1,1] <- 1
-    #argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    #argos_cov[2,1] <- sqrt(argos_alpha) * rho
-    #argos_cov[2,2] <- argos_alpha
+    argos_cov[1,1] <- 1
+    argos_cov[1,2] <- sqrt(argos_alpha) * rho
+    argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
     for(g in 1:tracks[i]){
@@ -60,11 +60,11 @@
     
     # loops over observed locations within interval t
     for(u in 1:idx[i,g,t]){ 
-    argos[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
+    zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
     
     #for each lat and long
     #argos error
-    #argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
+    argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
     }
     }
     }
