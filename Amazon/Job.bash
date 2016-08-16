@@ -1,10 +1,11 @@
 #!/bin/bash 
 
-#cd into whales, if directory doesn't exist, kill the run.
-
+#clone
 git clone  git@github.com:bw4sz/Whales.git --depth 1
 
 cd Whales||sudo halt
+
+unzip OutData/pars.zip
 
 #make new branch
 #name it the instance ID

@@ -501,7 +501,7 @@ rm(behav_chains)
 
 ###Correlation in posterior switching and state
 
-```{r}
+```{r,eval=F}
 a<-pc %>% filter(!Behavior==1|is.na(Behavior)) %>% filter(parameter %in% c("phi","state")) 
 a<-dcast(a,Draw+chain+Animal+Track+step~parameter)
 ggplot(a,aes(x=phi,y=state-1)) + geom_point() + geom_smooth(method="glm",method.args=list(family="binomial"))
