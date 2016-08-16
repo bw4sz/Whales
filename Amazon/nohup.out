@@ -1,0 +1,192 @@
+Warning: Permanently added 'ec2-52-38-102-88.us-west-2.compute.amazonaws.com,52.38.102.88' (ECDSA) to the list of known hosts.
+/bin/bash: : No such file or directory
+Warning: Permanently added 'ec2-52-36-168-120.us-west-2.compute.amazonaws.com,52.36.168.120' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Archive:  OutData/pars.zip
+  inflating: pars.csv                
+Switched to a new branch 'i-0f2ff79a'
+[i-0f2ff79a 9229375] ec2 run complete
+ 10 files changed, 267 insertions(+), 511 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (93%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (98%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (99%)
+ rewrite run.txt (64%)
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      i-0f2ff79a -> i-0f2ff79a
+Branch i-0f2ff79a set up to track remote branch i-0f2ff79a from origin.
+Warning: Permanently added 'ec2-52-26-128-192.us-west-2.compute.amazonaws.com,52.26.128.192' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+./Job.bash: line 9: cd: Outdata: No such file or directory
+Archive:  OutData/pars.zip
+  inflating: pars.csv                
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+fatal: Not a git repository (or any of the parent directories): .git
+Warning: Permanently added 'ec2-52-43-79-141.us-west-2.compute.amazonaws.com,52.43.79.141' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Warning: Permanently added the RSA host key for IP address '192.30.253.113' to the list of known hosts.
+unzip:  cannot find or open OutData/pars.zip, OutData/pars.zip.zip or OutData/pars.zip.ZIP.
+Switched to a new branch 'i-445a82d1'
+[i-445a82d1 1cf6c92] ec2 run complete
+ 10 files changed, 267 insertions(+), 511 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (93%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (98%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (99%)
+ rewrite run.txt (64%)
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      i-445a82d1 -> i-445a82d1
+Branch i-445a82d1 set up to track remote branch i-445a82d1 from origin.
+Warning: Permanently added 'ec2-52-43-67-61.us-west-2.compute.amazonaws.com,52.43.67.61' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Warning: Permanently added the RSA host key for IP address '192.30.253.113' to the list of known hosts.
+Archive:  pars.zip
+  inflating: pars.csv                
+Switched to a new branch 'i-0c5f8799'
+[i-0c5f8799 a01c527] ec2 run complete
+ 60 files changed, 84 insertions(+), 84 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (93%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-20-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-21-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-22-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-23-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-23-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-24-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-24-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-27-1.png (96%)
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-10.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-11.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-12.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-13.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-14.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-15.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-16.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-17.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-18.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-19.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-20.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-21.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-22.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-23.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-24.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-25.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-26.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-27.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-28.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-29.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-30.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-31.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-32.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-33.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-9.png
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-27-1.png => unnamed-chunk-28-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-28-1.png => unnamed-chunk-29-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-29-1.png => unnamed-chunk-30-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-30-1.png => unnamed-chunk-31-1.png} (100%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-33-1.png (99%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-33-1.png => unnamed-chunk-34-1.png} (100%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-36-1.png (79%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-37-1.png (98%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-37-1.png => unnamed-chunk-38-1.png} (100%)
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-38-2.png
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (98%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (99%)
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      Branch i-0c5f8799 set up to track remote branch i-0c5f8799 from origin.
+i-0c5f8799 -> i-0c5f8799
+Warning: Permanently added 'ec2-52-25-139-9.us-west-2.compute.amazonaws.com,52.25.139.9' (ECDSA) to the list of known hosts.
+Cloning into 'Whales'...
+Archive:  pars.zip
+  inflating: pars.csv                
+Switched to a new branch 'i-7c4890e9'
+[i-7c4890e9 f17434c] ec2 run complete
+ 64 files changed, 147 insertions(+), 140 deletions(-)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-13-1.png (95%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-14-1.png (93%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-15-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-20-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-21-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-22-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-23-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-23-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-24-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-24-2.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-27-1.png (96%)
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-10.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-11.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-12.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-13.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-14.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-15.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-16.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-17.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-18.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-19.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-2.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-20.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-21.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-22.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-23.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-24.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-25.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-26.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-27.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-28.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-29.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-3.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-30.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-31.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-32.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-33.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-4.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-5.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-6.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-7.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-8.png
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-27-9.png
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-27-1.png => unnamed-chunk-28-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-28-1.png => unnamed-chunk-29-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-29-1.png => unnamed-chunk-30-1.png} (100%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-30-1.png => unnamed-chunk-31-1.png} (100%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-33-1.png (99%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-33-1.png => unnamed-chunk-34-1.png} (100%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-36-1.png (79%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-37-1.png (98%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-37-1.png => unnamed-chunk-38-1.png} (100%)
+ create mode 100644 SingleSpecies_files/figure-html/unnamed-chunk-38-2.png
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-39-1.png (97%)
+ rename SingleSpecies_files/figure-html/{unnamed-chunk-39-1.png => unnamed-chunk-40-1.png} (100%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-5-1.png (96%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-6-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-7-1.png (98%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-8-1.png (99%)
+ rewrite SingleSpecies_files/figure-html/unnamed-chunk-9-1.png (99%)
+To git@github.com:bw4sz/Whales.git
+ * [new branch]      Branch i-7c4890e9 set up to track remote branch i-7c4890e9 from origin.
+i-7c4890e9 -> i-7c4890e9
