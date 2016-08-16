@@ -99,19 +99,18 @@ How did the filter change the extent of tracks?
 
 
 
-```
-##      user    system   elapsed 
-##  1376.814     5.762 63397.724
-```
 
 ##Chains
-![](SingleSpecies_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
+
+
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
 ## Parameter Summary
 
@@ -133,15 +132,15 @@ How did the filter change the extent of tracks?
 ## 10     theta    theta[2]  0.227316050  0.135579065  0.34660730
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 ##Behavior and environment
 
 ### Ocean Depth
-![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
 
 ### Distance to Coast
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -149,7 +148,7 @@ How did the filter change the extent of tracks?
 
 ###Correlation in posterior switching and state
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
+
 
 ##Spatial Prediction
 
@@ -159,261 +158,261 @@ How did the filter change the extent of tracks?
 ## $`7`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ```
 ## 
 ## $`8`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
 
 ```
 ## 
 ## $`9`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-3.png)<!-- -->
 
 ```
 ## 
 ## $`10`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-4.png)<!-- -->
 
 ```
 ## 
 ## $`11`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-5.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-5.png)<!-- -->
 
 ```
 ## 
 ## $`12`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-6.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-6.png)<!-- -->
 
 ```
 ## 
 ## $`13`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-7.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-7.png)<!-- -->
 
 ```
 ## 
 ## $`14`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-8.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-8.png)<!-- -->
 
 ```
 ## 
 ## $`15`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-9.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-9.png)<!-- -->
 
 ```
 ## 
 ## $`16`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-10.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-10.png)<!-- -->
 
 ```
 ## 
 ## $`17`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-11.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-11.png)<!-- -->
 
 ```
 ## 
 ## $`18`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-12.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-12.png)<!-- -->
 
 ```
 ## 
 ## $`19`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-13.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-13.png)<!-- -->
 
 ```
 ## 
 ## $`20`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-14.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-14.png)<!-- -->
 
 ```
 ## 
 ## $`21`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-15.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-15.png)<!-- -->
 
 ```
 ## 
 ## $`22`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-16.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-16.png)<!-- -->
 
 ```
 ## 
 ## $`23`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-17.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-17.png)<!-- -->
 
 ```
 ## 
 ## $`24`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-18.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-18.png)<!-- -->
 
 ```
 ## 
 ## $`25`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-19.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-19.png)<!-- -->
 
 ```
 ## 
 ## $`26`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-20.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-20.png)<!-- -->
 
 ```
 ## 
 ## $`27`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-21.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-21.png)<!-- -->
 
 ```
 ## 
 ## $`28`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-22.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-22.png)<!-- -->
 
 ```
 ## 
 ## $`29`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-23.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-23.png)<!-- -->
 
 ```
 ## 
 ## $`30`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-24.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-24.png)<!-- -->
 
 ```
 ## 
 ## $`31`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-25.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-25.png)<!-- -->
 
 ```
 ## 
 ## $`32`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-26.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-26.png)<!-- -->
 
 ```
 ## 
 ## $`33`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-27.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-27.png)<!-- -->
 
 ```
 ## 
 ## $`34`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-28.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-28.png)<!-- -->
 
 ```
 ## 
 ## $`35`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-29.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-29.png)<!-- -->
 
 ```
 ## 
 ## $`36`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-30.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-30.png)<!-- -->
 
 ```
 ## 
 ## $`37`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-31.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-31.png)<!-- -->
 
 ```
 ## 
 ## $`38`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-32.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-32.png)<!-- -->
 
 ```
 ## 
 ## $`39`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-33.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-33.png)<!-- -->
 
 ##Log Odds of Foraging
 
 ### Ocean Depth
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ### Distance From Coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 ###Interaction
 
 No estimate of uncertainty.
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
 
 #Environmental Prediction - Probability of Foraging
 
@@ -421,11 +420,11 @@ No estimate of uncertainty.
 
 ## Bathymetry
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 ## Distance to coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 
 ##All variables
@@ -435,25 +434,25 @@ No estimate of uncertainty.
 ## [[1]]
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
 ```
 ## 
 ## [[2]]
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 
 #Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
 
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1985536  106.1    7420064  396.3   9968622  532.4
-## Vcells 529111814 4036.9  924841272 7056.0 924671971 7054.7
+## Ncells   1672039   89.3    5526984  295.2   9275080  495.4
+## Vcells 143288754 1093.3  352644449 2690.5 352365889 2688.4
 ```
