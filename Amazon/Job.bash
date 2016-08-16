@@ -6,7 +6,7 @@ git clone  git@github.com:bw4sz/Whales.git --depth 1
 cd Whales||sudo halt
 
 #unzip data file if needed
-cd Outdata
+cd OutData
 unzip OutData/pars.zip
 
 cd ..
