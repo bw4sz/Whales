@@ -7,7 +7,7 @@ cd Whales||sudo halt
 
 #unzip data file if needed
 cd OutData
-unzip OutData/pars.zip
+unzip pars.zip
 
 cd ..
 
