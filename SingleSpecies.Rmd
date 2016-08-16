@@ -28,7 +28,7 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 ```
 
 ```{r,eval=F}
@@ -354,7 +354,7 @@ if(newModel){
 ```
 
 ##Chains
-```{r,fig.height=10}
+```{r,fig.height=10,eval=F}
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 colnames(pc)<-c("Draw","chain","par","value")
@@ -394,7 +394,14 @@ rm(splitpc)
 
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+```
 
+
+```{r,eval=T}
+#write.csv
+#write.csv(pc,"OutData/pars.csv")
+pc<-read.csv("OutData/pars.csv")
+pc$Behavior<-as.factor(pc$Behavior)
 ```
 
 ```{r,fig.width=11}

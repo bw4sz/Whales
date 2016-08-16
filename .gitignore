@@ -4,3 +4,5 @@
 .Rproj.user
 .Rhistory
 nohup.out
+pars.csv
+OutData/pars.csv
