@@ -31,7 +31,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta_mu[state[i,g,t-1]] * ocean[i,g,t] + beta2_mu[state[i,g,t-1]] * coast[i,g,t]
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta_mu[state[i,g,t-1]] * ocean[i,g,t] + beta2_mu[state[i,g,t-1]] * coast[i,g,t] + beta3_mu[state[i,g,t-1]] * ocean[i,g,t] * coast[i,g,t]
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -114,6 +114,10 @@ cat("
     beta2_mu[1] ~ dnorm(0,0.386)
     beta2_mu[2] = 0
     
+    # Interaction
+    beta3_mu[1] ~ dnorm(0,0.386)
+    beta3_mu[2] = 0
+
     #Variance
     #Ocean
     #beta_tau[1] ~ dt(0,1,1)I(0,)

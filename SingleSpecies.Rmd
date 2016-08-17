@@ -72,7 +72,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131134","131141"),]
+mxy<-mxy[mxy$Animal %in% c("131134","131141"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -96,6 +96,17 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 ```
+
+#Direction to coast
+
+```{r}
+#Compute angle to the nearest landmass
+land<-ice<0
+land[land==0]<-NA
+distcc<-distance(land)
+plot(distcc)
+```
+
 
 #Descriptive Statistics
 ```{r}
@@ -345,10 +356,10 @@ R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks)
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","state")
+pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta3_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=28000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=300,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -366,7 +377,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -472,7 +483,6 @@ postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Dra
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.5))
 
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
-
 ```
 
 #Behavioral Prediction
@@ -512,12 +522,17 @@ ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_b
 
 ##Spatial Prediction
 
+```{r}
+  ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
+```
+
+
 ### Per Animal
 ```{r}
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,zoom=7,source="google",scale=2,maptype="satellite",color="bw")
+  m <- get_map(location=pp,source="google",scale=2,maptype="satellite",color="bw")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
 })
 spp
@@ -528,7 +543,7 @@ spp
 
 ### Ocean Depth
 
-```{r,fig.height=10}
+```{r,fig.height=12}
 #phi and ocean plot
 ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~Animal,ncol=4,scales="free")
 ```
@@ -552,13 +567,14 @@ allx$ID<-1:nrow(allx)
 allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta3<-filter(pc,par %in% 'beta3_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 
-traj<-function(ocean,coast,alpha,beta1,beta2){
-  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast)
+traj<-function(ocean,coast,alpha,beta1,beta2,beta3){
+  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast + beta3*coast * ocean)
   data.frame(ocean,coast,phi=p)
 }
 
-intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
+intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2,.$beta3))
 
 ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
 ```
