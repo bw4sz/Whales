@@ -28,7 +28,7 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-T
 ```
 
 ```{r,eval=F}
@@ -96,17 +96,6 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 ```
-
-#Direction to coast
-
-```{r}
-#Compute angle to the nearest landmass
-land<-ice<0
-land[land==0]<-NA
-distcc<-distance(land)
-plot(distcc)
-```
-
 
 #Descriptive Statistics
 ```{r}
@@ -365,7 +354,7 @@ if(newModel){
 ```
 
 ##Chains
-```{r,fig.height=10,eval=F}
+```{r,fig.height=10,eval=T}
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 colnames(pc)<-c("Draw","chain","par","value")
@@ -377,7 +366,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -408,7 +397,7 @@ ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wra
 ```
 
 
-```{r,eval=T}
+```{r,eval=F}
 #write.csv
 #write.csv(pc,"OutData/pars.csv")
 pc<-read.csv("OutData/pars.csv")
@@ -685,7 +674,7 @@ ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,ae
 ##All variables
 
 ```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
+meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu","beta3_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
 ##Bathymetry
 s<-stack(rice,distc)
