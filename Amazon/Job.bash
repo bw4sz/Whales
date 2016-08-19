@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 #clone
-git clone -b interaction --single-branch git@github.com:bw4sz/Whales.git --depth 1
+git clone git@github.com:bw4sz/Whales.git --depth 1
 
 cd Whales||sudo halt
 
