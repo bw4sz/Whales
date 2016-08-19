@@ -72,7 +72,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("131134","131141"),]
+mxy<-mxy[mxy$Animal %in% c("112705","154187","121210","131134","131141","112701","131159"),]
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 #empty coordinates
@@ -112,6 +112,13 @@ pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
+
+##By Month
+
+```{r}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + facet_wrap(~Month)
+```
+
 
 ##Distance
 
@@ -298,6 +305,12 @@ oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
 #make coast a matrix -> MEAN VALUE
 coast<-acast(mxy,Animal~Track~Step,value.var="coast",fun.aggregate = mean)
 
+#month array
+mxy$MonthF<-as.numeric(factor(mxy$Month,levels=month.name))
+
+MonthA<-acast(mxy,Animal~Track~Step,value.var="MonthF",fun.aggregate = min)
+MonthA[!is.finite(MonthA)]<-NA
+
 #Individuals
 ind=length(unique(mxy$Animal))
 
@@ -310,6 +323,9 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~Step~jStep~variable)
+
+#Month array
+
 ```
 
 How did the filter change the extent of tracks?
@@ -342,13 +358,13 @@ source("Bayesian/MultiSpecies.R")
 
 #prior cov shape
 R <- diag(c(1,1))
-data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks)
+data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta3_mu","state")
+pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -366,7 +382,7 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","beta3_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
@@ -556,14 +572,13 @@ allx$ID<-1:nrow(allx)
 allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta3<-filter(pc,par %in% 'beta3_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
 
-traj<-function(ocean,coast,alpha,beta1,beta2,beta3){
-  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast + beta3*coast * ocean)
+traj<-function(ocean,coast,alpha,beta1,beta2){
+  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast)
   data.frame(ocean,coast,phi=p)
 }
 
-intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2,.$beta3))
+intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
 
 ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
 ```
@@ -674,13 +689,13 @@ ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,ae
 ##All variables
 
 ```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu","beta3_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
+meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
 
 ##Bathymetry
 s<-stack(rice,distc)
 
 #Traveling
-travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2] + meanpar$`beta3_mu[1]` * x[2]*x[1])})
+travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
 
 travdf<-data.frame(rasterToPoints(travpar))
 
@@ -709,7 +724,6 @@ ksuit<-extract(x=travpar,y=ksp)
 kdf<-data.frame(ksp,ksuit)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
-
 
 #toname<-kdf %>% filter(ksuit>0.9)
 #toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
