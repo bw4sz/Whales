@@ -72,8 +72,7 @@ mxy$y<-mxy$location.lat
 #grab set of animals
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-mxy<-mxy[mxy$Animal %in% c("112705","154187","121210","131134","131141","112701","131159"),]
-mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+mxy<-mxy[mxy$Animal %in% c("154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -115,10 +114,10 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 
 ##By Month
 
-```{r}
+```{r,fig.height=12}
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + facet_wrap(~Month)
 ```
-
 
 ##Distance
 
@@ -201,11 +200,16 @@ $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 
 With the probability of switching states:
 
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]} + \beta_2 * Coast_{y[t,]}$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_{Month,1} * Ocean_{y[t,]} + \beta_{Month,2} * Coast_{y[t,]}$$
 
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
 
 Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
+
+The effect of the environment is temporally variable such that
+
+$$ \beta_{Month,2} \sim ~ Normal(\beta_{\mu},\beta_\tau)$$
+
 
 ```{r,fig.height=3,fig.width=3.5}
 dplot<-function(a1,beta=c(0,0),beta2=c(0,0),x=0,coast=0){
@@ -281,6 +285,9 @@ return(x)
 })
 
 mxy<-rbind_all(sxy)
+
+#refactor animal
+mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
 
 ```{r}
@@ -323,9 +330,6 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~Step~jStep~variable)
-
-#Month array
-
 ```
 
 How did the filter change the extent of tracks?
@@ -348,7 +352,6 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-
 ```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
@@ -364,13 +367,13 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=2000,n.burnin=1500,n.thin=5,DIC=FALSE))
 }
 
 ```
 
 ##Chains
-```{r,fig.height=10,eval=T}
+```{r,fig.height=12,eval=T}
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 colnames(pc)<-c("Draw","chain","par","value")
@@ -385,6 +388,17 @@ splitpc<-split(pc,pc$parameter)
 splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
+    return(pc)
+})
+
+## double index
+splitpc[c("beta","beta2")]<-lapply(splitpc[c("beta","beta2")],function(x){
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]      
+    colnames(sv)<-c("MonthF","Behavior")
+    pc<-data.frame(x,sv)
+    #get month name
+    mindex<-mxy %>% select(MonthF,Month) %>% distinct()
+    pc<-merge(pc,mindex,by="MonthF")
     return(pc)
 })
 
@@ -464,7 +478,9 @@ psum
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free")
 ```
 
-##Behavior and environment
+#Behavior and environment
+
+##Hierarchical 
 
 ### Ocean Depth
 ```{r}
@@ -489,6 +505,65 @@ ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Sta
 
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
+
+## By Month
+
+```{r}
+#get the posterior estimates of the env function
+
+postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+
+allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+allplot$Month<-factor(allplot$Month,levels=month.name)
+
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5)) 
+
+#mean env estimate
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+```
+
+### Mean Estimates Only
+```{r}
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+```
+
+### As facets
+```{r}
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Transition") + xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Transition") 
+```
+
+###Interaction
+
+No estimate of uncertainty.
+```{r}
+coastx<-seq(0,quantile(mxy$coast,0.98),quantile(mxy$coast,0.98)/20)
+oceanx<-seq(0,quantile(mxy$ocean,0.98),quantile(mxy$ocean,0.98)/20)
+allx<-expand.grid(coastx,oceanx)
+colnames(allx)<-c("coast","ocean")
+allx$ID<-1:nrow(allx)
+allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
+
+traj<-function(ocean,coast,alpha,beta1,beta2){
+  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast)
+  data.frame(ocean,coast,phi=p)
+}
+
+intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
+
+ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
+```
+
 
 #Behavioral Prediction
 
@@ -528,7 +603,8 @@ ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_b
 ##Spatial Prediction
 
 ```{r}
-  ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Animal),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
 ```
 
 
@@ -537,7 +613,7 @@ ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_b
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color="bw")
+  m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite",color="bw")
   ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
 })
 spp
@@ -548,40 +624,18 @@ spp
 
 ### Ocean Depth
 
-```{r,fig.height=12}
+```{r,fig.height=20}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi))) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~Animal,ncol=4,scales="free")
+ggplot(data=mxy,aes(x=ocean,y=logit(phi),col=Month)) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=4,scales="free") + geom_smooth(method="lm")
 ```
 
 ### Distance From Coast
 
-```{r,fig.height=10}
+```{r,fig.height=20}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi))) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~Animal,ncol=4,scales="free")
+ggplot(data=mxy,aes(x=coast,y=logit(phi),col=Month)) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=4,scales="free")+ geom_smooth(method="lm")
 ```
 
-###Interaction
-
-No estimate of uncertainty.
-```{r}
-coastx<-seq(0,quantile(mxy$coast,0.98),quantile(mxy$coast,0.98)/20)
-oceanx<-seq(0,quantile(mxy$ocean,0.98),quantile(mxy$ocean,0.98)/20)
-allx<-expand.grid(coastx,oceanx)
-colnames(allx)<-c("coast","ocean")
-allx$ID<-1:nrow(allx)
-allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-
-traj<-function(ocean,coast,alpha,beta1,beta2){
-  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast)
-  data.frame(ocean,coast,phi=p)
-}
-
-intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
-
-ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
-```
 
 ##Autocorrelation in behavior
 
@@ -593,6 +647,9 @@ ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(gr
 ##Behavioral description
 
 ## Predicted behavior duration
+
+Needs to be indexed by month.
+
 ```{r,fig.height=5,fig.width=14}
 runf<-function(x){
   #arrange by step
@@ -606,7 +663,6 @@ runf<-function(x){
 }
 
 runs<-pc %>% filter(parameter=='state') %>% group_by(Animal,Draw,chain) %>% do(runf(.))
-
 
 #turn steps to hours
 runs$hours<-runs$runs*step_length
@@ -684,7 +740,6 @@ travdf<-data.frame(rasterToPoints(travpar))
 
 ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
 ```
-
 
 ##All variables
 

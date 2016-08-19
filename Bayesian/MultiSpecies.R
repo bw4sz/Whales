@@ -31,7 +31,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t],state[i,g,t-1]] * coast[i,g,t]
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t-1],state[i,g,t-1]] * coast[i,g,t]
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -94,7 +94,7 @@ cat("
     
     
     #Monthly Covaraites
-    for(x in Months){
+    for(x in 1:Months){
     beta[x,1]~dnorm(beta_mu[1],beta_tau[1])
     beta[x,2]<-0
     beta2[x,1]~dnorm(beta2_mu[1],beta2_tau[1])
