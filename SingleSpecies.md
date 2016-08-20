@@ -74,11 +74,16 @@ $$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 
 With the probability of switching states:
 
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_1 * Ocean_{y[t,]} + \beta_2 * Coast_{y[t,]}$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_{Month,1} * Ocean_{y[t,]} + \beta_{Month,2} * Coast_{y[t,]}$$
 
 $$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
 
 Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
+
+The effect of the environment is temporally variable such that
+
+$$ \beta_{Month,2} \sim ~ Normal(\beta_{\mu},\beta_\tau)$$
+
 
 
 
@@ -104,7 +109,7 @@ How did the filter change the extent of tracks?
 
 ```
 ##    user  system elapsed 
-##    0.74    0.08   87.64
+##  63.447   0.566 961.424
 ```
 
 ##Chains
@@ -122,33 +127,51 @@ How did the filter change the extent of tracks?
 ## Parameter Summary
 
 ```
-## Source: local data frame [26 x 5]
+## Source: local data frame [30 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par          mean     lower     upper
-##       (fctr)      (fctr)         (dbl)     (dbl)     (dbl)
-## 1   alpha_mu alpha_mu[1] -0.0003793991 -2.261512  2.472842
-## 2   alpha_mu alpha_mu[2] -2.2292549743 -3.522244 -1.069620
-## 3       beta   beta[1,1]  0.5646368637 -2.726495  3.452911
-## 4       beta   beta[2,1]  0.4208344778 -2.158011  3.679897
-## 5       beta   beta[3,1]  0.1466245109 -1.717353  2.292239
-## 6       beta   beta[4,1]  0.5352721566 -2.252437  4.088838
-## 7       beta   beta[1,2]  0.0000000000  0.000000  0.000000
-## 8       beta   beta[2,2]  0.0000000000  0.000000  0.000000
-## 9       beta   beta[3,2]  0.0000000000  0.000000  0.000000
-## 10      beta   beta[4,2]  0.0000000000  0.000000  0.000000
-## ..       ...         ...           ...       ...       ...
+##    parameter         par       mean     lower     upper
+##       (fctr)      (fctr)      (dbl)     (dbl)     (dbl)
+## 1   alpha_mu alpha_mu[1] -0.4946735 -2.251606 1.0026147
+## 2   alpha_mu alpha_mu[2] -1.1863259 -2.151771 0.0710141
+## 3       beta   beta[1,1] -1.3890359 -4.702633 1.6201856
+## 4       beta   beta[2,1] -1.2802992 -3.824901 1.6967505
+## 5       beta   beta[3,1] -1.2311811 -4.336639 1.8104413
+## 6       beta   beta[4,1] -1.3465117 -4.535175 1.8276893
+## 7       beta   beta[5,1] -1.1262951 -4.640459 1.7307380
+## 8       beta   beta[1,2]  0.0000000  0.000000 0.0000000
+## 9       beta   beta[2,2]  0.0000000  0.000000 0.0000000
+## 10      beta   beta[3,2]  0.0000000  0.000000 0.0000000
+## ..       ...         ...        ...       ...       ...
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
-##Behavior and environment
+#Behavior and environment
+
+##Hierarchical 
 
 ### Ocean Depth
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
 
 ### Distance to Coast
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
+
+## By Month
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
+
+### Mean Estimates Only
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
+
+### As facets
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-28-2.png)<!-- -->
+
+###Interaction
+
+No estimate of uncertainty.
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+
 
 #Behavioral Prediction
 
@@ -160,46 +183,101 @@ How did the filter change the extent of tracks?
 
 ##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 
 ### Per Animal
 
 ```
+## $`1`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+
+```
+## 
 ## $`2`
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+
+```
+## 
+## $`3`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
+
+```
+## 
+## $`4`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-4.png)<!-- -->
+
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-8.png)<!-- -->
+
+```
+## 
+## $`9`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-9.png)<!-- -->
 
 ##Log Odds of Foraging
 
 ### Ocean Depth
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
 
 ### Distance From Coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
 
-###Interaction
-
-No estimate of uncertainty.
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 ##Behavioral description
 
 ## Predicted behavior duration
 
+Needs to be indexed by month.
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
 #Environmental Prediction - Probability of Foraging
 
@@ -207,12 +285,11 @@ No estimate of uncertainty.
 
 ## Bathymetry
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
 
 ## Distance to coast
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
 ##All variables
 
@@ -221,25 +298,25 @@ No estimate of uncertainty.
 ## [[1]]
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
 ```
 ## 
 ## [[2]]
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-43-2.png)<!-- -->
 
 
 #Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
 
 
 
 ```
-##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1609682  86.0    5115198 273.2  7992498 426.9
-## Vcells 26262520 200.4   66993564 511.2 61597591 470.0
+##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1694905  90.6    5737724  306.5   9968622  532.4
+## Vcells 105724764 806.7  352865482 2692.2 352662502 2690.7
 ```
