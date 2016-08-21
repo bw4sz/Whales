@@ -367,13 +367,13 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=8,DIC=FALSE))
 }
 
 ```
 
 ##Chains
-```{r,fig.height=12,eval=T}
+```{r,fig.height=25,eval=T}
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 colnames(pc)<-c("Draw","chain","par","value")
@@ -471,11 +471,11 @@ rm(allp)
 ```
 
 ## Parameter Summary
-```{r}
+```{r,fig.height=12}
 psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 
 psum
-ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free")
+ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free",ncol=2)
 ```
 
 #Behavior and environment
@@ -506,44 +506,9 @@ ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Sta
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
 
-## By Month
-
-```{r}
-#get the posterior estimates of the env function
-
-postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
-postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
-postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
-
-allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
-
-allplot$Month<-factor(allplot$Month,levels=month.name)
-
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5)) 
-
-#mean env estimate
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
-```
-
-### Mean Estimates Only
-```{r}
-ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
-
-#mean env estimate
-ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
-```
-
-### As facets
-```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Transition") + xlim(0,quantile(mxy$ocean,0.5))
-
-#mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Transition") 
-```
 
 ###Interaction
 
-No estimate of uncertainty.
 ```{r}
 coastx<-seq(0,quantile(mxy$coast,0.98),quantile(mxy$coast,0.98)/20)
 oceanx<-seq(0,quantile(mxy$ocean,0.98),quantile(mxy$ocean,0.98)/20)
@@ -564,6 +529,75 @@ intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$bet
 ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
 ```
 
+## By Month
+
+### Depth
+
+```{r}
+#get the posterior estimates of the env function
+postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+
+allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+allplot$Month<-factor(allplot$Month,levels=month.name)
+
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5)) 
+
+#mean env estimate
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+```
+
+### Mean Estimates Only
+```{r}
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin) 
+```
+
+### As facets
+```{r}
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+```
+
+### Coast
+
+```{r}
+#get the posterior estimates of the env function
+postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+
+allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=0,coast=unique(mxy$coast))) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+
+allplot$Month<-factor(allplot$Month,levels=month.name)
+
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5)) 
+
+#mean env estimate
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+```
+
+### Mean Estimates Only
+```{r}
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin) 
+```
+
+### As facets
+```{r}
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+```
 
 #Behavioral Prediction
 
