@@ -108,8 +108,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##    user  system elapsed 
-##  63.447   0.566 961.424
+##      user    system   elapsed 
+##   198.285     1.609 10921.344
 ```
 
 ##Chains
@@ -127,22 +127,22 @@ How did the filter change the extent of tracks?
 ## Parameter Summary
 
 ```
-## Source: local data frame [30 x 5]
+## Source: local data frame [38 x 5]
 ## Groups: parameter [?]
 ## 
-##    parameter         par       mean     lower     upper
-##       (fctr)      (fctr)      (dbl)     (dbl)     (dbl)
-## 1   alpha_mu alpha_mu[1] -0.4946735 -2.251606 1.0026147
-## 2   alpha_mu alpha_mu[2] -1.1863259 -2.151771 0.0710141
-## 3       beta   beta[1,1] -1.3890359 -4.702633 1.6201856
-## 4       beta   beta[2,1] -1.2802992 -3.824901 1.6967505
-## 5       beta   beta[3,1] -1.2311811 -4.336639 1.8104413
-## 6       beta   beta[4,1] -1.3465117 -4.535175 1.8276893
-## 7       beta   beta[5,1] -1.1262951 -4.640459 1.7307380
-## 8       beta   beta[1,2]  0.0000000  0.000000 0.0000000
-## 9       beta   beta[2,2]  0.0000000  0.000000 0.0000000
-## 10      beta   beta[3,2]  0.0000000  0.000000 0.0000000
-## ..       ...         ...        ...       ...       ...
+##    parameter         par        mean      lower      upper
+##       (fctr)      (fctr)       (dbl)      (dbl)      (dbl)
+## 1   alpha_mu alpha_mu[1]  0.01804063 -0.6497932  0.6681658
+## 2   alpha_mu alpha_mu[2] -1.64435281 -2.2552399 -1.0862936
+## 3       beta   beta[1,1] -0.17076594 -1.8039178  1.9217257
+## 4       beta   beta[2,1] -1.52161389 -3.9871033 -0.1261102
+## 5       beta   beta[3,1] -1.52250167 -3.7409450  0.2167110
+## 6       beta   beta[4,1] -1.00901508 -2.5238436  0.5069955
+## 7       beta   beta[5,1] -0.56553751 -2.5615299  1.6717656
+## 8       beta   beta[9,1] -0.34906997 -1.8973933  2.0421645
+## 9       beta  beta[10,1] -1.23708135 -3.5817598  1.1308879
+## 10      beta   beta[1,2]  0.00000000  0.0000000  0.0000000
+## ..       ...         ...         ...        ...        ...
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -250,6 +250,55 @@ No estimate of uncertainty.
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-33-9.png)<!-- -->
 
+```
+## 
+## $`10`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-10.png)<!-- -->
+
+```
+## 
+## $`11`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-11.png)<!-- -->
+
+```
+## 
+## $`12`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-12.png)<!-- -->
+
+```
+## 
+## $`13`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-13.png)<!-- -->
+
+```
+## 
+## $`14`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-14.png)<!-- -->
+
+```
+## 
+## $`15`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-15.png)<!-- -->
+
+```
+## 
+## $`16`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-16.png)<!-- -->
+
 ##Log Odds of Foraging
 
 ### Ocean Depth
@@ -316,7 +365,7 @@ Needs to be indexed by month.
 
 
 ```
-##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1694905  90.6    5737724  306.5   9968622  532.4
-## Vcells 105724764 806.7  352865482 2692.2 352662502 2690.7
+##             used   (Mb) gc trigger   (Mb)   max used    (Mb)
+## Ncells   1773940   94.8   20145734 1075.9   39347138  2101.4
+## Vcells 311452879 2376.2 1083541430 8266.8 1383093853 10552.2
 ```
