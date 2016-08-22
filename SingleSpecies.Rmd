@@ -17,6 +17,7 @@ library(boot)
 library(raster)
 library(reshape2)
 library(ggplot2)
+library(maptools)
 library(survival)
 library(MASS)
 library(ggmap)
@@ -729,10 +730,13 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
-#Environmental Prediction - Probability of Foraging
+#Environmental Prediction - Probability of Foraging across time
 
 ```{r}
-mice<-stack("InputData/MonthlyIceRaster.grd")
+#get data frame of ice events
+fns<-paste("InputData/SeaIce/",month.abb[1:7],"_2015","LatLong.csv",sep="")
+pols<-lapply(fns,function(x){read.csv(x)})
+names(pols)<-month.abb[1:7]
 ```
 
 ## Bathymetry
@@ -747,7 +751,7 @@ rice[rice<0]<-NA
 travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
 travdf<-data.frame(rasterToPoints(travpar))
   
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1)) + xlim(-75,-50) + ylim(-70,-55) 
 ```
 
 ## Distance to coast
@@ -762,7 +766,7 @@ rice[rice<0]<-NA
 travpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
 travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55) +  geom_tile(data=data.frame(rasterToPoints(mice[[14]])),aes(x=x,y=y,fill=Feb_2013),alpha=0.8,fill='snow2') + ggtitle("Feb 2013") 
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-55)
 ```
 
 ##All variables
@@ -834,17 +838,8 @@ names(monthras)<-Months
 ```{r}
   #plot
 for(x in 1:length(monthras)){  
-  ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+   geom_tile(data=data.frame(rasterToPoints(monthras[[x]])),aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1))+  ggtitle(names(monthras)[[x]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="") 
+    ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+   geom_tile(data=data.frame(rasterToPoints(monthras[[x]])),aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1))+  ggtitle(names(monthras)[[x]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="") + geom_polygon(data=pols[[x]],aes(x=long,y=lat,group=group),fill="whitesmoke")
 }
-
-#geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') +
-#r <- raster(....) # any raster you want to plot
-#rtp <- rasterToPolygons(r)
-#rtp@data$id <- 1:nrow(rtp@data)   # add id column for join
-
-#rtpFort <- fortify(rtp, data = rtp@data)
-#rtpFortMer <- merge(rtpFort, rtp@data, by.x = 'id', by.y = 'id')  # join data
-pall1
 ```
 
 ## Change in foraging areas

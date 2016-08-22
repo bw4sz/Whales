@@ -82,3 +82,34 @@ writeRaster(spols,"InputData/MonthlyIceRaster",overwrite=T)
 #write.csv(sf.df,"InputData/SeaIce_AllYears.csv")
 
 
+#as individual polygons
+#read
+shp<-list.files("InputData/SeaIce",pattern="v2.shp",full.names=T)
+polygonlist<-list()
+for(a in 1:length(shp)){
+  
+  rp<-readShapePoly(shp[[a]])
+  #define projection
+  stere <- "+proj=stere +lat_0=-90 +lat_ts=70 +lon_0=0 +datum=WGS84 +units=m"
+  proj4string(rp)<-stere
+  
+  #0 width buffer
+  rp <- gBuffer(rp, byid=TRUE, width=0)
+  #crop
+  e<-extent(-3455516,-757334.6,66739.71,2200756)*1.1
+  crp<-crop(rp,e)
+  plot(tcrp<-spTransform(crp,CRS("+proj=longlat +ellps=WGS84")))
+
+  #name the layers
+  #get naming structure
+  s<-str_match(shp[[a]],"S_(\\d+)_")[,2]
+  yr<-as.numeric(substring(s,0,4))
+  mn<-as.numeric(substring(s,5,6))
+  polygonlist[[a]]<-fortify(tcrp)
+  names(polygonlist)[[a]]<-paste(month.abb[mn],yr,sep="_")
+}
+
+#write each
+for(x in 1:length(polygonlist)){
+  write.csv(polygonlist[[x]],paste("C:/Users/Ben/Documents/Whales/InputData/SeaIce/",names(polygonlist)[[x]],"LatLong.csv",sep=""))
+}
