@@ -70,9 +70,9 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+mxy<-mxy[mxy$Animal %in% c("154187","121210","131134","131141","112701"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -88,6 +88,9 @@ mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
 #month and year columns
 mxy$Month<-months(mxy$timestamp)
 mxy$Year<-years(mxy$timestamp)
+
+#Only austral sping and summer
+mxy<-mxy[mxy$Month %in% month.name[1:7],]
 
 #remove empty timestamps
 mxy<-mxy[!is.na(mxy$timestamp),]
@@ -367,7 +370,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -423,7 +426,7 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 #plot all but phi and state
-ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=2) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
 
 
@@ -434,9 +437,9 @@ pc<-read.csv("OutData/pars.csv")
 pc$Behavior<-as.factor(pc$Behavior)
 ```
 
-```{r,fig.width=11}
+```{r,fig.width=20}
 #Plot
-ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=4) + theme_bw()  + ggtitle("Estimated parameters")
+ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=3) + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
 ###Compare to priors
@@ -471,10 +474,11 @@ rm(allp)
 ```
 
 ## Parameter Summary
-```{r,fig.height=12}
+```{r,fig.height=20}
 psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 
-psum
+as.data.frame(psum)
+
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free",ncol=2)
 ```
 
@@ -485,7 +489,6 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 ### Ocean Depth
 ```{r}
 #get the posterior estimates of the env function
-
 postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
@@ -497,7 +500,6 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 ### Distance to Coast
 ```{r}
 #get the posterior estimates of the env function
-
 postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta2=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),coast=unique(mxy$coast))) %>% group_by(coast,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 #mean env estimate
@@ -505,7 +507,6 @@ ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Sta
 
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
 ```
-
 
 ###Interaction
 
@@ -583,14 +584,6 @@ ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),a
 ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
 ```
 
-### Mean Estimates Only
-```{r}
-ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5))
-
-#mean env estimate
-ggplot(allplot) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Month") + facet_grid(State~Begin) 
-```
-
 ### As facets
 ```{r}
 ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.5))
@@ -660,16 +653,15 @@ spp
 
 ```{r,fig.height=20}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi),col=Month)) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=4,scales="free") + geom_smooth(method="lm")
+ggplot(data=mxy,aes(x=ocean,y=logit(phi),col=Month)) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + geom_smooth(method="lm")
 ```
 
 ### Distance From Coast
 
 ```{r,fig.height=20}
 #phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi),col=Month)) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=4,scales="free")+ geom_smooth(method="lm")
+ggplot(data=mxy,aes(x=coast,y=logit(phi),col=Month)) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free")+ geom_smooth(method="lm")
 ```
-
 
 ##Autocorrelation in behavior
 
@@ -681,8 +673,6 @@ ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(gr
 ##Behavioral description
 
 ## Predicted behavior duration
-
-Needs to be indexed by month.
 
 ```{r,fig.height=5,fig.width=14}
 runf<-function(x){
@@ -788,18 +778,10 @@ travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta
 
 travdf<-data.frame(rasterToPoints(travpar))
 
-#plot for all months between jan and july.
-months<-25:26
-pall1<-list()
-for(mn in 1:length(months)){
-
-pall1[[mn]]<-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+ geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') + ggtitle(names(mice)[[months[mn]]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="")
-}
-pall1
+ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="")
 ```
 
-
-#Krill Fishery
+# Overlap with Krill Fishery
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
@@ -818,6 +800,64 @@ ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(
 #toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
 #toname
 #ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
+```
+
+## By Month
+
+```{r}
+#get the posterior estimates of the env function
+postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+
+postall$Month<-factor(postall$Month,levels=month.name)
+Months<-unique(postall$Month)
+
+monthras<-list()
+for (x in Months){
+
+  monthpar<-postall %>% filter(Month==x)
+  
+  ##Bathymetry
+  s<-stack(rice,distc)
+  
+  #Traveling
+  travpar<-calc(s,function(x){ 1-inv.logit(mean(monthpar$`alpha_mu[1]`) + mean(monthpar$`beta_1` ) * x[1] + mean(monthpar$`beta_2` * x[2]))})
+  
+  travdf<-data.frame(rasterToPoints(travpar))
+  
+  monthras[[x]]<-travpar
+}
+names(monthras)<-Months
+```
+
+```{r}
+  #plot
+for(x in 1:length(monthras)){  
+  ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+   geom_tile(data=data.frame(rasterToPoints(monthras[[x]])),aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1))+  ggtitle(names(monthras)[[x]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-55) + labs(x="",y="") 
+}
+
+#geom_tile(data=data.frame(rasterToPoints(mice[[months[mn]]])),aes(x=x,y=y,fill=names(mice)[[months[mn]]]),alpha=0.8,fill='snow2') +
+#r <- raster(....) # any raster you want to plot
+#rtp <- rasterToPolygons(r)
+#rtp@data$id <- 1:nrow(rtp@data)   # add id column for join
+
+#rtpFort <- fortify(rtp, data = rtp@data)
+#rtpFortMer <- merge(rtpFort, rtp@data, by.x = 'id', by.y = 'id')  # join data
+pall1
+```
+
+## Change in foraging areas
+
+January verus May
+
+Red = Better Foraging in Jan
+Blue = Better Foraging in May
+
+```{r}
+diffras<-monthras[[1]]-monthras[[5]]
+diffdf<-as.data.frame(rasterToPoints(diffras))
+ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red') + ggtitle("Comparing January and May") 
 ```
 
 
