@@ -105,6 +105,7 @@ for(a in 1:length(shp)){
   s<-str_match(shp[[a]],"S_(\\d+)_")[,2]
   yr<-as.numeric(substring(s,0,4))
   mn<-as.numeric(substring(s,5,6))
+  plot(tcrp)
   polygonlist[[a]]<-fortify(tcrp)
   names(polygonlist)[[a]]<-paste(month.abb[mn],yr,sep="_")
 }
