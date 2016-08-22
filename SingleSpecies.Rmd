@@ -799,11 +799,6 @@ ksuit<-extract(x=travpar,y=ksp)
 kdf<-data.frame(ksp,ksuit)
 
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
-
-#toname<-kdf %>% filter(ksuit>0.9)
-#toname<-SpatialPointsDataFrame(cbind(toname$GridMidpointDegreeLon,toname$GridMidpointHalfDegreeLat),toname)
-#toname
-#ggmap(temp) + geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
 ```
 
 ## By Month
@@ -853,6 +848,20 @@ Blue = Better Foraging in May
 diffras<-monthras[[1]]-monthras[[5]]
 diffdf<-as.data.frame(rasterToPoints(diffras))
 ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red') + ggtitle("Comparing January and May") 
+```
+
+## Monthly Overlap with Krill Fishery
+
+```{r}
+ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),krill)
+#extract probability of feeding at krill midpoints
+ksuit<-extract(x=stack(monthras),y=ksp)
+kdf<-data.frame(ksp,ksuit)
+mdf<-melt(kdf,measure.vars=names(monthras))
+
+mdf$Month<-factor(mdf$variable,levels=month.name)
+
+ggplot(mdf,aes(y=value,x=log(C1KRIcatchKG),col=Month)) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 ```
 
 
