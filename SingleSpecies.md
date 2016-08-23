@@ -108,8 +108,8 @@ How did the filter change the extent of tracks?
 
 
 ```
-##    user  system elapsed 
-##    3.40    1.07  569.49
+##     user   system  elapsed 
+##  206.707    1.415 3686.449
 ```
 
 ##Chains
@@ -127,37 +127,37 @@ How did the filter change the extent of tracks?
 ## Parameter Summary
 
 ```
-##    parameter         par        mean      lower       upper
-## 1   alpha_mu alpha_mu[1]  0.04170323 -2.0849442  1.93988456
-## 2   alpha_mu alpha_mu[2] -2.09712431 -2.5594583 -1.65644853
-## 3       beta   beta[1,1]  0.43669426 -4.5154874  5.45778878
-## 4       beta   beta[2,1] -0.65838844 -4.3739706  4.27935201
-## 5       beta   beta[3,1] -0.75737450 -5.7257015  3.53424348
-## 6       beta   beta[4,1] -0.98824406 -6.2889485  5.05834278
-## 7       beta   beta[5,1]  0.58427779 -3.4140069  7.73322418
-## 8       beta   beta[1,2]  0.00000000  0.0000000  0.00000000
-## 9       beta   beta[2,2]  0.00000000  0.0000000  0.00000000
-## 10      beta   beta[3,2]  0.00000000  0.0000000  0.00000000
-## 11      beta   beta[4,2]  0.00000000  0.0000000  0.00000000
-## 12      beta   beta[5,2]  0.00000000  0.0000000  0.00000000
-## 13   beta_mu  beta_mu[1] -0.50306330 -3.8227467  1.61570122
-## 14   beta_mu  beta_mu[2]  0.00000000  0.0000000  0.00000000
-## 15     beta2  beta2[1,1] -0.20569353 -2.8149914  1.15827751
-## 16     beta2  beta2[2,1] -1.34711477 -3.0127374  0.08369686
-## 17     beta2  beta2[3,1] -1.46778481 -3.1803814 -0.10024932
-## 18     beta2  beta2[4,1] -1.47172362 -3.3687022 -0.06242552
-## 19     beta2  beta2[5,1] -1.24035145 -3.7578076 -0.04579139
-## 20     beta2  beta2[1,2]  0.00000000  0.0000000  0.00000000
-## 21     beta2  beta2[2,2]  0.00000000  0.0000000  0.00000000
-## 22     beta2  beta2[3,2]  0.00000000  0.0000000  0.00000000
-## 23     beta2  beta2[4,2]  0.00000000  0.0000000  0.00000000
-## 24     beta2  beta2[5,2]  0.00000000  0.0000000  0.00000000
-## 25  beta2_mu beta2_mu[1] -0.86409758 -2.3779644  0.27909916
-## 26  beta2_mu beta2_mu[2]  0.00000000  0.0000000  0.00000000
-## 27     gamma    gamma[1]  1.41668749  1.3129662  1.49326071
-## 28     gamma    gamma[2]  0.48078888  0.4243989  0.53356526
-## 29     theta    theta[1] -0.21274252 -0.3107730 -0.09008332
-## 30     theta    theta[2]  6.09495083  6.0125447  6.15892884
+##    parameter         par        mean        lower        upper
+## 1   alpha_mu alpha_mu[1] -0.16093811 -0.711253454  0.318516695
+## 2   alpha_mu alpha_mu[2] -1.34545909 -1.703602408 -0.960502964
+## 3       beta   beta[1,1] -0.08868493 -1.949495925  2.010350191
+## 4       beta   beta[2,1] -1.00588840 -2.211595847  0.251083443
+## 5       beta   beta[3,1] -1.32430196 -2.867262749  0.007678424
+## 6       beta   beta[4,1] -0.80035834 -2.349682113  0.684147471
+## 7       beta   beta[5,1] -0.68421402 -2.615535672  1.341597950
+## 8       beta   beta[1,2]  0.00000000  0.000000000  0.000000000
+## 9       beta   beta[2,2]  0.00000000  0.000000000  0.000000000
+## 10      beta   beta[3,2]  0.00000000  0.000000000  0.000000000
+## 11      beta   beta[4,2]  0.00000000  0.000000000  0.000000000
+## 12      beta   beta[5,2]  0.00000000  0.000000000  0.000000000
+## 13     beta2  beta2[1,1]  0.02781336  0.007216153  0.055823476
+## 14     beta2  beta2[2,1]  0.02348769  0.007447670  0.045778399
+## 15     beta2  beta2[3,1]  0.01148409 -0.004312604  0.030340620
+## 16     beta2  beta2[4,1]  0.01340922 -0.008018526  0.036752287
+## 17     beta2  beta2[5,1]  0.16302000  0.061444247  0.339623889
+## 18     beta2  beta2[1,2]  0.00000000  0.000000000  0.000000000
+## 19     beta2  beta2[2,2]  0.00000000  0.000000000  0.000000000
+## 20     beta2  beta2[3,2]  0.00000000  0.000000000  0.000000000
+## 21     beta2  beta2[4,2]  0.00000000  0.000000000  0.000000000
+## 22     beta2  beta2[5,2]  0.00000000  0.000000000  0.000000000
+## 23  beta2_mu beta2_mu[1]  0.05098848 -0.033014925  0.170165521
+## 24  beta2_mu beta2_mu[2]  0.00000000  0.000000000  0.000000000
+## 25   beta_mu  beta_mu[1] -0.71782608 -2.072195597  0.573453559
+## 26   beta_mu  beta_mu[2]  0.00000000  0.000000000  0.000000000
+## 27     gamma    gamma[1]  0.89222522  0.860225392  0.922093365
+## 28     gamma    gamma[2]  0.01379875  0.001860104  0.033636478
+## 29     theta    theta[1] -0.02220363 -0.047839687  0.001400099
+## 30     theta    theta[2]  3.07305837  1.621681487  4.547176022
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -235,6 +235,90 @@ Zooming in on the top right plot.
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
 
+```
+## 
+## $`5`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-5.png)<!-- -->
+
+```
+## 
+## $`6`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-6.png)<!-- -->
+
+```
+## 
+## $`7`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-7.png)<!-- -->
+
+```
+## 
+## $`8`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-8.png)<!-- -->
+
+```
+## 
+## $`9`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-9.png)<!-- -->
+
+```
+## 
+## $`10`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-10.png)<!-- -->
+
+```
+## 
+## $`11`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-11.png)<!-- -->
+
+```
+## 
+## $`12`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-12.png)<!-- -->
+
+```
+## 
+## $`13`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-13.png)<!-- -->
+
+```
+## 
+## $`14`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-14.png)<!-- -->
+
+```
+## 
+## $`15`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-15.png)<!-- -->
+
+```
+## 
+## $`16`
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-16.png)<!-- -->
+
 ##Log Odds of Foraging
 
 ### Ocean Depth
@@ -304,7 +388,7 @@ Blue = Better Foraging in May
 
 
 ```
-##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1638706  87.6    5684620 303.6  5684620 303.6
-## Vcells 34416789 262.6   67014777 511.3 67014777 511.3
+##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1754130   93.7    5915776  316.0  14442815  771.4
+## Vcells 198187770 1512.1  607190379 4632.5 603213253 4602.2
 ```
