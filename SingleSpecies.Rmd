@@ -70,9 +70,8 @@ mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
-#mxy<-mxy[mxy$Animal %in% c("154187","121210","131134","131141","112701"),]
+mxy<-mxy[mxy$Animal %in% c("154187","121210","131134","131141","112701"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -118,6 +117,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ##By Month
 
 ```{r,fig.height=12}
+mxy$Month<-factor(mxy$Month,levels=month.name)
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + facet_wrap(~Month)
 ```
@@ -370,7 +370,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=2000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -547,7 +547,7 @@ allplot$Month<-factor(allplot$Month,levels=month.name)
 ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.5)) 
 
 #mean env estimate
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
 ```
 
 Just the probability of feeding when traveling.
