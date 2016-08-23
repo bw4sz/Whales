@@ -46,7 +46,7 @@ ice<-round(ice*-1/1000,3)
 rice<-aggregate(ice,fact=0.1/res(ice))
 
 #coast
-distc<-raster("InputData/DistancetoCoast.tif")
+distc<-raster("InputData/dist2coast-2015.tif")
 rice[rice<0]<-NA
 distc[is.na(rice)]<-NA
 
@@ -71,7 +71,7 @@ mxy$y<-mxy$location.lat
 
 #grab set of animals
 
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -370,7 +370,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=18000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=28000,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -569,22 +569,31 @@ postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+
 postplot_beta<-pc %>% filter(parameter %in% c('beta2')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
 postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
 
-allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta2_1',.$'beta2_2'),x=0,coast=unique(mxy$coast))) %>% group_by(x=coast,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta2=c(.$'beta2_1',.$'beta2_2'),coast=unique(mxy$coast))) %>% group_by(coast,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
 
 allplot$Month<-factor(allplot$Month,levels=month.name)
 
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$coast,0.5)) 
+ggplot(allplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Month") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$coast,0.5)) 
 
 #mean env estimate
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
+ggplot(allplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Month") + facet_grid(State~Begin) 
 ```
 
 Zooming in on the top right plot.
 ```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.5))
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.5))
 
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+```
+
+Just mean estimate.
+
+```{r}
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.5))
+
+#mean env estimate
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
 ```
 
 #Behavioral Prediction
@@ -628,7 +637,6 @@ ggplot(a) + geom_density(aes(x=1-phi,fill=as.factor(state)),alpha=0.5) + theme_b
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Animal),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
 ```
-
 
 ### Per Animal
 ```{r}
@@ -833,7 +841,7 @@ for(x in 1:length(monthras)){
 
 ## Change in foraging areas
 
-January verus May
+Jan verus May
 
 Red = Better Foraging in Jan
 Blue = Better Foraging in May
@@ -842,6 +850,18 @@ Blue = Better Foraging in May
 diffras<-monthras[[1]]-monthras[[5]]
 diffdf<-as.data.frame(rasterToPoints(diffras))
 ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red') + ggtitle("Comparing January and May") 
+```
+
+### Variance in monthly suitability
+
+```{r}
+plot(varArea<-calc(stack(monthras),sd))
+```
+
+### Mean suitability
+
+```{r}
+plot(varArea<-calc(stack(monthras),mean))
 ```
 
 ## Monthly Overlap with Krill Fishery
