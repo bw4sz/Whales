@@ -370,7 +370,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -398,11 +398,11 @@ splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("a
 splitpc[c("beta","beta2")]<-lapply(splitpc[c("beta","beta2")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]      
     colnames(sv)<-c("MonthF","Behavior")
-    pc<-data.frame(x,sv)
+    setp<-data.frame(x,sv)
     #get month name
-    mindex<-mxy %>% select(MonthF,Month) %>% distinct()
-    pc<-merge(pc,mindex,by="MonthF")
-    return(pc)
+    mindex<-mxy %>% ungroup() %>% select(MonthF,Month) %>% distinct()
+    setp<-merge(setp,mindex,by="MonthF")
+    return(setp)
 })
 
 #State index
@@ -425,6 +425,10 @@ splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 pc<-rbind_all(splitpc)
 rm(splitpc)
 
+
+```
+
+```{r}
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
