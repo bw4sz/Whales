@@ -46,7 +46,7 @@ ice<-round(ice*-1/1000,3)
 rice<-aggregate(ice,fact=0.1/res(ice))
 
 #coast
-distc<-raster("InputData/dist2coast-2015.tif")
+distc<-raster("InputData/DistancetoCoast.tif")
 rice[rice<0]<-NA
 distc[is.na(rice)]<-NA
 
