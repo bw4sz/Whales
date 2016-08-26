@@ -51,7 +51,7 @@ rice[rice<0]<-NA
 distc[is.na(rice)]<-NA
 
 #read data
-mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -1133643618235885002.csv")
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
 
 ##need to look into making into a movebank object.
 
@@ -78,7 +78,7 @@ mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
-d<-crop(d,y=extent(c(-75,-50,-70,-55)))
+d<-crop(d,y=extent(c(-75,-50,-70,-57)))
 mxy<-as.data.frame(d)
 
 #set datestamp
@@ -110,7 +110,7 @@ oxy<-mxy
 
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
 
@@ -561,6 +561,15 @@ Just the probability of feeding when traveling.
 ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
 ```
 
+Just mean estimate.
+
+```{r}
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.5))
+
+#mean env estimate
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+```
+
 ### Coast
 
 ```{r}
@@ -581,10 +590,10 @@ ggplot(allplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Mont
 
 Zooming in on the top right plot.
 ```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.5))
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.5))
 
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") 
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Switching",fill="Month") 
 ```
 
 Just mean estimate.
