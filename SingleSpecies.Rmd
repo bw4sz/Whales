@@ -262,7 +262,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=18) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=24) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
