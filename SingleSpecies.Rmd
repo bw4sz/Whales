@@ -69,6 +69,10 @@ mxy$Animal<-mxy$individual.local.identifier
 mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
+#remove minke whales
+minke<-c("131117","131118","131120","154184")
+mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
+
 #grab set of animals
 
 #mxy<-mxy[mxy$Animal %in% c("112699","121207","131151","112703","121211","131132","112737","131156","12326","123232","112705","154187","121210","131134","131141","112701","131159","131142","131144","154186","123224"),]
@@ -262,7 +266,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=24) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=20) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
