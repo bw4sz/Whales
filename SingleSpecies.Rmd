@@ -382,7 +382,7 @@ if(newModel){
 ```{r}
 #update function
 recompile(jagM)
-jagM <- update(jagM,n.iter=20000,n.burnin=17000,n.thin=10)
+jagM <- update(jagM,n.iter=20000,n.burnin=17000,n.thin=10) 
 ```
 
 ##Chains
