@@ -28,7 +28,7 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 ```
 
 ```{r,eval=F}
@@ -374,9 +374,15 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=28000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=60000,n.burnin=55000,n.thin=10,DIC=FALSE))
 }
 
+```
+
+```{r}
+#update function
+recompile(jagM)
+jagM <- update(jagM,n.iter=20000,n.burnin=17000,n.thin=10)
 ```
 
 ##Chains
