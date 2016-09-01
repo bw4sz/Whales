@@ -70,8 +70,6 @@ newModel<-F
 lsos <- function(..., n=10) {
     .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
 }
-
-lsos()
 ```
 
 ```{r}
@@ -80,6 +78,8 @@ lsos()
 ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
 ice<-round(ice*-1/1000,3)
 rice<-aggregate(ice,fact=0.1/res(ice))
+
+rm(ice)
 
 #coast
 distc<-raster("InputData/DistancetoCoast.tif")
@@ -198,6 +198,9 @@ astat<-melt(astat,measure.vars=colnames(astat[[1]]))
 astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
 levels(astat$variable)<-"Turning Angle (degrees)"
 ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
+
+#remove move object
+rm(moved)
 ```
 
 #Correlated random walk
@@ -410,7 +413,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=300,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -427,10 +430,17 @@ jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0)
 #check memory size
 lsos()
 
+#delete jags objects
+
+rm(data)
+rm(argos)
+rm(obs)
+rm(j)
+gc()
+
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 
-#delete jags objects
 rm(jagM)
 gc()
 
