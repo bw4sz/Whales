@@ -82,10 +82,10 @@ label: unnamed-chunk-2 (with options)
 List of 1
  $ eval: symbol F
 
-  |                                                                         |...                                                              |   4%
+  |                                                                         |...                                                              |   5%
   ordinary text without R code
 
-  |                                                                         |...                                                              |   5%
+  |                                                                         |....                                                             |   5%
 label: unnamed-chunk-3
   |                                                                         |....                                                             |   6%
   ordinary text without R code
@@ -97,80 +97,76 @@ label: unnamed-chunk-4
 
   |                                                                         |......                                                           |   9%
 label: unnamed-chunk-5
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |......                                                           |  10%
   ordinary text without R code
 
   |                                                                         |.......                                                          |  11%
-label: unnamed-chunk-6 (with options) 
+label: unnamed-chunk-6
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |........                                                         |  12%
+  ordinary text without R code
+
+  |                                                                         |........                                                         |  13%
+label: unnamed-chunk-7 (with options) 
 List of 1
  $ fig.height: num 12
 
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-
-  ordinary text without R code
-
-  |                                                                         |........                                                         |  12%
-label: unnamed-chunk-7 (with options) 
-List of 1
- $ fig.height: num 3
-
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-No id variables; using all as measure variables
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |.........                                                        |  13%
-  ordinary text without R code
-
   |                                                                         |.........                                                        |  14%
+  ordinary text without R code
+
+  |                                                                         |.........                                                        |  15%
 label: unnamed-chunk-8 (with options) 
 List of 1
  $ fig.height: num 3
 
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
+No id variables; using all as measure variables
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
   |                                                                         |..........                                                       |  15%
   ordinary text without R code
 
-  |                                                                         |..........                                                       |  16%
+  |                                                                         |...........                                                      |  16%
 label: unnamed-chunk-9 (with options) 
 List of 1
  $ fig.height: num 3
@@ -179,63 +175,72 @@ List of 1
   |                                                                         |...........                                                      |  17%
   ordinary text without R code
 
-  |                                                                         |...........                                                      |  18%
+  |                                                                         |............                                                     |  18%
 label: unnamed-chunk-10 (with options) 
+List of 1
+ $ fig.height: num 3
+
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+  |                                                                         |............                                                     |  19%
+  ordinary text without R code
+
+  |                                                                         |.............                                                    |  20%
+label: unnamed-chunk-11 (with options) 
 List of 1
  $ fig.height: num 2
 
 Loading required namespace: circular
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |............                                                     |  18%
+  |                                                                         |..............                                                   |  21%
   ordinary text without R code
 
-  |                                                                         |.............                                                    |  19%
-label: unnamed-chunk-11 (with options) 
+  |                                                                         |..............                                                   |  22%
+label: unnamed-chunk-12 (with options) 
 List of 2
  $ fig.height: num 3
  $ fig.width : num 3.5
 
-  |                                                                         |.............                                                    |  20%
-  ordinary text without R code
-
-  |                                                                         |..............                                                   |  21%
-label: unnamed-chunk-12
-  |                                                                         |..............                                                   |  22%
-  ordinary text without R code
-
   |                                                                         |...............                                                  |  23%
-label: unnamed-chunk-13
-Using jStep as value column: use value.var to override.
+  ordinary text without R code
+
   |                                                                         |...............                                                  |  24%
-  ordinary text without R code
-
+label: unnamed-chunk-13
   |                                                                         |................                                                 |  25%
-label: unnamed-chunk-14
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.686643,-63.88896&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-  |                                                                         |.................                                                |  25%
   ordinary text without R code
 
+  |                                                                         |.................                                                |  25%
+label: unnamed-chunk-14
+Using jStep as value column: use value.var to override.
   |                                                                         |.................                                                |  26%
-label: unnamed-chunk-15 (with options) 
+  ordinary text without R code
+
+  |                                                                         |..................                                               |  27%
+label: unnamed-chunk-15
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.686643,-63.88896&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..................                                               |  28%
+  ordinary text without R code
+
+  |                                                                         |...................                                              |  29%
+label: unnamed-chunk-16 (with options) 
 List of 1
  $ fig.height: num 15
 
-  |                                                                         |..................                                               |  27%
+  |                                                                         |....................                                             |  30%
   ordinary text without R code
 
-  |                                                                         |..................                                               |  28%
-label: unnamed-chunk-16 (with options) 
+  |                                                                         |....................                                             |  31%
+label: unnamed-chunk-17 (with options) 
 List of 2
  $ fig.height: num 3
  $ fig.width : num 5
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |...................                                              |  29%
+  |                                                                         |.....................                                            |  32%
   ordinary text without R code
 
-  |                                                                         |...................                                              |  30%
-label: unnamed-chunk-17 (with options) 
+  |                                                                         |.....................                                            |  33%
+label: unnamed-chunk-18 (with options) 
 List of 2
  $ child: chr "Bayesian/MultiSpecies.R"
  $ eval : symbol T
@@ -247,18 +252,34 @@ processing file: ./Bayesian/MultiSpecies.R
   ordinary text without R code
 
 
-  |                                                                         |....................                                             |  31%
+  |                                                                         |......................                                           |  34%
   ordinary text without R code
 
-  |                                                                         |.....................                                            |  32%
-label: unnamed-chunk-18 (with options) 
+  |                                                                         |......................                                           |  35%
+label: unnamed-chunk-19 (with options) 
 List of 1
  $ eval: symbol T
 
-Quitting from lines 366-380 (SingleSpecies.Rmd) 
-Error in checkForRemoteErrors(lapply(cl, recvResult)) : 
-  2 nodes produced errors; first error: n.iter must be a positive integer
-Calls: <Anonymous> ... tryCatchList -> clusterCall -> checkForRemoteErrors
+  |                                                                         |.......................                                          |  35%
+  ordinary text without R code
+
+  |                                                                         |........................                                         |  36%
+label: unnamed-chunk-20 (with options) 
+List of 1
+ $ eval: symbol F
+
+  |                                                                         |........................                                         |  37%
+  ordinary text without R code
+
+  |                                                                         |.........................                                        |  38%
+label: unnamed-chunk-21 (with options) 
+List of 1
+ $ eval: symbol T
+
+Quitting from lines 426-484 (SingleSpecies.Rmd) 
+Error in `[.data.frame`(data.frame(str_match(x$par, "(\\w+)\\[(\\d+),(\\d+),(\\d+)]")),  : 
+  undefined columns selected
+Calls: <Anonymous> ... withVisible -> eval -> eval -> lapply -> FUN -> [ -> [.data.frame
 In addition: There were 45 warnings (use warnings() to see them)
 
 Execution halted
