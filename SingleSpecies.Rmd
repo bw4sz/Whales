@@ -39,6 +39,42 @@ newModel<-F
 ```
 
 ```{r}
+#memory function
+
+# improved list of objects
+.ls.objects <- function (pos = 1, pattern, order.by,
+                        decreasing=FALSE, head=FALSE, n=5) {
+    napply <- function(names, fn) sapply(names, function(x)
+                                         fn(get(x, pos = pos)))
+    names <- ls(pos = pos, pattern = pattern)
+    obj.class <- napply(names, function(x) as.character(class(x))[1])
+    obj.mode <- napply(names, mode)
+    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
+    obj.prettysize <- napply(names, function(x) {
+                           capture.output(format(utils::object.size(x), units = "auto")) })
+    obj.size <- napply(names, object.size)
+    obj.dim <- t(napply(names, function(x)
+                        as.numeric(dim(x))[1:2]))
+    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
+    obj.dim[vec, 1] <- napply(names, length)[vec]
+    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)
+    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")
+    if (!missing(order.by))
+        out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    if (head)
+        out <- head(out, n)
+    out
+}
+
+# shorthand
+lsos <- function(..., n=10) {
+    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+}
+
+lsos()
+```
+
+```{r}
 #raster layers
 #ice
 ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
@@ -374,7 +410,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=47000,n.thin=10,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=47000,n.thin=10,DIC=FALSE))
 }
 
 ```
@@ -382,13 +418,22 @@ if(newModel){
 ```{r,eval=F}
 #update function
 recompile(jagM)
-jagM <- update(jagM,n.iter=20000,n.burnin=17000,n.thin=10) 
+jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0) 
 ```
 
 ##Chains
 ```{r,eval=T}
+
+#check memory size
+lsos()
+
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
+
+#delete jags objects
+rm(jagM)
+gc()
+
 colnames(pc)<-c("Draw","chain","par","value")
 
 #extract parameter name
@@ -902,6 +947,8 @@ ggplot(mdf,aes(y=value,x=log(C1KRIcatchKG),col=Month)) + geom_point() + theme_bw
 
 
 ```{r}
+#check out the memory sizing
+lsos()
 #notify end of run
 #size of the run
 gc()
