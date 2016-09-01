@@ -460,14 +460,6 @@ splitpc[c("beta","beta2")]<-lapply(splitpc[c("beta","beta2")],function(x){
     return(setp)
 })
 
-#State index
-splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
-    #As matrices
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
-    colnames(sv)<-c("Animal","Track","step")
-    pc<-data.frame(x,sv)
-})
-
 #Three index
 splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
 #As matrices
