@@ -4,10 +4,11 @@ author: "Ben Weinstein"
 date: "`r Sys.time()`"
 output: 
   html_document:
-    keep_md: true
-    number_sections: true
-    toc: true
+    keep_md: yes
+    number_sections: yes
+    self_contained: no
     theme: spacelab
+    toc: yes
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
