@@ -7,11 +7,6 @@ Ben Weinstein
 
 
 
-```
-##              Type Size     PrettySize Rows Columns
-## lsos     function 5184   [1] "5.1 Kb"   NA      NA
-## newModel  logical   48 [1] "48 bytes"    1      NA
-```
 
 
 
@@ -266,8 +261,8 @@ sink()
 
 
 ```
-##     user   system  elapsed 
-##  492.931    1.857 2283.980
+##    user  system elapsed 
+##    1.85    0.24  302.84
 ```
 
 
@@ -275,23 +270,29 @@ sink()
 ##Chains
 
 ```
-##                         Type      Size     PrettySize  Rows Columns
-## jagM          rjags.parallel 473960744   [1] "452 Mb"     6      NA
-## ice              RasterLayer 144011608 [1] "137.3 Mb"  3000    6000
-## data                    list  68284944  [1] "65.1 Mb"    11      NA
-## argos                  array  42969704    [1] "41 Mb"    34      21
-## obs                    array  42969704    [1] "41 Mb"    34      21
-## d     SpatialPointsDataFrame  26388136  [1] "25.2 Mb" 52492      60
-## mdat              data.frame  26066656  [1] "24.9 Mb" 57230      57
-## oxy               data.frame  21585864  [1] "20.6 Mb" 49938      64
-## j                      array  21492400  [1] "20.5 Mb"    34      21
-## moved              MoveStack  20413880  [1] "19.5 Mb" 49938      54
+##                         Type     Size    PrettySize  Rows Columns
+## jagM          rjags.parallel 29711288 [1] "28.3 Mb"     6      NA
+## mdat              data.frame 26066656 [1] "24.9 Mb" 57230      57
+## m                      ggmap 13116432 [1] "12.5 Mb"  1280    1280
+## d     SpatialPointsDataFrame  7933544  [1] "7.6 Mb"  8130      60
+## oxy               data.frame  3443496  [1] "3.3 Mb"  7942      64
+## sxy                     list  1994704  [1] "1.9 Mb"    21      NA
+## mxy               grouped_df  1871176  [1] "1.8 Mb"  3803      69
+## data                    list  1128208  [1] "1.1 Mb"    11      NA
+## argos                  array   691176  [1] "675 Kb"     2      12
+## obs                    array   691176  [1] "675 Kb"     2      12
 ```
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1517576  81.1    3205452  171.2   3205452  171.2
-## Vcells 47164675 359.9  187700905 1432.1 234625905 1790.1
+##            used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1496363 80.0    2637877 140.9  2637877 140.9
+## Vcells 12484315 95.3   39320772 300.0 56648713 432.2
+```
+
+```
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1491440 79.7    2637877 140.9  2637877 140.9
+## Vcells 9601044 73.3   31456617 240.0 56648713 432.2
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
@@ -309,40 +310,36 @@ sink()
 
 ```
 ##    parameter         par        mean       lower       upper
-## 1   alpha_mu alpha_mu[1] -1.47436244 -3.79904105 -0.09925083
-## 2   alpha_mu alpha_mu[2] -1.70260919 -1.95561670 -1.37162709
-## 3       beta   beta[1,1] -0.74892843 -3.16326261  1.13157745
-## 4       beta   beta[2,1] -1.02252400 -3.04885313  0.80695037
-## 5       beta   beta[3,1] -0.23647847 -2.27068598  1.65930299
-## 6       beta   beta[4,1]  0.04877074 -0.88078715  0.98928146
-## 7       beta   beta[5,1] -0.55859554 -2.63992839  1.34575749
-## 8       beta   beta[6,1] -0.44206366 -2.46222585  1.51614611
-## 9       beta   beta[1,2]  0.00000000  0.00000000  0.00000000
-## 10      beta   beta[2,2]  0.00000000  0.00000000  0.00000000
-## 11      beta   beta[3,2]  0.00000000  0.00000000  0.00000000
-## 12      beta   beta[4,2]  0.00000000  0.00000000  0.00000000
-## 13      beta   beta[5,2]  0.00000000  0.00000000  0.00000000
-## 14      beta   beta[6,2]  0.00000000  0.00000000  0.00000000
-## 15     beta2  beta2[1,1] -0.50675211 -1.74999368  0.04058361
-## 16     beta2  beta2[2,1] -0.61463152 -1.92114437  0.02971938
-## 17     beta2  beta2[3,1] -0.61175123 -2.32023438  0.03087522
-## 18     beta2  beta2[4,1]  0.02178906  0.01008166  0.03593939
-## 19     beta2  beta2[5,1] -0.44411203 -1.80089022  0.21468365
-## 20     beta2  beta2[6,1] -0.42955888 -2.16435304  0.22553022
-## 21     beta2  beta2[1,2]  0.00000000  0.00000000  0.00000000
-## 22     beta2  beta2[2,2]  0.00000000  0.00000000  0.00000000
-## 23     beta2  beta2[3,2]  0.00000000  0.00000000  0.00000000
-## 24     beta2  beta2[4,2]  0.00000000  0.00000000  0.00000000
-## 25     beta2  beta2[5,2]  0.00000000  0.00000000  0.00000000
-## 26     beta2  beta2[6,2]  0.00000000  0.00000000  0.00000000
-## 27  beta2_mu beta2_mu[1] -0.39762275 -1.36525446  0.11505955
-## 28  beta2_mu beta2_mu[2]  0.00000000  0.00000000  0.00000000
-## 29   beta_mu  beta_mu[1] -0.44910273 -1.66196289  0.44156361
-## 30   beta_mu  beta_mu[2]  0.00000000  0.00000000  0.00000000
-## 31     gamma    gamma[1]  1.16088308  0.90533524  1.42583702
-## 32     gamma    gamma[2]  0.29772712  0.13050172  0.43777810
-## 33     theta    theta[1] -0.01068402 -0.04667164  0.01850577
-## 34     theta    theta[2]  6.18712700  6.09807415  6.24955245
+## 1   alpha_mu alpha_mu[1] -0.96186842 -3.50549371  1.63657003
+## 2   alpha_mu alpha_mu[2]  0.59121895 -1.79674752  3.24489361
+## 3       beta   beta[1,1]  0.21538466 -2.85255567  2.88795455
+## 4       beta   beta[2,1]  0.53873503 -2.47186522  3.37309464
+## 5       beta   beta[3,1]  0.45485619 -2.19903357  3.35863224
+## 6       beta   beta[4,1]  0.55599632 -2.24198234  3.48079918
+## 7       beta   beta[5,1]  0.16276653 -2.80347699  3.29991559
+## 8       beta   beta[1,2]  0.00000000  0.00000000  0.00000000
+## 9       beta   beta[2,2]  0.00000000  0.00000000  0.00000000
+## 10      beta   beta[3,2]  0.00000000  0.00000000  0.00000000
+## 11      beta   beta[4,2]  0.00000000  0.00000000  0.00000000
+## 12      beta   beta[5,2]  0.00000000  0.00000000  0.00000000
+## 13   beta_mu  beta_mu[1]  0.38788331 -1.76786224  2.55801932
+## 14   beta_mu  beta_mu[2]  0.00000000  0.00000000  0.00000000
+## 15     beta2  beta2[1,1] -1.85955323 -4.37682736 -0.22298533
+## 16     beta2  beta2[2,1] -1.78439248 -4.17171631 -0.49847004
+## 17     beta2  beta2[3,1] -1.85084633 -4.18411487 -0.42928758
+## 18     beta2  beta2[4,1] -1.73403601 -4.17343944 -0.24105829
+## 19     beta2  beta2[5,1] -1.07793301 -4.25671057  0.30968408
+## 20     beta2  beta2[1,2]  0.00000000  0.00000000  0.00000000
+## 21     beta2  beta2[2,2]  0.00000000  0.00000000  0.00000000
+## 22     beta2  beta2[3,2]  0.00000000  0.00000000  0.00000000
+## 23     beta2  beta2[4,2]  0.00000000  0.00000000  0.00000000
+## 24     beta2  beta2[5,2]  0.00000000  0.00000000  0.00000000
+## 25  beta2_mu beta2_mu[1] -1.50654379 -3.75695277 -0.28775758
+## 26  beta2_mu beta2_mu[2]  0.00000000  0.00000000  0.00000000
+## 27     gamma    gamma[1]  1.06718093  0.78679965  1.41921474
+## 28     gamma    gamma[2]  0.37542745  0.19924033  0.53489391
+## 29     theta    theta[1] -0.00444458 -0.08423803  0.09554119
+## 30     theta    theta[2]  3.29740006  0.34551004  6.17409858
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
@@ -409,230 +406,6 @@ Just mean estimate.
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
-
-```
-## 
-## $`3`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-3.png)<!-- -->
-
-```
-## 
-## $`4`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-4.png)<!-- -->
-
-```
-## 
-## $`5`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-5.png)<!-- -->
-
-```
-## 
-## $`6`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-6.png)<!-- -->
-
-```
-## 
-## $`7`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-7.png)<!-- -->
-
-```
-## 
-## $`8`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-8.png)<!-- -->
-
-```
-## 
-## $`9`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-9.png)<!-- -->
-
-```
-## 
-## $`10`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-10.png)<!-- -->
-
-```
-## 
-## $`11`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-11.png)<!-- -->
-
-```
-## 
-## $`12`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-12.png)<!-- -->
-
-```
-## 
-## $`13`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-13.png)<!-- -->
-
-```
-## 
-## $`14`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-14.png)<!-- -->
-
-```
-## 
-## $`15`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-15.png)<!-- -->
-
-```
-## 
-## $`16`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-16.png)<!-- -->
-
-```
-## 
-## $`17`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-17.png)<!-- -->
-
-```
-## 
-## $`18`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-18.png)<!-- -->
-
-```
-## 
-## $`19`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-19.png)<!-- -->
-
-```
-## 
-## $`20`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-20.png)<!-- -->
-
-```
-## 
-## $`21`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-21.png)<!-- -->
-
-```
-## 
-## $`22`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-22.png)<!-- -->
-
-```
-## 
-## $`23`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-23.png)<!-- -->
-
-```
-## 
-## $`24`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-24.png)<!-- -->
-
-```
-## 
-## $`25`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-25.png)<!-- -->
-
-```
-## 
-## $`26`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-26.png)<!-- -->
-
-```
-## 
-## $`27`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-27.png)<!-- -->
-
-```
-## 
-## $`28`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-28.png)<!-- -->
-
-```
-## 
-## $`29`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-29.png)<!-- -->
-
-```
-## 
-## $`30`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-30.png)<!-- -->
-
-```
-## 
-## $`31`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-31.png)<!-- -->
-
-```
-## 
-## $`32`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-32.png)<!-- -->
-
-```
-## 
-## $`33`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-33.png)<!-- -->
-
-```
-## 
-## $`34`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-34.png)<!-- -->
 
 ##Log Odds of Foraging
 
@@ -705,21 +478,21 @@ Blue = Better Foraging in May
 
 
 ```
-##                         Type      Size     PrettySize    Rows Columns
-## ice              RasterLayer 144011608 [1] "137.3 Mb"    3000    6000
-## pc                    tbl_df  90943168  [1] "86.7 Mb" 1614400      12
-## data                    list  68284944  [1] "65.1 Mb"      11      NA
-## argos                  array  42969704    [1] "41 Mb"      34      21
-## obs                    array  42969704    [1] "41 Mb"      34      21
-## d     SpatialPointsDataFrame  26388136  [1] "25.2 Mb"   52492      60
-## mdat              data.frame  26066656  [1] "24.9 Mb"   57230      57
-## oxy               data.frame  21585864  [1] "20.6 Mb"   49938      64
-## j                      array  21492400  [1] "20.5 Mb"      34      21
-## moved              MoveStack  20413880  [1] "19.5 Mb"   49938      54
+##                            Type     Size      PrettySize   Rows Columns
+## pc                       tbl_df 30309904   [1] "28.9 Mb" 540000      12
+## mdat                 data.frame 26066656   [1] "24.9 Mb"  57230      57
+## temp                      ggmap 13116048   [1] "12.5 Mb"   1280    1280
+## d        SpatialPointsDataFrame  7933544    [1] "7.6 Mb"   8130      60
+## oxy                  data.frame  3443496    [1] "3.3 Mb"   7942      64
+## sxy                        list  1693456    [1] "1.6 Mb"      2      NA
+## mxy                  data.frame  1669496    [1] "1.6 Mb"   3526      70
+## allplot              grouped_df  1031880 [1] "1007.7 Kb"  19780       7
+## monthras                   list   858576  [1] "838.5 Kb"      5      NA
+## mdf                  data.frame   650704  [1] "635.5 Kb"   9515      11
 ```
 
 ```
-##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1660289  88.7    5695528  304.2  14442815  771.4
-## Vcells 118417998 903.5  376882324 2875.4 443504726 3383.7
+##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
+## Ncells  1621821  86.7    5289763 282.6  16143078  862.2
+## Vcells 20087661 153.3  120833612 921.9 271028039 2067.8
 ```
