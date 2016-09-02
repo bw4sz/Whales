@@ -6,7 +6,10 @@ output:
   html_document:
     keep_md: yes
     number_sections: yes
-    self_contained: no
+    pandoc_args: [ 
+      "+RTS", "-K64m", 
+      "-RTS" 
+    ]     
     theme: spacelab
     toc: yes
 ---
@@ -414,7 +417,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=200,n.burnin=0,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=300,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
