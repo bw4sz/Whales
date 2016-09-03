@@ -4,6 +4,10 @@ author: "Ben Weinstein"
 date: "`r Sys.time()`"
 output: 
   html_document:
+      pandoc_args: [
+      "+RTS", "-K64m",
+      "-RTS"
+    ]
     keep_md: yes
     number_sections: yes
     theme: spacelab
