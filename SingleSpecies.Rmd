@@ -407,7 +407,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=T}
+```{r,child="Bayesian/MultiSpecies.R",eval=F}
 ```
 
 ```{r,eval=T}
@@ -760,7 +760,7 @@ m<-rasterize(x=msp,y=r,field="phi")
 
 temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-mapview(m)
+plot(m)
 
 #ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
@@ -785,7 +785,7 @@ rice[rice<0]<-NA
 #Traveling
 travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
 
-mapview(travpar)
+plot(travpar)
 
 #travdf<-data.frame(rasterToPoints(travpar))
   
@@ -804,7 +804,7 @@ rice[rice<0]<-NA
 travpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
 #travdf<-data.frame(rasterToPoints(travpar))
 
-mapview(travpar)
+plot(travpar)
 #ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-57.5)
 ```
 
@@ -819,9 +819,9 @@ s<-stack(rice,distc)
 #Traveling
 travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
 
-mapview(travpar)
+plot(travpar)
 
-#travdf<-data.frame(rasterToPoints(travpar))
+travdf<-data.frame(rasterToPoints(travpar))
 
 #ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-57.5) + labs(x="",y="")
 ```
