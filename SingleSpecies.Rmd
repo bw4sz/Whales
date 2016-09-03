@@ -4,14 +4,13 @@ author: "Ben Weinstein"
 date: "`r Sys.time()`"
 output: 
   html_document:
-      pandoc_args: [
-      "+RTS", "-K64m",
-      "-RTS"
-    ]
     keep_md: yes
     number_sections: yes
     theme: spacelab
     toc: yes
+    pandoc_args: [
+      "+RTS", "-K64m","-RTS"
+    ]
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
@@ -121,8 +120,12 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
-d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy)
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
+)
 d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
+#give it a geospatial layer
+
+
 mxy<-as.data.frame(d)
 
 #set datestamp
