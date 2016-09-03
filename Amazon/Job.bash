@@ -17,6 +17,7 @@ iid=$(ec2metadata --instance-id)
 git checkout -b $iid
 
 #render script
+Rscript SingleSpecies.Rmd &> firstrun.txt
 Rscript -e "rmarkdown::render('SingleSpecies.Rmd')" &> run.txt
 
 #push results

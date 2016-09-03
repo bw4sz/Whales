@@ -6,16 +6,14 @@ output:
   html_document:
     keep_md: yes
     number_sections: yes
+    self_contained: no
     theme: spacelab
     toc: yes
-    pandoc_args: [
-      "+RTS", "-K64m","-RTS"
-    ]
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
-opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F,self.contained = FALSE)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
 library(boot)
 library(raster)
 library(reshape2)
@@ -143,6 +141,7 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
+
 ```
 
 #Descriptive Statistics
@@ -154,6 +153,9 @@ mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```{r}
 #hold copy of orig
 oxy<-mxy
+
+#remake spatial object
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
 
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
@@ -754,11 +756,13 @@ res(r)<-0.1
 m<-rasterize(x=msp,y=r,field="phi")
 
 #plotting
-feedmap <- data.frame(rasterToPoints(m))
+#feedmap <- data.frame(rasterToPoints(m))
 
 temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
+mapview(m)
+
+#ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
 #Environmental Prediction - Probability of Foraging across time
@@ -780,9 +784,12 @@ rice[rice<0]<-NA
 
 #Traveling
 travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
-travdf<-data.frame(rasterToPoints(travpar))
+
+mapview(travpar)
+
+#travdf<-data.frame(rasterToPoints(travpar))
   
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1)) + xlim(-75,-50) + ylim(-70,-57.5) 
+#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1)) + xlim(-75,-50) + ylim(-70,-57.5) 
 ```
 
 ## Distance to coast
@@ -795,9 +802,10 @@ rice[rice<0]<-NA
 
 #Traveling
 travpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
-travdf<-data.frame(rasterToPoints(travpar))
+#travdf<-data.frame(rasterToPoints(travpar))
 
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-57.5)
+mapview(travpar)
+#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-57.5)
 ```
 
 ##All variables
@@ -811,9 +819,11 @@ s<-stack(rice,distc)
 #Traveling
 travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
 
-travdf<-data.frame(rasterToPoints(travpar))
+mapview(travpar)
 
-ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-57.5) + labs(x="",y="")
+#travdf<-data.frame(rasterToPoints(travpar))
+
+#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-57.5) + labs(x="",y="")
 ```
 
 # Overlap with Krill Fishery
