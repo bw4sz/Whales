@@ -121,7 +121,7 @@ mxy<-mxy[!is.na(mxy$x),]
 
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
-)
+
 d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
 #give it a geospatial layer
 
