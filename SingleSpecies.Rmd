@@ -493,12 +493,6 @@ rm(splitpc)
 
 ```
 
-```{r}
-#stop running
-opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F,eval=F)
-```
-
-
 ```{r,fig.height=20}
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
@@ -703,7 +697,6 @@ mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
 rm(behav_chains)
 ```
 
-
 ##Spatial Prediction
 
 ```{r}
@@ -716,9 +709,9 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),siz
 sxy<-split(mxy,mxy$Animal)
 spp<-lapply(sxy,function(x){
   pp<-bbox(cbind(x$x,x$y))
-  m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite",color="bw")
-  ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
-    #ggplot()+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
+  #m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite",color="bw")
+  #ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
+    ggplot()+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
  
 })
 spp
@@ -768,6 +761,11 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 plot(m)
 
 #ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
+```
+
+```{r}
+#stop running
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F,eval=F)
 ```
 
 #Environmental Prediction - Probability of Foraging across time
