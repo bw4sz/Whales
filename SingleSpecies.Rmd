@@ -11,6 +11,8 @@ output:
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
+#extra pandoc.
+#["-M2GB", "+RTS", "-K64m", "-RTS"]
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
 library(boot)
@@ -706,16 +708,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),siz
 
 ### Per Animal
 ```{r}
-sxy<-split(mxy,mxy$Animal)
-spp<-lapply(sxy,function(x){
-  pp<-bbox(cbind(x$x,x$y))
-  #m <- get_map(location=pp,source="google",zoom=6,scale=2,maptype="satellite",color="bw")
-  #ggmap(m)+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
-    ggplot()+geom_path(data=x, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset()
- 
-})
-spp
-
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() + facet_wrap(~Animal,scale="free")
 ```
 
 ##Log Odds of Foraging
