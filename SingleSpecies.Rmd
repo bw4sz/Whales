@@ -6,7 +6,6 @@ output:
   html_document:
     keep_md: yes
     number_sections: yes
-    self_contained: no
     theme: spacelab
     toc: yes
 ---
@@ -407,7 +406,7 @@ ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
 
-```{r,child="Bayesian/MultiSpecies.R",eval=F}
+```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
 ```{r,eval=T}
@@ -493,6 +492,12 @@ rm(splitpc)
 
 
 ```
+
+```{r}
+#stop running
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F,eval=F)
+```
+
 
 ```{r,fig.height=20}
 #plot all but phi and state
