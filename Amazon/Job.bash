@@ -2,7 +2,7 @@
 
 #clean temp file for memory utility
 rm -rf /var/tmp/aws-mon.bak
-mv /var/tmp/aws-mon /var/tmp/aws-mon.bak -f
+mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
 
 #clone
 git clone git@github.com:bw4sz/Whales.git --depth 1
