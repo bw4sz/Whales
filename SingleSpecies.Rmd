@@ -8,11 +8,12 @@ output:
     number_sections: yes
     theme: spacelab
     toc: yes
+    pandoc_args: [
+    "-M2GB", "+RTS", "-K64m", "-RTS"
+    ]
 ---
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
-#extra pandoc.
-#["-M2GB", "+RTS", "-K64m", "-RTS"]
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
 library(boot)
