@@ -175,7 +175,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + fac
 
 ##Distance
 
-```{r,fig.height=3}
+```{r,fig.height=3,eval=F}
 moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
 dstat<-melt(move::distanceSummary(moved))
 
@@ -185,7 +185,7 @@ ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="
 ```
 
 ##Time 
-```{r,fig.height=3}
+```{r,fig.height=3,eval=F}
 tstat<-move::timeSummary(moved)
 tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
 tstat<-droplevels(tstat[tstat$variable %in% c("Duration","AverDur"),])
@@ -194,7 +194,7 @@ ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free"
 ```
 
 ##Velocity
-```{r,fig.height=3}
+```{r,fig.height=3,eval=F}
 vstat<-move::speedSummary(moved)
 vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
 levels(vstat$variable)<-c("Average Speed (m/s)","Variance in Speed (m/s)","Max Speed (m/s)")
@@ -203,7 +203,7 @@ ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free"
 
 ##Angles
 
-```{r,fig.height=2}
+```{r,fig.height=2,eval=F}
 astat<-move::angleSummary(moved)
 astat<-melt(astat,measure.vars=colnames(astat[[1]]))
 astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
