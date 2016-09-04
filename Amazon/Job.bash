@@ -1,8 +1,9 @@
 #!/bin/bash 
 
-#clone
+#clean temp file for memory utility
 mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
 
+#clone
 git clone git@github.com:bw4sz/Whales.git --depth 1
 
 cd Whales||sudo halt
