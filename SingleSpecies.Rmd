@@ -916,5 +916,5 @@ lsos()
 #notify end of run
 #size of the run
 gc()
-save.image("SingleSpecies.RData")
+#save.image("SingleSpecies.RData")
 ```
