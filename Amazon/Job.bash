@@ -1,7 +1,8 @@
 #!/bin/bash 
 
 #clean temp file for memory utility
-mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
+rm -rf /var/tmp/aws-mon.bak
+mv /var/tmp/aws-mon /var/tmp/aws-mon.bak -f
 
 #clone
 git clone git@github.com:bw4sz/Whales.git --depth 1
