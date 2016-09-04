@@ -1,6 +1,8 @@
 #!/bin/bash 
 
 #clone
+mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
+
 git clone git@github.com:bw4sz/Whales.git --depth 1
 
 cd Whales||sudo halt
