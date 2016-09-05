@@ -114,7 +114,7 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
 
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -708,8 +708,8 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),siz
 ```
 
 ### Per Animal
-```{r,eval=F}
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() + facet_wrap(~Animal,scale="free")
+```{r,eval=T}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() + facet_wrap(~Animal,scale="free")
 ```
 
 ##Log Odds of Foraging
@@ -752,9 +752,9 @@ m<-rasterize(x=msp,y=r,field="phi")
 
 temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-plot(m)
+#plot(m)
 
-#ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
+ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
 #Environmental Prediction - Probability of Foraging across time
