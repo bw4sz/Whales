@@ -29,6 +29,8 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(move)
+library(doSNOW)
+library(foreach)
 
 #Source model file
 source("RunModel.R")
@@ -259,7 +261,8 @@ Looping through each covariate.
 names_of_vars<-c("ocean","coast","SST","ChloroA","WaveH","NPP","Ice")
 
 posteriors<-list()
-for (x in 1:length(names_of_vars)){
+
+foreach(x=1:length(names_of_vars)) %dopar% {
   posteriors[[x]]<-runModel(names_of_vars[[x]],mxy)
 }
 
