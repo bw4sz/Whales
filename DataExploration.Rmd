@@ -262,9 +262,12 @@ names_of_vars<-c("ocean","coast","SST","ChloroA","WaveH","NPP","Ice")
 
 posteriors<-list()
 
+cl<-makeCluster(4,"SOCK")
+registerDoSNOW(cl)
 foreach(x=1:length(names_of_vars)) %dopar% {
   posteriors[[x]]<-runModel(names_of_vars[[x]],mxy)
 }
+stopCluster(cl)
 
 #Name by variable
 names(posteriors)<-names_of_vars
