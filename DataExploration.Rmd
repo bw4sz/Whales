@@ -262,9 +262,9 @@ names_of_vars<-c("ocean","coast","SST","ChloroA","WaveH","NPP","Ice")
 
 posteriors<-list()
 
-cl<-makeCluster(4,"SOCK")
+cl<-makeCluster(2,"SOCK")
 registerDoSNOW(cl)
-foreach(x=1:length(names_of_vars)) %dopar% {
+foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags")) %dopar% {
   posteriors[[x]]<-runModel(names_of_vars[[x]],mxy)
 }
 stopCluster(cl)
