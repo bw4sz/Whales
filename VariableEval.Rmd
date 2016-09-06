@@ -126,8 +126,8 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Mean.
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=MODIS.Ocean.Terra.OceanColor.4km.Monthly.Chlorophyll.A),size=.5)  + scale_color_continuous(low='blue',high='red')
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=MODIS.Ocean.Terra.OceanColor.4km.Monthly.Daytime.SST),size=.5)  + scale_color_continuous(low='blue',high='red')
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=MODIS.Ocean.Terra.OceanColor.4km.Monthly.Daytime.SST,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red')
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height),size=.5)  + scale_color_continuous(low='blue',high='red')
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red')
 
 ```

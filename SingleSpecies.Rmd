@@ -77,17 +77,6 @@ lsos <- function(..., n=10) {
 
 ```{r}
 #raster layers
-#ice
-ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
-ice<-round(ice*-1/1000,3)
-rice<-aggregate(ice,fact=0.1/res(ice))
-
-rm(ice)
-
-#coast
-distc<-raster("InputData/DistancetoCoast.tif")
-rice[rice<0]<-NA
-distc[is.na(rice)]<-NA
 
 #read data
 mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
@@ -100,6 +89,9 @@ mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
 mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
 mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
+mdat$WaveH<-mdat$ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height
+mdat$NPP<-mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP
+mdat$Ice<-ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -114,7 +106,7 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
 
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -171,47 +163,6 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 mxy$Month<-factor(mxy$Month,levels=month.name)
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month) + scale_color_discrete(guide="none")
-```
-
-##Distance
-
-```{r,fig.height=3,eval=F}
-moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
-dstat<-melt(move::distanceSummary(moved))
-
-dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
-levels(dstat$variable)<-c("Total Distance","Average Distance Between Points","Farthest Distance Between Points")
-ggplot(dstat,aes(value/1000)) + geom_histogram() + facet_wrap(~variable,scales="free") + labs(x="Kilometers")
-```
-
-##Time 
-```{r,fig.height=3,eval=F}
-tstat<-move::timeSummary(moved)
-tstat<-melt(tstat,measure.vars=colnames(tstat[[1]]))
-tstat<-droplevels(tstat[tstat$variable %in% c("Duration","AverDur"),])
-levels(tstat$variable)<-c("Total Time (Hours)","Average Time Between Points (Hours)")
-ggplot(tstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-```
-
-##Velocity
-```{r,fig.height=3,eval=F}
-vstat<-move::speedSummary(moved)
-vstat<-melt(vstat,measure.vars=colnames(vstat[[1]]))
-levels(vstat$variable)<-c("Average Speed (m/s)","Variance in Speed (m/s)","Max Speed (m/s)")
-ggplot(vstat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-```
-
-##Angles
-
-```{r,fig.height=2,eval=F}
-astat<-move::angleSummary(moved)
-astat<-melt(astat,measure.vars=colnames(astat[[1]]))
-astat<-droplevels(astat[astat$variable %in% "AverAzimuth",])
-levels(astat$variable)<-"Turning Angle (degrees)"
-ggplot(astat,aes(value)) + geom_histogram() + facet_wrap(~variable,scales="free")
-
-#remove move object
-rm(moved)
 ```
 
 #Correlated random walk
@@ -412,6 +363,8 @@ ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per A
 ```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
+# Data Exploration
+
 ```{r,eval=T}
 #source jags file
 source("Bayesian/MultiSpecies.R")
@@ -424,7 +377,7 @@ data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tra
 pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=48000,n.thin=20,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -500,7 +453,6 @@ rm(splitpc)
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
-
 
 ```{r,eval=F}
 #write.csv
