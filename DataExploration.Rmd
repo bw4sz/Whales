@@ -47,7 +47,7 @@ mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -30850
 #Create a oceandepth in km 
 mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
-mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
+mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
 mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
 mdat$WaveH<-mdat$ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height
 mdat$NPP<-mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP
@@ -297,13 +297,15 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange(aes(col=L1
 #get the posterior estimates of the env function
 plotall<-list()
   
-  for(x in 1:length(posteriors)){
-    plotall[[x]]<-posteriors[[x]] %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy[[names(posteriors)[x]]]))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))  
+  for(j in 1:length(posteriors)){
+    plotall[[j]]<-posteriors[[j]] %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy[[names(posteriors)[j]]]))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y,na.rm=T),lower=quantile(y,0.05,na.rm=T),upper=quantile(y,0.95,na.rm=T))  
   }
 names(plotall)<-names_of_vars
 plotall<-melt(plotall,id.vars=colnames(plotall[[1]]))
 
 ggplot(plotall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
+
+ggplot(plotall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
 ```
 
 ## By Month
@@ -312,14 +314,14 @@ ggplot(plotall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),a
 
 monthall<-list()
   
-  for(x in 1:length(posteriors)){
+  for(j in 1:length(posteriors)){
     
   #get the posterior estimates of the env function
-  postplot_alpha<-posteriors[[x]] %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
-  postplot_beta<-posteriors[[x]] %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+  postplot_alpha<-posteriors[[j]] %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+  postplot_beta<-posteriors[[j]] %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
   postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
 
-  monthall[[x]]<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy[[names(posteriors)[x]]]))) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
+  monthall[[j]]<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy[[names(posteriors)[j]]]))) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y,na.rm=T),lower=quantile(y,0.05,na.rm=T),upper=quantile(y,0.95,na.rm=T))
    }
 
 names(monthall)<-names_of_vars
@@ -327,12 +329,11 @@ monthall<-melt(monthall,id.vars=colnames(monthall[[1]]))
 
 monthall$Month<-factor(monthall$Month,levels=month.name)
 
-ggplot(monthall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
+ggplot(monthall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability of foraging when traveling",fill="Transition") + facet_wrap(~L1,scales="free")
 
-ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
+ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching to Foraging to Traveling",fill="Transition") + facet_wrap(~L1,scales="free")
 
 ```
-
 
 ```{r}
 #check out the memory sizing
