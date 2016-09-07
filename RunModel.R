@@ -52,7 +52,7 @@ runModel<-function(variable_name,mxy){
   #paramters to track
   pt<-c("theta","gamma","alpha_mu","beta_mu","beta")
   
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5,n.burnin=0,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=2800,n.thin=2,DIC=FALSE))
 
   #delete jags objects
   rm(data)

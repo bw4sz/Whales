@@ -68,7 +68,7 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
 
-mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
