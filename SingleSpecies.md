@@ -21,17 +21,17 @@ Ben Weinstein
 
 ##Distance
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 
 ##Time 
-![](SingleSpecies_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 
 ##Velocity
-![](SingleSpecies_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 
 ##Angles
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 
 #Correlated random walk
 
@@ -107,11 +107,162 @@ How did the filter change the extent of tracks?
 ![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
 
 
+sink("Bayesian/Multi_RW.jags")
+cat("
+    model{
+    
+    #Constants
+    pi <- 3.141592653589
+    
+    ##argos observation error##
+    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    
+    #Constructing the covariance matrix
+    argos_cov[1,1] <- 1
+    argos_cov[1,2] <- sqrt(argos_alpha) * rho
+    argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    argos_cov[2,2] <- argos_alpha
+    
+    for(i in 1:ind){
+    for(g in 1:tracks[i]){
+    
+    ## Priors for first true location
+    #for lat long
+    y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec)
+    
+    #First movement - random walk.
+    y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
+    
+    ###First Behavioral State###
+    state[i,g,1] ~ dcat(lambda[]) ## assign state for first obs
+    
+    #Process Model for movement
+    for(t in 2:(steps[i,g]-1)){
+    
+    #Behavioral State at time T
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t-1],state[i,g,t-1]] * coast[i,g,t]
+    phi[i,g,t,2] <- 1-phi[i,g,t,1]
+    state[i,g,t] ~ dcat(phi[i,g,t,])
+    
+    #Turning covariate
+    #Transition Matrix for turning angles
+    T[i,g,t,1,1] <- cos(theta[state[i,g,t]])
+    T[i,g,t,1,2] <- (-sin(theta[state[i,g,t]]))
+    T[i,g,t,2,1] <- sin(theta[state[i,g,t]])
+    T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
+    
+    #Correlation in movement change
+    d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
+    
+    #Gaussian Displacement
+    y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
+    }
+    
+    #Final behavior state
+    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
+    phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
+    state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
+    
+    ##	Measurement equation - irregular observations
+    # loops over regular time intervals (t)    
+    
+    for(t in 2:steps[i,g]){
+    
+    # loops over observed locations within interval t
+    for(u in 1:idx[i,g,t]){ 
+    zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
+    
+    #for each lat and long
+    #argos error
+    argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
+    }
+    }
+    }
+    }
+    ###Priors###
+    
+    #Process Variance
+    iSigma ~ dwish(R,2)
+    Sigma <- inverse(iSigma)
+    
+    ##Mean Angle
+    tmp[1] ~ dbeta(10, 10)
+    tmp[2] ~ dbeta(10, 10)
+    
+    # prior for theta in 'traveling state'
+    theta[1] <- (2 * tmp[1] - 1) * pi
+    
+    # prior for theta in 'foraging state'    
+    theta[2] <- (tmp[2] * pi * 2)
+    
+    ##Move persistance
+    # prior for gamma (autocorrelation parameter) in state 1
+    gamma[2] ~ dbeta(1.5, 5)		## gamma for state 2
+    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] <- gamma[2] + dev 		## gamma for state 1
+    
+    
+    #Monthly Covaraites
+    for(x in 1:Months){
+    beta[x,1]~dnorm(beta_mu[1],beta_tau[1])
+    beta[x,2]<-0
+    beta2[x,1]~dnorm(beta2_mu[1],beta2_tau[1])
+    beta2[x,2]<-0
+    }
+    
+    ##Behavioral States
+    
+    #Hierarchical structure across motnhs
+    #Intercepts
+    alpha_mu[1] ~ dnorm(0,0.386)
+    alpha_mu[2] ~ dnorm(0,0.386)
+    
+    #Variance
+    alpha_tau[1] ~ dt(0,1,1)I(0,)
+    alpha_tau[2] ~ dt(0,1,1)I(0,)
+    
+    #Slopes
+    ## Ocean Depth
+    beta_mu[1] ~ dnorm(0,0.386)
+    beta_mu[2] = 0
+    
+    # Distance coast
+    beta2_mu[1] ~ dnorm(0,0.386)
+    beta2_mu[2] = 0
+    
+    #Monthly Variance
+    #Ocean
+    beta_tau[1] ~ dt(0,1,1)I(0,)
+    beta_tau[2] = 0
+    
+    #Coast
+    beta2_tau[1] ~ dt(0,1,1)I(0,)
+    beta2_tau[2]  = 0
+    
+    
+    #Probability of behavior switching 
+    lambda[1] ~ dbeta(1,1)
+    lambda[2] <- 1 - lambda[1]
+    
+    ##Argos priors##
+    #longitudinal argos error
+    argos_sigma ~ dunif(0,10)
+    
+    #latitidunal argos error
+    argos_alpha~dunif(0,10)
+    
+    #correlation in argos error
+    rho ~ dunif(-1, 1)
+    
+    
+    }"
+    ,fill=TRUE)
+sink()
 
 
 ```
-##    user  system elapsed 
-##    1.22    0.10  136.00
+##       user     system    elapsed 
+##    425.838      2.132 142562.746
 ```
 
 
@@ -119,29 +270,29 @@ How did the filter change the extent of tracks?
 ##Chains
 
 ```
-##                         Type     Size    PrettySize  Rows Columns
-## mdat              data.frame 26066656 [1] "24.9 Mb" 57230      57
-## m                      ggmap 13116432 [1] "12.5 Mb"  1280    1280
-## d     SpatialPointsDataFrame  3573656  [1] "3.4 Mb"  7942      64
-## oxy               data.frame  3443496  [1] "3.3 Mb"  7942      64
-## sxy                     list  1994704  [1] "1.9 Mb"    21      NA
-## mxy               grouped_df  1871176  [1] "1.8 Mb"  3803      69
-## jagM          rjags.parallel  1620728  [1] "1.5 Mb"     6      NA
-## data                    list  1128208  [1] "1.1 Mb"    11      NA
-## argos                  array   691176  [1] "675 Kb"     2      12
-## obs                    array   691176  [1] "675 Kb"     2      12
+##                         Type      Size    PrettySize  Rows Columns
+## jagM          rjags.parallel 473946664  [1] "452 Mb"     6      NA
+## data                    list  74728304 [1] "71.3 Mb"    11      NA
+## argos                  array  47265240 [1] "45.1 Mb"    34      21
+## obs                    array  47265240 [1] "45.1 Mb"    34      21
+## mdat              data.frame  26066656 [1] "24.9 Mb" 57230      57
+## j                      array  23640224 [1] "22.5 Mb"    34      21
+## d     SpatialPointsDataFrame  22387960 [1] "21.4 Mb" 49938      64
+## oxy               data.frame  21585864 [1] "20.6 Mb" 49938      64
+## sxy                     list  18067424 [1] "17.2 Mb"   188      NA
+## mxy               grouped_df  16758528   [1] "16 Mb" 34484      69
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1495874 79.9    2637877 140.9  2637877 140.9
-## Vcells 8565407 65.4   31156538 237.8 56241480 429.1
+##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1640746  87.7    3205452  171.2   3205452  171.2
+## Vcells 110859996 845.8  205553718 1568.3 205553518 1568.3
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1490951 79.7    2637877 140.9  2637877 140.9
-## Vcells 7888456 60.2   24925230 190.2 56241480 429.1
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1500843  80.2    3205452  171.2   3205452  171.2
+## Vcells 18261485 139.4  164442974 1254.7 205553518 1568.3
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
@@ -158,37 +309,41 @@ How did the filter change the extent of tracks?
 ## Parameter Summary
 
 ```
-##    parameter         par         mean       lower       upper
-## 1   alpha_mu alpha_mu[1] -1.036173707 -3.93239634  1.23350593
-## 2   alpha_mu alpha_mu[2]  0.186877428 -1.17175757  1.55959984
-## 3       beta   beta[1,1] -0.141005123 -1.89336242  1.80426171
-## 4       beta   beta[2,1]  0.004119516 -1.81008562  1.56683487
-## 5       beta   beta[3,1]  0.044204506 -1.52644449  1.15773055
-## 6       beta   beta[4,1]  0.311075762 -0.95704603  1.35641796
-## 7       beta   beta[5,1] -0.309386466 -1.99324723  0.69232750
-## 8       beta   beta[1,2]  0.000000000  0.00000000  0.00000000
-## 9       beta   beta[2,2]  0.000000000  0.00000000  0.00000000
-## 10      beta   beta[3,2]  0.000000000  0.00000000  0.00000000
-## 11      beta   beta[4,2]  0.000000000  0.00000000  0.00000000
-## 12      beta   beta[5,2]  0.000000000  0.00000000  0.00000000
-## 13   beta_mu  beta_mu[1] -0.080347235 -0.98733467  0.77901393
-## 14   beta_mu  beta_mu[2]  0.000000000  0.00000000  0.00000000
-## 15     beta2  beta2[1,1] -1.243037350 -2.72164551 -0.31415846
-## 16     beta2  beta2[2,1] -0.696848162 -1.36825899 -0.19523779
-## 17     beta2  beta2[3,1] -0.926160004 -1.39334617 -0.46883858
-## 18     beta2  beta2[4,1] -1.059332768 -1.39327606 -0.60393622
-## 19     beta2  beta2[5,1] -0.363180879 -1.18710453  0.22022130
-## 20     beta2  beta2[1,2]  0.000000000  0.00000000  0.00000000
-## 21     beta2  beta2[2,2]  0.000000000  0.00000000  0.00000000
-## 22     beta2  beta2[3,2]  0.000000000  0.00000000  0.00000000
-## 23     beta2  beta2[4,2]  0.000000000  0.00000000  0.00000000
-## 24     beta2  beta2[5,2]  0.000000000  0.00000000  0.00000000
-## 25  beta2_mu beta2_mu[1] -0.913852677 -1.24859160 -0.41778463
-## 26  beta2_mu beta2_mu[2]  0.000000000  0.00000000  0.00000000
-## 27     gamma    gamma[1]  1.057178600  0.83573582  1.27414471
-## 28     gamma    gamma[2]  0.329435027  0.15846767  0.47074921
-## 29     theta    theta[1]  0.010065471 -0.02709249  0.06264831
-## 30     theta    theta[2]  3.343830664  0.47751855  6.16522796
+##    parameter         par         mean        lower        upper
+## 1   alpha_mu alpha_mu[1] -0.587529796 -1.015184420 -0.152447154
+## 2   alpha_mu alpha_mu[2] -1.563433562 -1.936021183 -1.231049424
+## 3       beta   beta[1,1] -0.471920667 -1.819158184  0.920936875
+## 4       beta   beta[2,1] -0.799143679 -2.216653731  0.221961056
+## 5       beta   beta[3,1]  0.020219959 -1.139794932  0.931900321
+## 6       beta   beta[4,1]  0.383622121 -0.566287958  1.565239780
+## 7       beta   beta[5,1] -0.188857597 -1.370726940  1.285232410
+## 8       beta   beta[6,1] -0.132707742 -2.129637079  1.674876693
+## 9       beta   beta[1,2]  0.000000000  0.000000000  0.000000000
+## 10      beta   beta[2,2]  0.000000000  0.000000000  0.000000000
+## 11      beta   beta[3,2]  0.000000000  0.000000000  0.000000000
+## 12      beta   beta[4,2]  0.000000000  0.000000000  0.000000000
+## 13      beta   beta[5,2]  0.000000000  0.000000000  0.000000000
+## 14      beta   beta[6,2]  0.000000000  0.000000000  0.000000000
+## 15     beta2  beta2[1,1]  0.025974964  0.010584399  0.045291144
+## 16     beta2  beta2[2,1]  0.020849719  0.008934419  0.035986856
+## 17     beta2  beta2[3,1]  0.017808854  0.004823071  0.030612541
+## 18     beta2  beta2[4,1]  0.022402314  0.008914916  0.039013603
+## 19     beta2  beta2[5,1]  0.095173797  0.031976100  0.177862765
+## 20     beta2  beta2[6,1]  0.009560674 -0.152089119  0.116002149
+## 21     beta2  beta2[1,2]  0.000000000  0.000000000  0.000000000
+## 22     beta2  beta2[2,2]  0.000000000  0.000000000  0.000000000
+## 23     beta2  beta2[3,2]  0.000000000  0.000000000  0.000000000
+## 24     beta2  beta2[4,2]  0.000000000  0.000000000  0.000000000
+## 25     beta2  beta2[5,2]  0.000000000  0.000000000  0.000000000
+## 26     beta2  beta2[6,2]  0.000000000  0.000000000  0.000000000
+## 27  beta2_mu beta2_mu[1]  0.032250858 -0.018777087  0.091527106
+## 28  beta2_mu beta2_mu[2]  0.000000000  0.000000000  0.000000000
+## 29   beta_mu  beta_mu[1] -0.148457488 -1.080190552  0.839051942
+## 30   beta_mu  beta_mu[2]  0.000000000  0.000000000  0.000000000
+## 31     gamma    gamma[1]  0.929247370  0.895830063  0.959317558
+## 32     gamma    gamma[2]  0.170241902  0.133220235  0.206685932
+## 33     theta    theta[1] -0.027871011 -0.052277094 -0.006148731
+## 34     theta    theta[2]  0.226868230  0.141164584  0.320152731
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
@@ -236,25 +391,12 @@ Just mean estimate.
 
 
 
-
 ##Spatial Prediction
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 ### Per Animal
 
-```
-## $`1`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
-
-```
-## 
-## $`2`
-```
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 ##Log Odds of Foraging
 
@@ -327,21 +469,21 @@ Blue = Better Foraging in May
 
 
 ```
-##                            Type     Size      PrettySize  Rows Columns
-## mdat                 data.frame 26066656   [1] "24.9 Mb" 57230      57
-## temp                      ggmap 13116048   [1] "12.5 Mb"  1280    1280
-## d        SpatialPointsDataFrame  3573656    [1] "3.4 Mb"  7942      64
-## oxy                  data.frame  3443496    [1] "3.3 Mb"  7942      64
-## sxy                        list  1693456    [1] "1.6 Mb"     2      NA
-## mxy                  data.frame  1669496    [1] "1.6 Mb"  3526      70
-## pc                       tbl_df  1077904      [1] "1 Mb" 18000      12
-## allplot              grouped_df  1031880 [1] "1007.7 Kb" 19780       7
-## monthras                   list   858576  [1] "838.5 Kb"     5      NA
-## mdf                  data.frame   650704  [1] "635.5 Kb"  9515      11
+##                           Type     Size    PrettySize    Rows Columns
+## pc                      tbl_df 90898112 [1] "86.7 Mb" 1613600      12
+## mdat                data.frame 26066656 [1] "24.9 Mb"   57230      57
+## d       SpatialPointsDataFrame 22387960 [1] "21.4 Mb"   49938      64
+## oxy                 data.frame 21585864 [1] "20.6 Mb"   49938      64
+## sxy                       list 18067424 [1] "17.2 Mb"     188      NA
+## mxy                 data.frame 15224248 [1] "14.5 Mb"   32477      70
+## temp                     ggmap 13116048 [1] "12.5 Mb"    1280    1280
+## allplot             grouped_df  2710232  [1] "2.6 Mb"   52056       7
+## msp     SpatialPointsDataFrame  1823384  [1] "1.7 Mb"   32477       5
+## coast                    array  1087976    [1] "1 Mb"      34      21
 ```
 
 ```
-##            used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  1622120 86.7    4547696 242.9  5684620 303.6
-## Vcells 11890867 90.8   36068331 275.2 56241480 429.1
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1630073  87.1    6860029  366.4  14442815  771.4
+## Vcells 33767586 257.7  207377168 1582.2 405033533 3090.2
 ```
