@@ -264,7 +264,7 @@ posteriors<-list()
 
 cl<-makeCluster(2,"SOCK")
 registerDoSNOW(cl)
-foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags")) %dopar% {
+foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   posteriors[[x]]<-runModel(names_of_vars[[x]],mxy)
 }
 stopCluster(cl)
