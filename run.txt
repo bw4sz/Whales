@@ -1,4 +1,182 @@
-Error in yaml::yaml.load(enc2utf8(string), ...) : 
-  Parser error: while parsing a block mapping at line 5, column 3did not find expected key at line 10, column 5
-Calls: <Anonymous> ... yaml_load_utf8 -> mark_utf8 -> <Anonymous> -> .Call
-Execution halted
+
+
+processing file: DataExploration.Rmd
+  |                                                                         |                                                                 |   0%  |                                                                         |..                                                               |   4%
+   inline R code fragments
+
+  |                                                                         |.....                                                            |   7%
+label: unnamed-chunk-1 (with options) 
+List of 3
+ $ warning: logi FALSE
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+
+Loading required package: methods
+Loading required package: sp
+Loading required package: splines
+
+Attaching package: 'survival'
+
+The following object is masked from 'package:boot':
+
+    aml
+
+
+Attaching package: 'MASS'
+
+The following objects are masked from 'package:raster':
+
+    area, select
+
+
+Attaching package: 'dplyr'
+
+The following object is masked from 'package:MASS':
+
+    select
+
+The following objects are masked from 'package:raster':
+
+    intersect, select, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'gridExtra'
+
+The following object is masked from 'package:dplyr':
+
+    combine
+
+Loading required package: rjags
+Loading required package: coda
+Linked to JAGS 4.2.0
+Loaded modules: basemod,bugs
+
+Attaching package: 'R2jags'
+
+The following object is masked from 'package:coda':
+
+    traceplot
+
+Loading required package: geosphere
+Loading required package: rgdal
+rgdal: version: 1.1-10, (SVN revision 622)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 1.10.1, released 2013/08/26
+ Path to GDAL shared files: /usr/share/gdal/1.10
+ Loaded PROJ.4 runtime: Rel. 4.8.0, 6 March 2012, [PJ_VERSION: 480]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.2-3 
+Loading required package: foreach
+
+Attaching package: 'foreach'
+
+The following object is masked from 'package:chron':
+
+    times
+
+Loading required package: iterators
+Loading required package: snow
+  |                                                                         |.......                                                          |  11%
+  ordinary text without R code
+
+  |                                                                         |.........                                                        |  14%
+label: unnamed-chunk-2 (with options) 
+List of 1
+ $ eval: symbol F
+
+  |                                                                         |............                                                     |  18%
+  ordinary text without R code
+
+  |                                                                         |..............                                                   |  21%
+label: unnamed-chunk-3
+  |                                                                         |................                                                 |  25%
+  ordinary text without R code
+
+  |                                                                         |...................                                              |  29%
+label: unnamed-chunk-4
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |.....................                                            |  32%
+  ordinary text without R code
+
+  |                                                                         |.......................                                          |  36%
+label: unnamed-chunk-5 (with options) 
+List of 1
+ $ fig.height: num 12
+
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..........................                                       |  39%
+  ordinary text without R code
+
+  |                                                                         |............................                                     |  43%
+label: unnamed-chunk-6
+  |                                                                         |..............................                                   |  46%
+  ordinary text without R code
+
+  |                                                                         |................................                                 |  50%
+label: unnamed-chunk-7
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.686643,-63.88896&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |...................................                              |  54%
+  ordinary text without R code
+
+  |                                                                         |.....................................                            |  57%
+label: unnamed-chunk-8
+  |                                                                         |.......................................                          |  61%
+  ordinary text without R code
+
+  |                                                                         |..........................................                       |  64%
+label: unnamed-chunk-9 (with options) 
+List of 1
+ $ fig.height: num 20
+
+  |                                                                         |............................................                     |  68%
+  ordinary text without R code
+
+  |                                                                         |..............................................                   |  71%
+label: unnamed-chunk-10 (with options) 
+List of 1
+ $ fig.height: num 20
+
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+  |                                                                         |.................................................                |  75%
+  ordinary text without R code
+
+  |                                                                         |...................................................              |  79%
+label: unnamed-chunk-11 (with options) 
+List of 2
+ $ fig.height: num 10
+ $ fig.width : num 15
+
+  |                                                                         |.....................................................            |  82%
+  ordinary text without R code
+
+  |                                                                         |........................................................         |  86%
+label: unnamed-chunk-12
+  |                                                                         |..........................................................       |  89%
+  ordinary text without R code
+
+  |                                                                         |............................................................     |  93%
+label: unnamed-chunk-13
+  |                                                                         |...............................................................  |  96%
+  ordinary text without R code
+
+  |                                                                         |.................................................................| 100%
+label: unnamed-chunk-14
+
+output file: DataExploration.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS DataExploration.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output DataExploration.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/Rtmp05l5gK/rmarkdown-str58bd6bdb9b.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+
+Output created: DataExploration.html
+Warning messages:
+1: Removed 52 rows containing missing values (geom_path). 
+2: Removed 19 rows containing missing values (geom_path). 
+3: Removed 1 rows containing missing values (geom_path). 
+4: Removed 6 rows containing missing values (geom_path). 
