@@ -551,6 +551,7 @@ psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par
 
 as.data.frame(psum)
 
+write.csv(psum,"Figures/Table1.csv")
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free",ncol=2)
 ```
 
@@ -567,6 +568,9 @@ ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),
 
 #mean env estimate
 ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+
+ggplot(postplot[postplot$Begin %in% "Traveling" & postplot$State %in% "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.2) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of switching to foraging state",fill="Transition") + geom_line(aes(x=x,y=mean)) 
+ggsave("Figures/Ocean.jpeg",dpi=300,height=3,width=4)
 ```
 
 ### Distance to Coast
@@ -578,6 +582,11 @@ postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Dra
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.75))
 
 ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
+
+ggplot(postplot[postplot$Begin %in% "Traveling" & postplot$State %in% "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower),alpha=0.2) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability of switching to foraging state",fill="Transition") + geom_line(aes(x=coast,y=mean)) + xlim(0,quantile(mxy$coast,0.75))
+
+ggsave("Figures/Distance_Coast.jpeg",dpi=300,height=3,width=4)
+
 ```
 
 ###Interaction
@@ -626,7 +635,7 @@ Just the probability of feeding when traveling.
 
 ```{r}
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of switching to foraging state",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
 ```
 
 Just mean estimate.
@@ -635,7 +644,7 @@ Just mean estimate.
 ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.75))
 
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_color_brewer(palette="YlOrRd")
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of switching to foraging state",fill="Month") + scale_color_brewer(palette="YlOrRd")
 ```
 
 ### Coast
@@ -661,9 +670,9 @@ Zooming in on the top right plot.
 ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.75)) + scale_fill_brewer(palette="YlOrRd")
 
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd")
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of switching to foraging state",fill="Month") + scale_fill_brewer(palette="YlOrRd")
 
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of switching to foraging state",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
 
 ```
 
@@ -673,7 +682,7 @@ Just mean estimate.
 ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.75))+ scale_color_brewer(palette="YlOrRd")
 
 #mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_color_brewer(palette="YlOrRd")
+ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of switching to foraging state",fill="Month") + scale_color_brewer(palette="YlOrRd")
 ```
 
 #Behavioral Prediction
@@ -703,8 +712,8 @@ rm(behav_chains)
 ##Spatial Prediction
 
 ```{r}
-m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color="bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset() + geom_polygon(data=pols[[2]],aes(x=long,y=lat,group=id),fill="whitesmoke")
 ```
 
 ### Per Animal
@@ -750,7 +759,7 @@ m<-rasterize(x=msp,y=r,field="phi")
 #plotting
 feedmap <- data.frame(rasterToPoints(m))
 
-temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
+temp <- get_map(location=bbox(m),source="google",zoom=4,maptype="satellite",color = "bw",scale = 2)
 
 #plot(m)
 
@@ -822,7 +831,7 @@ travdf<-data.frame(rasterToPoints(travpar))
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
-ggmap(temp) + geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8))
+ggmap(temp) + geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) 
 ```
 
 ```{r}
@@ -831,7 +840,8 @@ ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpoint
 ksuit<-extract(x=travpar,y=ksp)
 kdf<-data.frame(ksp,ksuit)
 
-ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
+ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Probability of switching from traveling to foraging") + geom_smooth(method="glm",method.args=list(family="binomial"))
+ggsave("Figures/Krillcatch.jpeg",height=4,width=4,dpi=300)
 ```
 
 ## By Month
@@ -872,7 +882,7 @@ for(x in 1:length(monthras)){
 
 ## Change in foraging areas
 
-Jan verus May
+###Jan verus May
 
 Red = Better Foraging in Jan
 Blue = Better Foraging in May
@@ -880,7 +890,8 @@ Blue = Better Foraging in May
 ```{r}
 diffras<-monthras[[1]]-monthras[[5]]
 diffdf<-as.data.frame(rasterToPoints(diffras))
-ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red') + ggtitle("Comparing January and May") 
+ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red')  + geom_polygon(data=pols[[2]],aes(x=long,y=lat,group=id),fill="whitesmoke")
+ggsave("Figures/")
 ```
 
 ### Variance in monthly suitability
@@ -906,7 +917,7 @@ mdf<-melt(kdf,measure.vars=names(monthras))
 
 mdf$Month<-factor(mdf$variable,levels=month.name)
 
-ggplot(mdf,aes(y=value,x=log(C1KRIcatchKG),col=Month)) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
+ggplot(mdf,aes(y=value,x=C1KRIcatchKG,col=Month)) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 ```
 
 
