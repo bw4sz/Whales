@@ -38,7 +38,7 @@ source("RunModel.R")
 
 ```{r,eval=F}
 #Load in data
-load("SingleSpecies.RData")
+load("DataExploration.RData")
 ```
 
 ```{r}
@@ -312,6 +312,29 @@ ggplot(plotall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),a
 ggplot(plotall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
 ```
 
+### Zoom in
+
+
+```{r}
+
+limits<-plotall %>% group_by(L1) %>% summarize(min=quantile(x,0,na.rm=T),max=quantile(x,0.75,na.rm=T))
+limits<-limits %>% mutate(L1=factor(L1,levels=names(posteriors))) %>% arrange(L1)
+p<-list()
+for (x in 1:length(posteriors)){
+p[[x]]<-ggplot(plotall[plotall$L1 %in% names(posteriors)[x],]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition")  + scale_x_continuous(limits=c(limits$min[x],limits$max[x])) + ggtitle(names(posteriors)[x])
+}
+p
+```
+
+
+```{r}
+pribbon<-list()
+for (x in 1:length(posteriors)){
+pribbon[[x]]<-ggplot(plotall[plotall$L1 %in% names(posteriors)[x],]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition")  + scale_x_continuous(limits=c(limits$min[x],limits$max[x])) + ggtitle(names(posteriors)[x])
+}
+pribbon
+```
+
 ## By Month
 
 ```{r}
@@ -345,5 +368,5 @@ lsos()
 #notify end of run
 #size of the run
 gc()
-save.image("SingleSpecies.RData")
+save.image("DataExploration.RData")
 ```
