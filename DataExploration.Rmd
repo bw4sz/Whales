@@ -1,0 +1,372 @@
+---
+title: "Antarctic Whale Project: Data Exploration"
+author: "Ben Weinstein"
+date: "`r Sys.time()`"
+output: 
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+    pandoc_args: [
+    "-M2GB", "+RTS", "-K64m", "-RTS"
+    ]
+---
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
+library(boot)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(survival)
+library(MASS)
+library(ggmap)
+library(dplyr)
+library(chron)
+library(gridExtra)
+library(stringr)
+library(R2jags)
+library(move)
+library(doSNOW)
+library(foreach)
+
+#Source model file
+source("RunModel.R")
+```
+
+```{r,eval=F}
+#Load in data
+load("DataExploration.RData")
+```
+
+```{r}
+#read data
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
+
+#name env columns
+#Create a oceandepth in km 
+mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
+mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
+mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
+mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
+mdat$WaveH<-mdat$ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height
+mdat$NPP<-mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP
+mdat$Ice<-mdat$ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
+
+#standardize column names to match the simulation
+#Create an animal tag.
+mxy <- as(mdat, "data.frame")
+mxy$Animal<-mxy$individual.local.identifier
+mxy$x<-mxy$location.long
+mxy$y<-mxy$location.lat
+
+#remove minke whales
+minke<-c("131117","131118","131120","154184")
+mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
+
+#grab set of animals
+
+#mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
+
+#empty coordinates
+mxy<-mxy[!is.na(mxy$x),]
+
+#crop by extent
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
+
+d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
+#give it a geospatial layer
+
+
+mxy<-as.data.frame(d)
+
+#set datestamp
+mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+
+#month and year columns
+mxy$Month<-months(mxy$timestamp)
+mxy$Year<-years(mxy$timestamp)
+
+#Only austral sping and summer
+mxy<-mxy[mxy$Month %in% month.name[1:7],]
+
+#remove empty timestamps
+mxy<-mxy[!is.na(mxy$timestamp),]
+
+#remove duplicates
+mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
+
+#no distance to coast,elevation
+mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+```
+
+```{r}
+#hold copy of orig
+oxy<-mxy
+
+#remake spatial object
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
+
+#Plot
+pp<-c(mean(mxy$x),mean(mxy$y))
+m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
+```
+
+##By Month
+
+```{r,fig.height=12}
+mxy$Month<-factor(mxy$Month,levels=month.name)
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month) + scale_color_discrete(guide="none")
+```
+
+#Correlated random walk
+
+*Process Model*
+
+$$ d_{t} \sim T*d_{t-1} + Normal(0,\Sigma)$$
+$$ x_t = x_{t-1} + d_{t} $$
+
+## Parameters
+
+For each individual:
+
+$$\theta = \text{Mean turning angle}$$
+$$\gamma = \text{Move persistence} $$
+
+For both behaviors process variance is:
+$$ \sigma_{latitude} = 0.1$$
+$$ \sigma_{longitude} = 0.1$$
+
+##Behavioral States
+
+$$ \text{For each individual i}$$
+$$ Behavior_1 = \text{traveling}$$
+$$ Behavior_2 = \text{foraging}$$
+
+$$ \alpha_{i,1,1} = \text{Probability of remaining traveling when traveling}$$
+$$\alpha_{i,2,1} = \text{Probability of switching from Foraging to traveling}$$
+
+$$\begin{matrix}
+  \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
+  \alpha_{i,2,1} & 1-\alpha_{i,2,1} \\
+\end{matrix}
+$$
+
+##Environment
+
+Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
+
+It generally follows the form, conditional on behavior at t -1:
+
+$$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
+
+With the probability of switching states:
+
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_{Month,1} * Environment_{y[t,]}$$
+
+$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
+
+Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
+
+The effect of the environment is temporally variable such that
+
+$$ \beta_{Month,2} \sim ~ Normal(\beta_{\mu},\beta_\tau)$$
+
+
+##Continious tracks
+
+The transmitter will often go dark for 10 to 12 hours, due to weather, right in the middle of an otherwise good track. The model requires regular intervals to estimate the turning angles and temporal autocorrelation. As a track hits one of these walls, call it the end of a track, and begin a new track once the weather improves. We can remove any micro-tracks that are less than three days.
+Specify a duration, calculate the number of tracks and the number of removed points. Iteratively.
+
+```{r}
+##Time is the beginning of the first point.
+step_length=6
+
+sxy<-split(mxy,mxy$Animal)
+
+#time diff function
+timed<-function(d,step_length){
+  d$j[1]<-0
+  for (x in 2:nrow(d)){
+    d$j[x]<-as.numeric(difftime(as.POSIXct(d$timestamp[x]),as.POSIXct(d$timestamp[x-1]),units="mins"))/(step_length*60)
+  }
+  
+  #Split out track endings
+  ends<-c(1,which(d$j>1),nrow(d))
+
+  for(w in 2:length(ends)){
+    d[ends[w-1]:ends[w],"Track"]<-w-1
+  }
+  
+  #remove tracks that are shorter than three days
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=24) %>% .$Track
+  
+  d<-d[d$Track %in% track_time,]
+  
+  #renumber the tracks
+  d$Track<-as.numeric(as.factor(d$Track))
+  return(d)
+  }
+
+sxy<-lapply(sxy,timed,step_length=6)
+
+#Format matrices for jags
+mxy<-rbind_all(sxy)
+
+######recode whales
+#mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+
+sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
+
+sxy<-lapply(sxy,function(x){
+#How many observations in each step length segment
+x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+return(x)
+})
+
+mxy<-rbind_all(sxy)
+
+#refactor animal
+mxy$Animal<-as.numeric(as.factor(mxy$Animal))
+```
+
+How did the filter change the extent of tracks?
+
+```{r}
+#Plot
+mxy<-mxy %>% arrange(Animal,Track,Step)
+
+pp<-c(mean(mxy$x),mean(mxy$y))
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Animal,Track)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
+```
+
+#Environmental Models
+
+Looping through each covariate.
+
+* Bathymetry
+* Distance to coast
+* Sea surface temperature
+* Chlorophyl A
+* Wave Height
+* Primary Productivity
+* Sea Ice Cover (%)
+
+```{r}
+names_of_vars<-c("ocean","coast","SST","ChloroA","WaveH","NPP","Ice")
+
+cl<-makeCluster(3,"SOCK")
+registerDoSNOW(cl)
+posteriors<-foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
+  runModel(names_of_vars[[x]],mxy)
+}
+stopCluster(cl)
+
+#Name by variable
+names(posteriors)<-names_of_vars
+pc<-melt(posteriors,id.vars=colnames(posteriors[[1]]))
+pc$L1<-as.factor(pc$L1)
+levels(pc$L1)<-names_of_vars
+```
+
+
+##Chains
+```{r,fig.height=20}
+ggplot(data=pc,aes(x=Draw,y=value)) + geom_line(aes(col=chain)) + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
+```
+
+
+```{r,fig.height=20}
+#Plot
+ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
+```
+
+
+## Parameter Summary
+```{r,fig.height=10,fig.width=15}
+psum<-pc %>% group_by(L1,parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
+ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange(aes(col=L1),position=position_dodge(width = 0.1)) + geom_point(aes(col=L1),position=position_dodge(width = 0.1)) + facet_wrap(~parameter,scales="free",ncol=2)
+```
+
+#Behavior and environment
+
+##Hierarchical 
+
+```{r}
+#get the posterior estimates of the env function
+plotall<-list()
+  
+  for(j in 1:length(posteriors)){
+    plotall[[j]]<-posteriors[[j]] %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy[[names(posteriors)[j]]]))) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y,na.rm=T),lower=quantile(y,0.05,na.rm=T),upper=quantile(y,0.95,na.rm=T))  
+  }
+names(plotall)<-names_of_vars
+plotall<-melt(plotall,id.vars=colnames(plotall[[1]]))
+
+ggplot(plotall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
+
+ggplot(plotall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition") + facet_wrap(~L1,scales="free")
+```
+
+### Zoom in
+
+
+```{r}
+
+limits<-plotall %>% group_by(L1) %>% summarize(min=quantile(x,0,na.rm=T),max=quantile(x,0.75,na.rm=T))
+limits<-limits %>% mutate(L1=factor(L1,levels=names(posteriors))) %>% arrange(L1)
+p<-list()
+for (x in 1:length(posteriors)){
+p[[x]]<-ggplot(plotall[plotall$L1 %in% names(posteriors)[x],]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition")  + scale_x_continuous(limits=c(limits$min[x],limits$max[x])) + ggtitle(names(posteriors)[x])
+}
+p
+```
+
+
+```{r}
+pribbon<-list()
+for (x in 1:length(posteriors)){
+pribbon[[x]]<-ggplot(plotall[plotall$L1 %in% names(posteriors)[x],]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition")  + scale_x_continuous(limits=c(limits$min[x],limits$max[x])) + ggtitle(names(posteriors)[x])
+}
+pribbon
+```
+
+## By Month
+
+```{r}
+
+monthall<-list()
+  
+  for(j in 1:length(posteriors)){
+    
+  #get the posterior estimates of the env function
+  postplot_alpha<-posteriors[[j]] %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
+  postplot_beta<-posteriors[[j]] %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
+  postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+
+  monthall[[j]]<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy[[names(posteriors)[j]]]))) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y,na.rm=T),lower=quantile(y,0.05,na.rm=T),upper=quantile(y,0.95,na.rm=T))
+   }
+
+names(monthall)<-names_of_vars
+monthall<-melt(monthall,id.vars=colnames(monthall[[1]]))
+
+monthall$Month<-factor(monthall$Month,levels=month.name)
+
+ggplot(monthall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability of foraging when traveling",fill="Transition") + facet_wrap(~L1,scales="free")
+
+ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching to Foraging to Traveling",fill="Transition") + facet_wrap(~L1,scales="free")
+
+```
+
+```{r}
+#check out the memory sizing
+lsos()
+#notify end of run
+#size of the run
+gc()
+save.image("DataExploration.RData")
+```
