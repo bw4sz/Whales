@@ -31,10 +31,10 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -429,10 +429,10 @@ if(newModel){
 
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #update function
 recompile(jagM)
-jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0) 
+jagM <- update(jagM,n.iter=5000,n.burnin=0,n.thin=5) 
 ```
 
 ##Chains
