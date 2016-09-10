@@ -31,10 +31,10 @@ library(R2jags)
 library(move)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-T
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -412,7 +412,7 @@ ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per A
 ```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #source jags file
 source("Bayesian/MultiSpecies.R")
 
