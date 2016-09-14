@@ -5,7 +5,7 @@ rm -rf /var/tmp/aws-mon.bak
 mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
 
 #clone
-git clone git@github.com:bw4sz/Whales.git --branch ChloroA --single-branch  --depth 1
+git clone git@github.com:bw4sz/Whales.git --depth 1
 
 cd Whales||sudo halt
 

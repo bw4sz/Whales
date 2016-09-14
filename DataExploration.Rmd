@@ -256,9 +256,9 @@ Looping through each covariate.
 * Sea Ice Cover (%)
 
 ```{r}
-names_of_vars<-c("SST","ChloroA","Ocean","Coast","NPP")
+names_of_vars<-c("SST","ChloroA","ocean","coast","NPP")
 
-cl<-makeCluster(3,"SOCK")
+cl<-makeCluster(5,"SOCK")
 registerDoSNOW(cl)
 posteriors<-foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   runModel(names_of_vars[[x]],mxy)
@@ -272,18 +272,15 @@ pc$L1<-as.factor(pc$L1)
 levels(pc$L1)<-names_of_vars
 ```
 
-
 ##Chains
 ```{r,fig.height=20}
 ggplot(data=pc,aes(x=Draw,y=value)) + geom_line(aes(col=chain)) + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
-
 ```{r,fig.height=20}
 #Plot
 ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
 ```
-
 
 ## Parameter Summary
 ```{r,fig.height=10,fig.width=15}
@@ -294,9 +291,11 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange(aes(col=L1
 ## Which estimates do not overlap with zero?
 
 ```{r}
-psum<-pc %>% group_by(L1,parameter,par)%>% filter(parameter %in% c("beta_mu","beta"))  %>%  summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
+psum<-pc %>% group_by(L1,parameter,par)%>% filter(parameter %in% c("beta_mu","beta"),Behavior==1)  %>%  summarize(mean=round(mean(value),3),lower=round(quantile(value,0.05),3),upper=round(quantile(value,0.95),3))
 
-sig<-psum %>% group_by(L1,par) %>% summarize(Significant=!findInterval(0,sort(c(lower,upper)))==1)
+sig<-psum %>% group_by(L1,par) %>%summarize(Significant=!findInterval(0,sort(c(lower,upper)))==1) %>% filter(Significant==TRUE) %>% as.data.frame()
+
+sig
 ```
 
 #Behavior and environment
@@ -364,7 +363,12 @@ monthall$Month<-factor(monthall$Month,levels=month.name)
 
 ggplot(monthall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability of foraging when traveling",fill="Transition") + facet_wrap(~L1,scales="free")
 
+ggplot(monthall) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability of foraging when traveling",fill="Transition") + facet_grid(Month~L1,scales="free")
+
+
 ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching to Foraging to Traveling",fill="Transition") + facet_wrap(~L1,scales="free")
+
+ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching to Foraging to Traveling",fill="Transition") + facet_grid(Month~L1,scales="free")
 
 ```
 
