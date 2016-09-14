@@ -50,9 +50,8 @@ mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -30850
 mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
 mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
-mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
-mdat$NPP<-mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP
-mdat$Ice<-mdat$ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
+mdat$ChloroA<-log(mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A)
+mdat$NPP<-log(mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP)
 
 #standardize column names to match the simulation
 #Create an animal tag.
@@ -67,7 +66,7 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
 
-#mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -99,19 +98,7 @@ mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 
 #no distance to coast,elevation
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
-
-#chloroA has some funky data points.
-hist(mxy$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A)
 ```
-
-## Correlation in variables
-```{r,eval=F}
-tocor<-mxy %>% select(ocean,coast,SST,ChloroA,WaveH,NPP,Ice)
-
-GGally::ggpairs(tocor)
-ggsave("Figures/pairsplot.jpeg",height=7,width=7)
-```
-
 
 ```{r}
 #hold copy of orig
@@ -269,7 +256,7 @@ Looping through each covariate.
 * Sea Ice Cover (%)
 
 ```{r}
-names_of_vars<-c("SST","ChloroA","WaveH","NPP")
+names_of_vars<-c("SST","ChloroA","Ocean","Coast","NPP")
 
 cl<-makeCluster(3,"SOCK")
 registerDoSNOW(cl)
@@ -302,6 +289,14 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_grid(par~L1,scales='free
 ```{r,fig.height=10,fig.width=15}
 psum<-pc %>% group_by(L1,parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange(aes(col=L1),position=position_dodge(width = 0.1)) + geom_point(aes(col=L1),position=position_dodge(width = 0.1)) + facet_wrap(~parameter,scales="free",ncol=2)
+```
+
+## Which estimates do not overlap with zero?
+
+```{r}
+psum<-pc %>% group_by(L1,parameter,par)%>% filter(parameter %in% c("beta_mu","beta"))  %>%  summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
+
+sig<-psum %>% group_by(L1,par) %>% summarize(Significant=!findInterval(0,sort(c(lower,upper)))==1)
 ```
 
 #Behavior and environment

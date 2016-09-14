@@ -17,6 +17,7 @@ library(raster)
 library(reshape2)
 library(ggplot2)
 library(ggbiplot)
+library(GGally)
 library(ggmap)
 library(dplyr)
 library(chron)
@@ -34,8 +35,8 @@ mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
 mdat$DSST<-mdat$ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
 mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
-mdat$ChloroA_Aqua<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
-mdat$ChloroA_Terra<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Monthly.Chlorophyll.A
+mdat$ChloroA_Aqua<-log(mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A)
+mdat$NPP<-log(mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP)
 
 #Create an animal tag.
 mxy <- as(mdat, "data.frame")
@@ -75,6 +76,7 @@ mxy$Month<-factor(mxy$Month,levels=month.name)
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 
 #get map
+pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 ```
 
@@ -105,7 +107,6 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Sea.S
 
 # Monthly Sea surface temperature
 ```{r}
-
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=SST,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
 ```
 
@@ -115,14 +116,12 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=SST,group=Animal),size=.5)  + scal
 ```{r}
 chl<-list.files("InputData/",pattern="CHL",full.names=T)
 chlr<-stack(chl)
-names(chl)
 sn<-str_match(chl,"chlor_a-(\\d{4})(\\d{2})")[,2:3]
 names(chlr)<-paste(sn[,1],sn[,2],sep="_")
 
 plot(log(chlr),addfun=function(){map(add=T)})
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=C),size=.5)  + scale_color_continuous(low='blue',high='red')
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=log(ChloroA_Aqua),group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ChloroA_Aqua,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
 ```
 
 # NPP
