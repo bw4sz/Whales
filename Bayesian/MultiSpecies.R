@@ -31,7 +31,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t-1],state[i,g,t-1]] * coast[i,g,t]
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * variable[i,g,t]
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -50,7 +50,7 @@ cat("
     }
     
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * variable[i,g,steps[i,g]]
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -97,8 +97,6 @@ cat("
     for(x in 1:Months){
     beta[x,1]~dnorm(beta_mu[1],beta_tau[1])
     beta[x,2]<-0
-    beta2[x,1]~dnorm(beta2_mu[1],beta2_tau[1])
-    beta2[x,2]<-0
     }
     
     ##Behavioral States
@@ -113,22 +111,14 @@ cat("
     alpha_tau[2] ~ dt(0,1,1)I(0,)
     
     #Slopes
-    ## Ocean Depth
     beta_mu[1] ~ dnorm(0,0.386)
     beta_mu[2] = 0
     
-    # Distance coast
-    beta2_mu[1] ~ dnorm(0,0.386)
-    beta2_mu[2] = 0
     
     #Monthly Variance
-    #Ocean
     beta_tau[1] ~ dt(0,1,1)I(0,)
     beta_tau[2] = 0
     
-    #Coast
-    beta2_tau[1] ~ dt(0,1,1)I(0,)
-    beta2_tau[2]  = 0
     
     
     #Probability of behavior switching 

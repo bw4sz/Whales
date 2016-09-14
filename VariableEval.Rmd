@@ -12,57 +12,32 @@ output:
 
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
-opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5)
-library(boot)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 7)
 library(raster)
 library(reshape2)
 library(ggplot2)
-library(survival)
-library(MASS)
+library(ggbiplot)
+library(GGally)
 library(ggmap)
 library(dplyr)
 library(chron)
-library(gridExtra)
 library(stringr)
-library(R2jags)
-library(move)
-
-#New model to be run, flag turned off if just updating.
-newModel<-T
-```
-
-```{r,eval=F}
-#Load in data
-load("SingleSpecies.RData")
-#jags$recompile()
-newModel<-F
+library(maps)
 ```
 
 ```{r}
-#raster layers
-#ice
-ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
-ice<-round(ice*-1/1000,3)
-rice<-aggregate(ice,fact=0.1/res(ice))
-
-#coast
-distc<-raster("InputData/DistancetoCoast.tif")
-rice[rice<0]<-NA
-distc[is.na(rice)]<-NA
-
-#read data
+#read whale data
 mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
-
-##need to look into making into a movebank object.
 
 #name env columns
 #Create a oceandepth in km 
 mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
-mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
-mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
+mdat$DSST<-mdat$ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
+mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
+mdat$ChloroA_Aqua<-log(mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A)
+mdat$NPP<-log(mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP)
 
-#standardize column names to match the simulation
 #Create an animal tag.
 mxy <- as(mdat, "data.frame")
 mxy$Animal<-mxy$individual.local.identifier
@@ -95,39 +70,76 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
-```
+mxy$Month<-factor(mxy$Month,levels=month.name)
 
-#Descriptive Statistics
-```{r}
 #no distance to coast,elevation
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
-```
 
-```{r}
-#hold copy of orig
-oxy<-mxy
-
-#Plot
+#get map
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
 ```
+
+# Bathymetry
+```{r}
+ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
+ice<-round(ice*-1/1000,3)
+rice<-aggregate(ice,fact=0.1/res(ice))
+plot(rice)
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ocean,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+```
+
+# Distance to coast
 
 ```{r}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover),size=.5)  + scale_color_continuous(low='blue',high='red')
+#coast
+distc<-raster("InputData/DistancetoCoast.tif")
+rice[rice<0]<-NA
+distc[is.na(rice)]<-NA
 
-a<-cut(mxy$ECMWF.Interim.Full.Daily.SFC.Charnock.Parameter,10)
-
-#cc <- scales::seq_gradient_pal("blue", "red", "Lab")(seq(0,1,length.out=100))
-
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.integer(a),group=Animal),size=.5) + scale_color_continuous(low='blue',high='red')
-
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Mean.Wave.Period/max(ECMWF.Interim.Full.Daily.SFC.Mean.Wave.Period,na.rm=T)),size=.5)  + scale_color_continuous(low='blue',high='red')
-
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=MODIS.Ocean.Terra.OceanColor.4km.Monthly.Chlorophyll.A),size=.5)  + scale_color_continuous(low='blue',high='red')
-
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=MODIS.Ocean.Terra.OceanColor.4km.Monthly.Daytime.SST),size=.5)  + scale_color_continuous(low='blue',high='red')
-
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height),size=.5)  + scale_color_continuous(low='blue',high='red')
-
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=coast,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
 ```
+
+# Daily Sea surface temperature
+```{r}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ECMWF.Interim.Full.Daily.SFC.Sea.Surface.Temperature,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+```
+
+# Monthly Sea surface temperature
+```{r}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=SST,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+```
+
+# Chlorophyll A
+
+##Aqua 
+```{r}
+chl<-list.files("InputData/",pattern="CHL",full.names=T)
+chlr<-stack(chl)
+sn<-str_match(chl,"chlor_a-(\\d{4})(\\d{2})")[,2:3]
+names(chlr)<-paste(sn[,1],sn[,2],sep="_")
+
+plot(log(chlr),addfun=function(){map(add=T)})
+
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ChloroA_Aqua,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+```
+
+# NPP
+```{r}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=NPP,group=Animal),size=.5)  + scale_color_continuous(low='blue',high='red') + facet_wrap(~Month)
+```
+
+###Correlation matrix
+```{r}
+sxy<-mxy[,colnames(mxy) %in% c("ocean","coast","DSST","SST","ChloroA_Aqua","ChloroA_Terra")]
+sxy<-sxy[complete.cases(sxy),]
+
+pca<-prcomp(sxy,scale. = T,center = T)
+ggbiplot(pca)
+```
+
+```{r,fig.height=12,fig.width=12}
+ggpairs(sxy)
+```
+
+
