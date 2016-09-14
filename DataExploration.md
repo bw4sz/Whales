@@ -93,44 +93,133 @@ Looping through each covariate.
 
 
 
-
 ##Chains
 ![](DataExploration_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
-
 ![](DataExploration_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
-
 
 ## Parameter Summary
 ![](DataExploration_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+## Which estimates do not overlap with zero?
+
+
+```
+##         L1        par Significant
+## 1      SST  beta[4,1]        TRUE
+## 2      SST  beta[5,1]        TRUE
+## 3  ChloroA  beta[3,1]        TRUE
+## 4    ocean  beta[2,1]        TRUE
+## 5    ocean  beta[4,1]        TRUE
+## 6    ocean  beta[5,1]        TRUE
+## 7    coast  beta[5,1]        TRUE
+## 8      NPP  beta[2,1]        TRUE
+## 9      NPP  beta[4,1]        TRUE
+## 10     NPP  beta[5,1]        TRUE
+## 11     NPP beta_mu[1]        TRUE
+```
 
 #Behavior and environment
 
 ##Hierarchical 
 
-![](DataExploration_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
+![](DataExploration_files/figure-html/unnamed-chunk-13-1.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-13-2.png)<!-- -->
+
+### Zoom in
+
+
+
+```
+## [[1]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
+```
+## 
+## [[2]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+
+```
+## 
+## [[3]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-14-3.png)<!-- -->
+
+```
+## 
+## [[4]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-14-4.png)<!-- -->
+
+```
+## 
+## [[5]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-14-5.png)<!-- -->
+
+
+
+```
+## [[1]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+```
+## 
+## [[2]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+
+```
+## 
+## [[3]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-15-3.png)<!-- -->
+
+```
+## 
+## [[4]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-15-4.png)<!-- -->
+
+```
+## 
+## [[5]]
+```
+
+![](DataExploration_files/figure-html/unnamed-chunk-15-5.png)<!-- -->
 
 ## By Month
 
-![](DataExploration_files/figure-html/unnamed-chunk-13-1.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-13-2.png)<!-- -->
+![](DataExploration_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-16-2.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-16-3.png)<!-- -->![](DataExploration_files/figure-html/unnamed-chunk-16-4.png)<!-- -->
 
 
 ```
-##                              Type     Size    PrettySize   Rows Columns
-## monthall               data.frame 39710360 [1] "37.9 Mb" 763590       8
-## mdat                   data.frame 27898432 [1] "26.6 Mb"  57230      61
-## d          SpatialPointsDataFrame 23986392 [1] "22.9 Mb"  49938      68
-## oxy                    data.frame 23184296 [1] "22.1 Mb"  49938      68
-## sxy                          list 19249184 [1] "18.4 Mb"    188      NA
-## mxy                        tbl_df 16704512 [1] "15.9 Mb"  34484      71
-## m                           ggmap 13116624 [1] "12.5 Mb"   1280    1280
-## plotall                data.frame  6111224  [1] "5.8 Mb" 127265       7
-## pc                     data.frame  1126952  [1] "1.1 Mb"  28000       9
-## posteriors                   list  1051328    [1] "1 Mb"      7      NA
+##                            Type     Size     PrettySize  Rows Columns
+## mdat                 data.frame 26982544  [1] "25.7 Mb" 57230      59
+## m                         ggmap 13116432  [1] "12.5 Mb"  1280    1280
+## d        SpatialPointsDataFrame  2516368   [1] "2.4 Mb"  5389      66
+## oxy                  data.frame  2427056   [1] "2.3 Mb"  5389      66
+## monthall             data.frame  1513456   [1] "1.4 Mb" 29036       8
+## sxy                        list  1318080   [1] "1.3 Mb"     9      NA
+## mxy                      tbl_df  1216312   [1] "1.2 Mb"  2569      69
+## pc                   data.frame   646664 [1] "631.5 Kb" 16000       9
+## p                          list   611184 [1] "596.9 Kb"     5      NA
+## pribbon                    list   611184 [1] "596.9 Kb"     5      NA
 ```
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1536619  82.1   26806501 1431.7  43588708 2327.9
-## Vcells 52620450 401.5  617177466 4708.7 803549827 6130.6
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1532719 81.9    3886542 207.6  3886542 207.6
+## Vcells 8174541 62.4   31069088 237.1 59796647 456.3
 ```

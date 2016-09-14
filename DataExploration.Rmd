@@ -258,9 +258,9 @@ Looping through each covariate.
 ```{r}
 names_of_vars<-c("SST","ChloroA","ocean","coast","NPP")
 
-cl<-makeCluster(5,"SOCK")
+cl<-makeCluster(2,"SOCK")
 registerDoSNOW(cl)
-posteriors<-foreach(x=1:length(names_of_vars),.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
+posteriors<-foreach(x=1:length(names_of_vars),.errorhandling="pass",.verbose=T,.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   runModel(names_of_vars[[x]],mxy)
 }
 stopCluster(cl)
