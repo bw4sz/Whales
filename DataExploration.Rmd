@@ -51,7 +51,6 @@ mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
 mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
 mdat$SST<-mdat$MODIS.Ocean.Terra.OceanColor.4km.Yearly.Daytime.SST
 mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
-mdat$WaveH<-mdat$ECMWF.Interim.Full.Daily.SFC.Significant.Wave.Height
 mdat$NPP<-mdat$OSU.Ocean.NPP.0.17deg.Monthly.NPP
 mdat$Ice<-mdat$ECMWF.Interim.Full.Daily.SFC.Sea.Ice.Cover
 
@@ -100,7 +99,19 @@ mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 
 #no distance to coast,elevation
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+
+#chloroA has some funky data points.
+hist(mxy$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A)
 ```
+
+## Correlation in variables
+```{r,eval=F}
+tocor<-mxy %>% select(ocean,coast,SST,ChloroA,WaveH,NPP,Ice)
+
+GGally::ggpairs(tocor)
+ggsave("Figures/pairsplot.jpeg",height=7,width=7)
+```
+
 
 ```{r}
 #hold copy of orig
@@ -258,7 +269,7 @@ Looping through each covariate.
 * Sea Ice Cover (%)
 
 ```{r}
-names_of_vars<-c("ocean","coast","SST","ChloroA","WaveH","NPP","Ice")
+names_of_vars<-c("SST","ChloroA","WaveH","NPP")
 
 cl<-makeCluster(3,"SOCK")
 registerDoSNOW(cl)
