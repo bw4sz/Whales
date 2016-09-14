@@ -66,7 +66,7 @@ mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
 
-mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -258,7 +258,7 @@ Looping through each covariate.
 ```{r}
 names_of_vars<-c("SST","ChloroA","ocean","coast","NPP")
 
-cl<-makeCluster(2,"SOCK")
+cl<-makeCluster(3,"SOCK")
 registerDoSNOW(cl)
 posteriors<-foreach(x=1:length(names_of_vars),.errorhandling="pass",.verbose=T,.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   runModel(names_of_vars[[x]],mxy)
