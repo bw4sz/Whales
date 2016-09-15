@@ -36,9 +36,9 @@ library(foreach)
 source("RunModel.R")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
-#load("DataExploration.RData")
+load("DataExploration.RData")
 ```
 
 ```{r}
@@ -257,19 +257,22 @@ Looping through each covariate.
 
 ```{r}
 names_of_vars<-c("SST","ChloroA","ocean","coast","NPP")
+```
 
+```{r,eval=F}
 cl<-makeCluster(5,"SOCK")
 registerDoSNOW(cl)
 posteriors<-foreach(x=1:length(names_of_vars),.verbose=T,.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   runModel(names_of_vars[[x]],mxy)
 }
 stopCluster(cl)
+```
 
+```{r}
 #Name by variable
 names(posteriors)<-names_of_vars
 pc<-melt(posteriors,id.vars=colnames(posteriors[[1]]))
-pc$L1<-as.factor(pc$L1)
-levels(pc$L1)<-names_of_vars
+pc$L1<-factor(pc$L1,levels=names_of_vars)
 ```
 
 ##Chains
