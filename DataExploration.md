@@ -92,6 +92,24 @@ Looping through each covariate.
 * Sea Ice Cover (%)
 
 
+```
+## automatically exporting the following variables from the local environment:
+##   mxy, names_of_vars, runModel 
+## numValues: 4, numResults: 1, stopped: FALSE
+## returning status FALSE
+## numValues: 5, numResults: 2, stopped: FALSE
+## returning status FALSE
+## numValues: 5, numResults: 2, stopped: TRUE
+## numValues: 5, numResults: 3, stopped: TRUE
+## returning status FALSE
+## numValues: 5, numResults: 4, stopped: TRUE
+## returning status FALSE
+## numValues: 5, numResults: 5, stopped: TRUE
+## calling combine function
+## evaluating call object to combine results:
+##   fun(accum, result.1, result.2, result.3, result.4, result.5)
+## returning status TRUE
+```
 
 ##Chains
 ![](DataExploration_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
@@ -106,17 +124,27 @@ Looping through each covariate.
 
 ```
 ##         L1        par Significant
-## 1      SST  beta[4,1]        TRUE
-## 2      SST  beta[5,1]        TRUE
-## 3  ChloroA  beta[3,1]        TRUE
-## 4    ocean  beta[2,1]        TRUE
-## 5    ocean  beta[4,1]        TRUE
-## 6    ocean  beta[5,1]        TRUE
-## 7    coast  beta[5,1]        TRUE
-## 8      NPP  beta[2,1]        TRUE
-## 9      NPP  beta[4,1]        TRUE
-## 10     NPP  beta[5,1]        TRUE
-## 11     NPP beta_mu[1]        TRUE
+## 1      SST  beta[1,1]        TRUE
+## 2      SST  beta[2,1]        TRUE
+## 3      SST  beta[3,1]        TRUE
+## 4      SST  beta[4,1]        TRUE
+## 5      SST  beta[5,1]        TRUE
+## 6      SST  beta[6,1]        TRUE
+## 7      SST beta_mu[1]        TRUE
+## 8  ChloroA  beta[1,1]        TRUE
+## 9  ChloroA  beta[2,1]        TRUE
+## 10 ChloroA  beta[3,1]        TRUE
+## 11 ChloroA  beta[4,1]        TRUE
+## 12 ChloroA  beta[5,1]        TRUE
+## 13   ocean  beta[1,1]        TRUE
+## 14   ocean  beta[2,1]        TRUE
+## 15   ocean  beta[4,1]        TRUE
+## 16   ocean  beta[5,1]        TRUE
+## 17     NPP  beta[1,1]        TRUE
+## 18     NPP  beta[2,1]        TRUE
+## 19     NPP  beta[3,1]        TRUE
+## 20     NPP  beta[4,1]        TRUE
+## 21     NPP  beta[5,1]        TRUE
 ```
 
 #Behavior and environment
@@ -205,21 +233,21 @@ Looping through each covariate.
 
 
 ```
-##                            Type     Size     PrettySize  Rows Columns
-## mdat                 data.frame 26982544  [1] "25.7 Mb" 57230      59
-## m                         ggmap 13116432  [1] "12.5 Mb"  1280    1280
-## d        SpatialPointsDataFrame  2516368   [1] "2.4 Mb"  5389      66
-## oxy                  data.frame  2427056   [1] "2.3 Mb"  5389      66
-## monthall             data.frame  1513456   [1] "1.4 Mb" 29036       8
-## sxy                        list  1318080   [1] "1.3 Mb"     9      NA
-## mxy                      tbl_df  1216312   [1] "1.2 Mb"  2569      69
-## pc                   data.frame   646664 [1] "631.5 Kb" 16000       9
-## p                          list   611184 [1] "596.9 Kb"     5      NA
-## pribbon                    list   611184 [1] "596.9 Kb"     5      NA
+##                            Type     Size    PrettySize   Rows Columns
+## monthall             data.frame 28512896 [1] "27.2 Mb" 548256       8
+## mdat                 data.frame 26982544 [1] "25.7 Mb"  57230      59
+## d        SpatialPointsDataFrame 23187176 [1] "22.1 Mb"  49938      66
+## oxy                  data.frame 22385080 [1] "21.3 Mb"  49938      66
+## sxy                        list 18658304 [1] "17.8 Mb"    188      NA
+## mxy                      tbl_df 16152560 [1] "15.4 Mb"  34484      69
+## m                         ggmap 13116624 [1] "12.5 Mb"   1280    1280
+## p                          list  4868472  [1] "4.6 Mb"      5      NA
+## pribbon                    list  4868472  [1] "4.6 Mb"      5      NA
+## plotall              data.frame  4388448  [1] "4.2 Mb"  91376       7
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1532719 81.9    3886542 207.6  3886542 207.6
-## Vcells 8174541 62.4   31069088 237.1 59796647 456.3
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1541608  82.4   27858283 1487.8  47136036 2517.4
+## Vcells 51975586 396.6  617908278 4714.3 827726610 6315.1
 ```
