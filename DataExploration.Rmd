@@ -260,7 +260,7 @@ names_of_vars<-c("SST","ChloroA","ocean","coast","NPP")
 
 cl<-makeCluster(3,"SOCK")
 registerDoSNOW(cl)
-posteriors<-foreach(x=1:length(names_of_vars),.errorhandling="pass",.verbose=T,.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
+posteriors<-foreach(x=1:length(names_of_vars),.verbose=T,.packages=c("dplyr","reshape2","R2jags","stringr")) %dopar% {
   runModel(names_of_vars[[x]],mxy)
 }
 stopCluster(cl)
@@ -274,7 +274,7 @@ levels(pc$L1)<-names_of_vars
 
 ##Chains
 ```{r,fig.height=20}
-ggplot(data=pc,aes(x=Draw,y=value)) + geom_line(aes(col=chain)) + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
+ggplot(data=pc,aes(x=Draw,y=value)) + geom_line(aes(col=as.factor(chain))) + facet_grid(par~L1,scales='free') + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
 ```{r,fig.height=20}
@@ -286,16 +286,6 @@ ggplot(data=pc,aes(x=value)) + geom_histogram() + facet_grid(par~L1,scales='free
 ```{r,fig.height=10,fig.width=15}
 psum<-pc %>% group_by(L1,parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange(aes(col=L1),position=position_dodge(width = 0.1)) + geom_point(aes(col=L1),position=position_dodge(width = 0.1)) + facet_wrap(~parameter,scales="free",ncol=2)
-```
-
-## Which estimates do not overlap with zero?
-
-```{r}
-psum<-pc %>% group_by(L1,parameter,par)%>% filter(parameter %in% c("beta_mu","beta"),Behavior==1)  %>%  summarize(mean=round(mean(value),3),lower=round(quantile(value,0.05),3),upper=round(quantile(value,0.95),3))
-
-sig<-psum %>% group_by(L1,par) %>%summarize(Significant=!findInterval(0,sort(c(lower,upper)))==1) %>% filter(Significant==TRUE) %>% as.data.frame()
-
-sig
 ```
 
 #Behavior and environment
@@ -370,6 +360,28 @@ ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + 
 
 ggplot(monthall) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month)) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching to Foraging to Traveling",fill="Transition") + facet_grid(Month~L1,scales="free")
 
+```
+
+### Zoom in
+
+```{r}
+
+limits<-monthall %>% group_by(L1) %>% summarize(min=quantile(x,0,na.rm=T),max=quantile(x,0.5,na.rm=T))
+limits<-limits %>% mutate(L1=factor(L1,levels=names(posteriors))) %>% arrange(L1)
+p<-list()
+for (x in 1:length(posteriors)){
+p[[x]]<-ggplot(monthall[monthall$L1 %in% names(posteriors)[x],]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower),alpha=0.5) + theme_bw() + labs(col="Transition",y="Probability",fill="Transition")  + facet_wrap(~Month) + scale_x_continuous(limits=c(limits$min[x],limits$max[x])) + ggtitle(names(posteriors)[x])
+}
+p
+```
+
+
+```{r}
+psum<-pc %>% group_by(L1,par)%>% filter(parameter %in% c("beta_mu","beta"),Behavior==1)  %>%  summarize(mean=round(mean(value),3),lower=round(quantile(value,0.05),3),upper=round(quantile(value,0.95),3))
+
+sig<-psum %>% group_by(L1,par)%>%summarize(mean=unique(mean),lower=unique(lower),upper=unique(upper),Significant=!findInterval(0,sort(c(lower,upper)))==1) %>% filter(Significant==TRUE) %>% as.data.frame()
+
+sig
 ```
 
 ```{r}
