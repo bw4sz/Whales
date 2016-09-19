@@ -1,0 +1,216 @@
+---
+title: 'Antarctic Whale Project: Time Raster'
+author: "Ben Weinstein"
+date: "September 16, 2016"
+output: html_document
+---
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
+library(raster)
+library(reshape2)
+library(ggplot2)
+library(MASS)
+library(ggmap)
+library(dplyr)
+library(chron)
+library(gridExtra)
+library(stringr)
+library(move)
+library(maps)
+
+#New model to be run, flag turned off if just updating.
+newModel<-T
+```
+
+```{r,eval=F}
+#Load in data
+load("SingleSpecies.RData")
+#jags$recompile()
+newModel<-F
+```
+
+```{r}
+#memory function
+
+# improved list of objects
+.ls.objects <- function (pos = 1, pattern, order.by,
+                        decreasing=FALSE, head=FALSE, n=5) {
+    napply <- function(names, fn) sapply(names, function(x)
+                                         fn(get(x, pos = pos)))
+    names <- ls(pos = pos, pattern = pattern)
+    obj.class <- napply(names, function(x) as.character(class(x))[1])
+    obj.mode <- napply(names, mode)
+    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
+    obj.prettysize <- napply(names, function(x) {
+                           capture.output(format(utils::object.size(x), units = "auto")) })
+    obj.size <- napply(names, object.size)
+    obj.dim <- t(napply(names, function(x)
+                        as.numeric(dim(x))[1:2]))
+    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
+    obj.dim[vec, 1] <- napply(names, length)[vec]
+    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)
+    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")
+    if (!missing(order.by))
+        out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    if (head)
+        out <- head(out, n)
+    out
+}
+
+# shorthand
+lsos <- function(..., n=10) {
+    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+}
+```
+
+```{r}
+#raster layers
+#ice
+ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
+ice<-round(ice*-1/1000,3)
+rice<-aggregate(ice,fact=0.1/res(ice))
+
+rm(ice)
+
+#coast
+distc<-raster("InputData/DistancetoCoast.tif")
+rice[rice<0]<-NA
+distc[is.na(rice)]<-NA
+
+#read data
+mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
+
+##need to look into making into a movebank object.
+
+#name env columns
+#Create a oceandepth in km 
+mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
+mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
+mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
+mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
+
+#standardize column names to match the simulation
+#Create an animal tag.
+mxy <- as(mdat, "data.frame")
+mxy$Animal<-mxy$individual.local.identifier
+mxy$x<-mxy$location.long
+mxy$y<-mxy$location.lat
+
+#remove minke whales
+minke<-c("131117","131118","131120","154184")
+mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
+
+#grab set of animals
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+
+#empty coordinates
+mxy<-mxy[!is.na(mxy$x),]
+
+#crop by extent
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
+
+d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
+#give it a geospatial layer
+
+mxy<-as.data.frame(d)
+
+#set datestamp
+mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+
+#month and year columns
+mxy$Month<-months(mxy$timestamp)
+mxy$Year<-years(mxy$timestamp)
+
+#Only austral sping and summer
+mxy<-mxy[mxy$Month %in% month.name[1:7],]
+
+#remove empty timestamps
+mxy<-mxy[!is.na(mxy$timestamp),]
+
+#remove duplicates
+mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
+
+mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+
+```
+
+# Overlap with Krill Fishery
+
+```{r}
+krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
+ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),krill)
+```
+
+```{r}
+#raster
+r<-raster(extent(d)*c(2,1.1),nrow=100,ncol=100)
+
+#res(r)<-0.25
+#put cellindex number
+r[]<-1:ncell(r)
+
+sxy<-split(mxy,mxy$Animal)
+sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
+
+#plot(rasterize(j,r,field="Index",fun='count'))
+
+#time in each cell
+timecell<-function(j){
+  
+  rlej<-rle(x=diff(j$Index))
+  position<-c(1,cumsum(rlej$lengths))
+  timestack<-c()
+  
+  #if only one position
+  if(length(position)==1){
+    timestack[1]<-0
+    
+  } else {
+    
+    #time difference between first and last point in the cell
+      for(x in 2:length(position)){
+        timed<-j[position[x-1]:position[x],]
+        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
+    }
+  }
+
+  out<-data.frame(Sum=sum(timestack))
+  return(out)
+}
+
+#loop through all animals
+sptracks<-lapply(sxy,function(x){
+  k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
+  
+  #get the cells that points are in
+  k$cellvalue<-extract(r,k)
+  
+  #for each cell value, perform time function
+  sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
+  return(sptrack)}
+)
+
+sptracks<-rbind_all(sptracks)
+
+#get sum across animals
+cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
+
+#is there a better way to loop through?
+r[]<-NA
+for(x in 1:nrow(cellvals)){
+r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+}
+
+plot(r/length(unique(mxy$Animal)))
+map(add=T)
+```
+
+
+```{r}
+temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
+
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggsave("Figures/ResidenceTime.jpeg",height=9,width=7)
+```
