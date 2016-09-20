@@ -207,6 +207,14 @@ plot(r/length(unique(mxy$Animal)))
 map(add=T)
 ```
 
+```{r}
+#extract
+ksp$ResidencyTime<-extract(r,y=ksp)
+#write to file
+ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
+ggsave("Figures/Observed.svg")
+```
+
 
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
@@ -214,3 +222,5 @@ temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",colo
 ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
 ggsave("Figures/ResidenceTime.jpeg",height=9,width=7)
 ```
+
+

@@ -5,10 +5,10 @@ library(dplyr)
 library(htmltools)
 
 server <- function(input, output, session) {
+  
+  #Read in data
   d<-read.csv("WhaleDat.csv")
   
-  d<-d %>% filter(Animal %in% c("112699","121207","131151"))
-
   wrapper <- function(df) {
     df  %>% select(x,y) %>% as.data.frame %>% Line %>% list %>% return
   }
@@ -22,12 +22,21 @@ server <- function(input, output, session) {
     mapply(x = y$res, ids = ids, FUN = function(x,ids) {Lines(x,ID=ids)})
   ,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
-  #Associate line data - data doesn't quite work
-  spl<-SpatialLinesDataFrame(data,d)
-  spp<-SpatialPointsDataFrame(data=d,cbind(d$x,d$y),proj4string=CRS("+proj=longlat +datum=WGS84"))
+  #Base map
+  m<-leaflet() %>% addTiles() 
   
-  #points
-  m <- leaflet() %>% addTiles() %>% addMarkers(data=spp,lng=~x,lat=~x,clusterId = ~Animal,clusterOptions = markerClusterOptions())
+  #By Year
+    dinfo<-d %>% distinct(Animal) %>% select(Animal,Year)
+    spl<-SpatialLinesDataFrame(data,dinfo)
+    
+    #Associate points data
+    spp<-SpatialPointsDataFrame(data=d,cbind(d$x,d$y),proj4string=CRS("+proj=longlat +datum=WGS84"))
+    
+    #points
+    #m <- leaflet() %>% addTiles() %>% addMarkers(data=spp,lng=~x,lat=~x,clusterId = ~Animal,clusterOptions = markerClusterOptions())
+    
+    binpal <- colorBin("RdYlBu", dinfo$Year, 6, pretty = FALSE)
+
+  m <- leaflet() %>% addTiles() %>% addPolylines(data=spl,color=~binpal(Year),popup=~as.character(Animal),weight=2)
   output$mymap <- renderLeaflet(m)
-    #renderMapview(mapview(data,zcol="Year")) %>% addMarkers(d,lng = ~x, lat=~y,group=~Animal)
 }

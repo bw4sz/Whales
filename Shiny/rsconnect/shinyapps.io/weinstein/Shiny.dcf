@@ -2,6 +2,6 @@ name: Shiny
 account: weinstein
 server: shinyapps.io
 appId: 126262
-bundleId: 560508
+bundleId: 561642
 url: https://weinstein.shinyapps.io/Shiny/
-when: 1474158427.79783
+when: 1474299200.02221
