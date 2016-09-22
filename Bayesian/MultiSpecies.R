@@ -95,7 +95,7 @@ cat("
     
     #Monthly Covaraites
     for(x in 1:Months){
-    beta[x,1]~dnorm(beta_mu[1],beta_tau[1])
+    beta[x,1]<-0
     beta[x,2]<-0
     }
     
@@ -111,12 +111,12 @@ cat("
     alpha_tau[2] ~ dt(0,1,1)I(0,)
     
     #Slopes
-    beta_mu[1] ~ dnorm(0,0.386)
+    beta_mu[1] = 0
     beta_mu[2] = 0
     
     
     #Monthly Variance
-    beta_tau[1] ~ dt(0,1,1)I(0,)
+    beta_tau[1] = 0
     beta_tau[2] = 0
     
     
