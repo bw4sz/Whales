@@ -26,7 +26,6 @@ newModel<-T
 
 ```{r,eval=F}
 #Load in data
-load("SingleSpecies.RData")
 #jags$recompile()
 newModel<-F
 ```
@@ -219,8 +218,10 @@ ggsave("Figures/Observed.svg")
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
-ggsave("Figures/ResidenceTime.jpeg",height=9,width=7)
+#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggsave("Figures/ResidenceTime_JustTracks.jpeg",height=9,width=7)
 ```
+
 
 
