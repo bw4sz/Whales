@@ -20,7 +20,6 @@ library(boot)
 library(raster)
 library(reshape2)
 library(ggplot2)
-library(survival)
 library(MASS)
 library(ggmap)
 library(dplyr)
@@ -29,6 +28,7 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(move)
+library(maptools)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
@@ -705,6 +705,19 @@ rm(behav_chains)
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset() + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000),col="black")
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
+```
+
+Compared to CMLRR regions
+
+```{r}
+ssm<-readShapePoly("InputData/SSMU_2013/SSMU_2013.shp")
+csmm<-crop(ssm,d)
+plot(csmm)
+f<-fortify(csmm)
+
+ggmap(m)+ geom_polygon(data=f,aes(x=long,y=lat,fill=id,alpha=0.5))+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging")  + theme_inset() 
+ggsave("Figures/SpatialPred_regions.jpg",height=5,width=5)
+
 ```
 
 ### Per Animal

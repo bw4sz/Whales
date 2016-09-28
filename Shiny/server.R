@@ -9,6 +9,8 @@ server <- function(input, output, session) {
   #Read in data
   d<-read.csv("WhaleDat.csv")
   
+  #ice data
+  
   ##Base map
   wrapper <- function(df) {
     df  %>% select(x,y) %>% as.data.frame %>% Line %>% list %>% return
