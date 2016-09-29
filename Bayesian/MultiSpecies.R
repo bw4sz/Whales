@@ -88,7 +88,7 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[2] ~ dbeta(1.5, 6)		## gamma for state 2
+    gamma[2] ~ dbeta(1.5, 2)		## gamma for state 2
     dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[1] <- gamma[2] + dev 		## gamma for state 1
     
