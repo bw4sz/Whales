@@ -353,7 +353,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9500,n.thin=5,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=100,n.burnin=0,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -771,7 +771,6 @@ mksp<-melt(ksp,measure.vars=names(s))
 
 #write to file
 ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=variable))  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tons)")
-ggsave("Figures/Observed.svg")
 ```
 
 
