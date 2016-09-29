@@ -29,6 +29,7 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(move)
+library(maps)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
@@ -271,7 +272,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$Step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
 return(x)
 })
 
@@ -283,30 +284,24 @@ mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 
 ```{r}
 #total number of steps per track/animal
-steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(Step)))
+steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(step)))
 
 # give each step a label
-mxy<-mxy %>% group_by(Animal,Track,Step) %>% mutate(jStep=1:n())
+mxy<-mxy %>% group_by(Animal,Track,step) %>% mutate(jStep=1:n())
 
 #Cast time array
-j<-acast(mxy,Animal~Track~Step~jStep,value.var="j")
+j<-acast(mxy,Animal~Track~step~jStep,value.var="j")
 
-#how many observations per individual in each Step
-mxy$Step<-factor(mxy$Step,levels=1:max(steps_all$n))
-idx<-melt(table(mxy$Animal,mxy$Track,mxy$Step))
-colnames(idx)<-c("Animal","Track","Step","jStep")
-idx<-acast(data=idx,Animal~Track~Step)
-
-#make ocean a matrix -> MEAN VALUE -> will this yield a jags error on empty cells?
-oc<-acast(mxy,Animal~Track~Step,value.var="ocean",fun.aggregate = mean)
-
-#make coast a matrix -> MEAN VALUE
-coast<-acast(mxy,Animal~Track~Step,value.var="coast",fun.aggregate = mean)
+#how many observations per individual in each step
+mxy$step<-factor(mxy$step,levels=1:max(steps_all$n))
+idx<-melt(table(mxy$Animal,mxy$Track,mxy$step))
+colnames(idx)<-c("Animal","Track","step","jStep")
+idx<-acast(data=idx,Animal~Track~step)
 
 #month array
 mxy$MonthF<-as.numeric(factor(mxy$Month,levels=month.name))
 
-MonthA<-acast(mxy,Animal~Track~Step,value.var="MonthF",fun.aggregate = min)
+MonthA<-acast(mxy,Animal~Track~step,value.var="MonthF",fun.aggregate = min)
 MonthA[!is.finite(MonthA)]<-NA
 
 #Individuals
@@ -320,14 +315,14 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
-obs<-acast(obs,Animal~Track~Step~jStep~variable)
+obs<-acast(obs,Animal~Track~step~jStep~variable)
 ```
 
 How did the filter change the extent of tracks?
 
 ```{r}
 #Plot
-mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
+mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
@@ -352,10 +347,10 @@ source("Bayesian/MultiSpecies.R")
 
 #prior cov shape
 R <- diag(c(1,1))
-data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
+data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu")
+pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
   system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=1,DIC=FALSE))
@@ -377,17 +372,16 @@ lsos()
 
 #delete jags objects
 
-rm(data)
-rm(argos)
-rm(obs)
-rm(j)
+#rm(data)
+#rm(argos)
+#rm(obs)
+#rm(j)
 gc()
 
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 
-rm(jagM)
-gc()
+#rm(jagM)
 
 colnames(pc)<-c("Draw","chain","par","value")
 
@@ -412,10 +406,17 @@ splitpc[c("phi")]<-lapply(splitpc[c("phi")],function(x){
     pc<-data.frame(x,sv)
 })
 
+#State index
+splitpc[c("state")]<-lapply(splitpc[c("state")],function(x){
+#As matrices
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+),(\\d+)]"))[,3:5]
+    colnames(sv)<-c("Animal","Track","step")
+    pc<-data.frame(x,sv)
+})
+
 #bind all matrices back together
 pc<-rbind_all(splitpc)
 rm(splitpc)
-
 
 ```
 
@@ -480,19 +481,25 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 behav_chains<-pc[pc$parameter %in% "phi" & pc$Behavior==2,]
 
 #arrange by time - capitalize
-behav_chains$Step<-as.numeric(as.character(behav_chains$step))
-behav_chains<-behav_chains %>% arrange(Step)
+behav_chains$step<-as.numeric(as.character(behav_chains$step))
+behav_chains<-behav_chains %>% arrange(step)
 
 #Label Behaviors
 behav_chains$Behavior<-as.factor(behav_chains$Behavior)
 levels(behav_chains$Behavior)<-c("Traveling","Foraging")
 
-mean_phi<-behav_chains %>% group_by(Animal,Track,Step) %>% summarize(phi=mean(value))
+#mean transition probability
+mean_phi<-behav_chains %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value))
 
-mxy<-merge(mxy,mean_phi,by=c("Step","Track","Animal"))
+#mode state for each position
+mode_state<-pc %>% filter(pc$parameter %in% "state") %>% group_by(Animal,Track,step) %>% summarize(state=as.numeric(names(which.max(table(value)))))
+
+mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
+
+mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
 
 #ensure order for plotting
-mxy<-mxy %>% arrange(Animal,Track,Step,jStep)
+mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 rm(behav_chains)
 ```
@@ -514,7 +521,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scal
 
 ```{r,fig.height=20,fig.width=13}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi,col=ocean)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Foraging") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Foraging") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + ylim(0,1)
 ```
 
 ##Behavioral description
@@ -534,33 +541,19 @@ feedmap <- data.frame(rasterToPoints(m))
 
 temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-#plot(m)
-
-#ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
 # Overlap with Krill Fishery
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
-
-#ggmap(temp) + geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) + theme_inset()
-ggsave("Figures/KrillOverlap.jpg",height=8,width=8) 
-```
-
-```{r}
 ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),krill)
-#extract probability of feeding at krill midpoints
-ksuit<-extract(x=travpar,y=ksp)
-kdf<-data.frame(ksp,ksuit)
-
-ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 ```
 
 #Time spent in grid cell
 
 ```{r}
 #raster
-r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
+r<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
 #res(r)<-0.25
 #put cellindex number
@@ -615,11 +608,10 @@ cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
 #is there a better way to loop through?
 r[]<-NA
 for(x in 1:nrow(cellvals)){
-r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+  r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
-
+plot(r)
 plot(r/length(unique(mxy$Animal)))
-map(add=T)
 ```
 
 ```{r}
@@ -630,41 +622,26 @@ ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG))
 ggsave("Figures/Observed.svg")
 ```
 
-
 ```{r}
-temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
-
-#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
-#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
-ggsave("Figures/ResidenceTime_JustTracks.jpeg",height=9,width=7)
+traveling<-mxy %>% filter(state==1)
+foraging<-mxy %>% filter(state==2)
 ```
 
 ##Traveling
 
 ```{r}
-#For convienance we are calling the traveling state as phi above 0.5
-mxy$State<-factor(mxy$phi>0.5)
-levels(mxy$State)<-c("Foraging","Traveling")
-
-ssy<-split(mxy,mxy$State)
-
-traveling<-ssy[[2]]
-foraging<-ssy[[1]]
-```
-
-```{r}
 #raster
-r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
+rtraveling<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
-#res(r)<-0.25
+#res(rtraveling)<-0.25
 #put cellindex number
-r[]<-1:ncell(r)
+rtraveling[]<-1:ncell(rtraveling)
 
 
 sxy<-split(traveling,traveling$Animal)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
-#plot(rasterize(j,r,field="Index",fun='count'))
+#plot(rasterize(j,rtraveling,field="Index",fun='count'))
 
 #time in each cell
 timecell<-function(j){
@@ -695,7 +672,7 @@ sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
   #get the cells that points are in
-  k$cellvalue<-extract(r,k)
+  k$cellvalue<-extract(rtraveling,k)
   
   #for each cell value, perform time function
   sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
@@ -708,24 +685,23 @@ sptracks<-rbind_all(sptracks)
 cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
 
 #is there a better way to loop through?
-r[]<-NA
+rtraveling[]<-NA
 for(x in 1:nrow(cellvals)){
-r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+  rtraveling[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
 
-plot(r/length(unique(traveling$Animal)))
-map(add=T)
+plot(rtraveling/length(unique(traveling$Animal)))
+plot(rtraveling)
 ```
 
 
 ```{r}
 #raster
-r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
+rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
 #res(r)<-0.25
 #put cellindex number
-r[]<-1:ncell(r)
-
+rforaging[]<-1:ncell(rforaging)
 
 sxy<-split(foraging,foraging$Animal)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
@@ -761,7 +737,7 @@ sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
   #get the cells that points are in
-  k$cellvalue<-extract(r,k)
+  k$cellvalue<-extract(rforaging,k)
   
   #for each cell value, perform time function
   sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
@@ -774,19 +750,28 @@ sptracks<-rbind_all(sptracks)
 cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
 
 #is there a better way to loop through?
-r[]<-NA
+rforaging[]<-NA
 for(x in 1:nrow(cellvals)){
-r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+  rforaging[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
 
 plot(r/length(unique(foraging$Animal)))
 map(add=T)
 ```
+
+```{r}
+s<-stack(r,rforaging,rtraveling)
+names(s)<-c("All","Foraging","Traveling")
+plot(s,nr=1,addfun=function(){map(add=T)})
+```
+
 ```{r}
 #extract
-ksp$ResidencyTime<-extract(r,y=ksp)
+ksp<-data.frame(ksp,extract(s,y=ksp))
+mksp<-melt(ksp,measure.vars=names(s))
+
 #write to file
-ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
+ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=variable))  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tons)")
 ggsave("Figures/Observed.svg")
 ```
 
@@ -794,9 +779,22 @@ ggsave("Figures/Observed.svg")
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
-#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+mxy$bstate<-factor(mxy$state)
+levels(mxy$bstate)<-c("Traveling","Foraging")
+ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=bstate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
 ggsave("Figures/TravelingResidenceTime_JustTracks.jpeg",height=9,width=7)
+```
+
+```{r}
+ggmap(temp) + geom_tile(data.frame(rasterToPoints(r)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+```
+
+```{r}
+ggmap(temp) + geom_tile(data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Foraging") 
+```
+
+```{r}
+ggmap(temp) + geom_tile(data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling")
 ```
 
 ```{r}
