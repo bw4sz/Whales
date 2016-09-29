@@ -178,7 +178,7 @@ cat("
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter) in state 1
-    gamma[2] ~ dbeta(1.5, 5)		## gamma for state 2
+    gamma[2] ~ dbeta(1.5, 2)		## gamma for state 2
     dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[1] <- gamma[2] + dev 		## gamma for state 1
     
@@ -215,8 +215,8 @@ sink()
 
 
 ```
-##    user  system elapsed 
-##    2.67    0.09  144.86
+##     user   system  elapsed 
+##  437.387    1.532 2506.422
 ```
 
 
@@ -224,23 +224,23 @@ sink()
 ##Chains
 
 ```
-##                         Type     Size    PrettySize  Rows Columns
-## mdat              data.frame 24692824 [1] "23.5 Mb" 57230      54
-## m                      ggmap 13116672 [1] "12.5 Mb"  1280    1280
-## d     SpatialPointsDataFrame  3459904  [1] "3.3 Mb"  8124      61
-## oxy               data.frame  3326832  [1] "3.2 Mb"  8124      61
-## jagM          rjags.parallel  2373272  [1] "2.3 Mb"     6      NA
-## sxy                     list  1904000  [1] "1.8 Mb"    21      NA
-## mxy               grouped_df  1787056  [1] "1.7 Mb"  3820      66
-## data                    list  1081312    [1] "1 Mb"     9      NA
-## argos                  array   691176  [1] "675 Kb"     2      12
-## obs                    array   691176  [1] "675 Kb"     2      12
+##                         Type      Size    PrettySize  Rows Columns
+## jagM          rjags.parallel 326073088  [1] "311 Mb"     6      NA
+## data                    list  62794448 [1] "59.9 Mb"     9      NA
+## argos                  array  40901024   [1] "39 Mb"    34      14
+## obs                    array  40901024   [1] "39 Mb"    34      14
+## mdat              data.frame  24692824 [1] "23.5 Mb" 57230      54
+## d     SpatialPointsDataFrame  21934528 [1] "20.9 Mb" 51696      61
+## oxy               data.frame  21104304 [1] "20.1 Mb" 51696      61
+## j                      array  20459496 [1] "19.5 Mb"    34      14
+## sxy                     list  17585904 [1] "16.8 Mb"   164      NA
+## mxy               grouped_df  16724840   [1] "16 Mb" 36213      66
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1460639 78.1    3886542 207.6  3886542 207.6
-## Vcells 8502722 64.9   24806718 189.3 60480683 461.5
+##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells  1664970  89.0    3886542  207.6   3886542  207.6
+## Vcells 92626348 706.7  148852402 1135.7 148852398 1135.7
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
@@ -257,13 +257,13 @@ sink()
 ## Parameter Summary
 
 ```
-##   parameter         par        mean        lower      upper
-## 1  alpha_mu alpha_mu[1]  2.42370753  2.196926797  2.7081927
-## 2  alpha_mu alpha_mu[2] -2.27771811 -2.900654004 -1.6469218
-## 3     gamma    gamma[1]  0.80230224  0.741749236  0.8593515
-## 4     gamma    gamma[2]  0.11076147  0.009213097  0.2013641
-## 5     theta    theta[1]  0.03936701 -0.014165665  0.1280827
-## 6     theta    theta[2]  3.81522576  2.217518225  5.2836334
+##   parameter         par        mean        lower       upper
+## 1  alpha_mu alpha_mu[1]  1.00891237  0.733299824  1.29444602
+## 2  alpha_mu alpha_mu[2] -2.20556490 -2.806954358 -1.51849410
+## 3     gamma    gamma[1]  0.90086453  0.826061178  0.95174042
+## 4     gamma    gamma[2]  0.15498165  0.007416695  0.23156457
+## 5     theta    theta[1] -0.00450118 -0.023512847  0.02081974
+## 6     theta    theta[2]  5.75929716  4.027373748  6.17736495
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
@@ -322,21 +322,21 @@ sink()
 
 
 ```
-##                            Type     Size     PrettySize  Rows Columns
-## mdat                 data.frame 24692824  [1] "23.5 Mb" 57230      54
-## temp                      ggmap 13116192  [1] "12.5 Mb"  1280    1280
-## d        SpatialPointsDataFrame  3459904   [1] "3.3 Mb"  8124      61
-## oxy                  data.frame  3326832   [1] "3.2 Mb"  8124      61
-## jagM             rjags.parallel  2373272   [1] "2.3 Mb"     6      NA
-## mxy                  data.frame  1635416   [1] "1.6 Mb"  3543      69
-## pc                       tbl_df  1479728   [1] "1.4 Mb" 26640      10
-## data                       list  1081312     [1] "1 Mb"     9      NA
-## sxy                        list   871192 [1] "850.8 Kb"     2      NA
-## foraging             data.frame   840856 [1] "821.1 Kb"  1818      68
+##                         Type      Size    PrettySize    Rows Columns
+## jagM          rjags.parallel 326073088  [1] "311 Mb"       6      NA
+## pc                    tbl_df  66876592 [1] "63.8 Mb" 1270100      10
+## data                    list  62794448 [1] "59.9 Mb"       9      NA
+## argos                  array  40901024   [1] "39 Mb"      34      14
+## obs                    array  40901024   [1] "39 Mb"      34      14
+## mdat              data.frame  24692824 [1] "23.5 Mb"   57230      54
+## d     SpatialPointsDataFrame  21934528 [1] "20.9 Mb"   51696      61
+## oxy               data.frame  21104304 [1] "20.1 Mb"   51696      61
+## j                      array  20459496 [1] "19.5 Mb"      34      14
+## mxy               data.frame  15682008   [1] "15 Mb"   34328      69
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1513442 80.9    3886542 207.6  3886542 207.6
-## Vcells 8976384 68.5   24806718 189.3 60480683 461.5
+##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1704503  91.1    3886542  207.6   3886542  207.6
+## Vcells 102782828 784.2  148852402 1135.7 148852398 1135.7
 ```
