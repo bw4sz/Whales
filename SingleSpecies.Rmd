@@ -76,31 +76,8 @@ lsos <- function(..., n=10) {
 ```
 
 ```{r}
-#raster layers
-#ice
-ice<-raster("InputData/ETOPO1_Ice_g_geotiff.tif")
-ice<-round(ice*-1/1000,3)
-rice<-aggregate(ice,fact=0.1/res(ice))
-
-rm(ice)
-
-#coast
-distc<-raster("InputData/DistancetoCoast.tif")
-rice[rice<0]<-NA
-distc[is.na(rice)]<-NA
-
 #read data
 mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
-
-##need to look into making into a movebank object.
-
-#name env columns
-#Create a oceandepth in km 
-mdat$ocean<-round(mdat$ETOPO1.Elevation * -1 /1000,3)
-mdat$coast<-round(mdat$NASA.Distance.to.Coast,1)
-mdat$SST<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Daytime.SST
-mdat$ChloroA<-mdat$MODIS.Ocean.Aqua.OceanColor.4km.Monthly.Chlorophyll.A
-
 #standardize column names to match the simulation
 #Create an animal tag.
 mxy <- as(mdat, "data.frame")
@@ -113,7 +90,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -143,12 +120,6 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 
-```
-
-#Descriptive Statistics
-```{r}
-#no distance to coast,elevation
-mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 ```
 
 ```{r}
@@ -246,48 +217,12 @@ $$\begin{matrix}
 \end{matrix}
 $$
 
-##Environment
-
-Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
-
-It generally follows the form, conditional on behavior at t -1:
-
-$$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 
 With the probability of switching states:
 
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_{Month,1} * Ocean_{y[t,]} + \beta_{Month,2} * Coast_{y[t,]}$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}}$$
 
-$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
-
-Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
-
-The effect of the environment is temporally variable such that
-
-$$ \beta_{Month,2} \sim ~ Normal(\beta_{\mu},\beta_\tau)$$
-
-
-```{r,fig.height=3,fig.width=3.5}
-dplot<-function(a1,beta=c(0,0),beta2=c(0,0),x=0,coast=0){
-
-  #Transition from traveling to traveling
-  y<-inv.logit(a1[1]+beta[1]*x + beta2[1]*coast)
-  d11<-data.frame(x,coast,y,State="Traveling",Begin="Traveling")
-  
-  #transition from Traveling to Foraging
-  y<-1-inv.logit(a1[1]+beta[1]*x+ beta2[1]*coast)
-  d12<-data.frame(x,coast,y,State="Foraging",Begin="Traveling")
-
-  y<-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
-  d21<-data.frame(x,coast,y,State="Traveling",Begin="Foraging")
-  
-  y<-1-inv.logit(a1[2]+beta[2]*x+ beta2[2]*coast)
-  d22<-data.frame(x,coast,y,State="Foraging",Begin="Foraging")
-  
-  d<-rbind_all(list(d11,d12,d21,d22))
-  return(d)
-}
-```
+$$\phi_{foraging} = 1 - \phi_{traveling} $$
 
 ##Continious tracks
 
@@ -420,10 +355,10 @@ R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ocean=oc,coast=coast,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","beta_mu","beta2_mu","beta","beta2")
+pt<-c("theta","gamma","phi","alpha_mu")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=10,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -463,21 +398,10 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","beta_mu","beta2_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","gamma","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
     return(pc)
-})
-
-## double index
-splitpc[c("beta","beta2")]<-lapply(splitpc[c("beta","beta2")],function(x){
-    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]      
-    colnames(sv)<-c("MonthF","Behavior")
-    setp<-data.frame(x,sv)
-    #get month name
-    mindex<-mxy %>% ungroup() %>% select(MonthF,Month) %>% distinct()
-    setp<-merge(setp,mindex,by="MonthF")
-    return(setp)
 })
 
 #Three index
@@ -526,15 +450,11 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),para
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-beta1prior<-data.frame(Draw=1:todraw,par='beta[1]',value=rnorm(todraw,0,1.67),parameter='beta_mu',Behavior=1,Estimate="Prior")
-
-beta21prior<-data.frame(Draw=1:todraw,par='beta2[1]',value=rnorm(todraw,0,1.67),parameter='beta2_mu',Behavior=1,Estimate="Prior")
-
 gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,1,10),parameter='gamma',Behavior=1,Estimate="Prior")
 
 gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,1.5,5),parameter='gamma',Behavior=2,Estimate="Prior")
 
-prs<-rbind_all(list(a1prior,a2prior,beta1prior,beta21prior,gamma1prior,gamma2prior))
+prs<-rbind_all(list(a1prior,a2prior,gamma1prior,gamma2prior))
 
 prs$Behavior<-as.factor(prs$Behavior)
 
@@ -551,128 +471,6 @@ psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par
 as.data.frame(psum)
 
 ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_point() + facet_wrap(~parameter,scales="free",ncol=2)
-```
-
-#Behavior and environment
-
-##Hierarchical 
-
-### Ocean Depth
-```{r}
-#get the posterior estimates of the env function
-postplot<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_mu[1]',.$'beta_mu[2]'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
-
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin)+ xlim(0,quantile(mxy$ocean,0.75))
-
-#mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
-```
-
-### Distance to Coast
-```{r}
-#get the posterior estimates of the env function
-postplot<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu')) %>% dcast(.,Draw+chain~par) %>% group_by(Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta2=c(.$'beta2_mu[1]',.$'beta2_mu[2]'),coast=unique(mxy$coast))) %>% group_by(coast,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
-
-#mean env estimate
-ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) + xlim(0,quantile(mxy$coast,0.75))
-
-ggplot(postplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=State),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Transition") + facet_wrap(~Begin) 
-```
-
-###Interaction
-
-```{r}
-coastx<-seq(0,quantile(mxy$coast,0.98),quantile(mxy$coast,0.98)/20)
-oceanx<-seq(0,quantile(mxy$ocean,0.98),quantile(mxy$ocean,0.98)/20)
-allx<-expand.grid(coastx,oceanx)
-colnames(allx)<-c("coast","ocean")
-allx$ID<-1:nrow(allx)
-allx$alpha<-filter(pc,par %in% 'alpha_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta1<-filter(pc,par %in% 'beta_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-allx$beta2<-filter(pc,par %in% 'beta2_mu[1]') %>% group_by(parameter) %>% summarize(m=mean(value)) %>% .$m
-
-traj<-function(ocean,coast,alpha,beta1,beta2){
-  p<-1-inv.logit(alpha + beta1*ocean + beta2*coast)
-  data.frame(ocean,coast,phi=p)
-}
-
-intplot<-allx %>% group_by(ID) %>% do(traj(.$ocean,.$coast,.$alpha,.$beta1,.$beta2))
-
-ggplot(intplot,aes(x=ocean,y=coast,fill=phi)) + geom_tile() + theme_bw() + labs(x="Ocean Depth (km)",y="Distance to coast (km)") + scale_fill_gradient(low="blue",high="red") + ggtitle("Mean Probability of Foraging when Traveling")
-```
-
-## By Month
-
-### Depth
-
-```{r}
-#get the posterior estimates of the env function
-postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
-postplot_beta<-pc %>% filter(parameter %in% c('beta')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
-postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
-
-allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta=c(.$'beta_1',.$'beta_2'),x=unique(mxy$ocean),coast=0)) %>% group_by(x=x,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
-
-allplot$Month<-factor(allplot$Month,levels=month.name)
-
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$ocean,0.75)) 
-
-#mean env estimate
-ggplot(allplot) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability",fill="Transition") + facet_grid(State~Begin) 
-```
-
-Just the probability of feeding when traveling.
-
-```{r}
-#mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=x,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
-```
-
-Just mean estimate.
-
-```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$ocean,0.75))
-
-#mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=x,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_color_brewer(palette="YlOrRd")
-```
-
-### Coast
-
-```{r}
-#get the posterior estimates of the env function
-postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
-postplot_beta<-pc %>% filter(parameter %in% c('beta2')) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
-postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
-
-allplot<-postall %>% group_by(Month,Draw,chain) %>% do(dplot(a1=c(.$'alpha_mu[1]',.$'alpha_mu[2]'),beta2=c(.$'beta2_1',.$'beta2_2'),coast=unique(mxy$coast))) %>% group_by(coast,Month,Begin,State) %>% summarize(mean=mean(y),lower=quantile(y,0.05),upper=quantile(y,0.95))
-
-allplot$Month<-factor(allplot$Month,levels=month.name)
-
-ggplot(allplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Month") + facet_grid(State~Begin)+ xlim(0,quantile(mxy$coast,0.75)) + scale_fill_brewer(palette="YlOrRd")
-
-#mean env estimate
-ggplot(allplot) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5) + theme_bw() + labs(col="Transition",x="Distance to Coast (km)",y="Probability",fill="Month") + facet_grid(State~Begin) + scale_fill_brewer(palette="YlOrRd")
-```
-
-Zooming in on the top right plot.
-```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.75)) + scale_fill_brewer(palette="YlOrRd")
-
-#mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd")
-
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_ribbon(aes(x=coast,y=mean,ymin=upper,ymax=lower,fill=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Distance to coast (km)",y="Probability of Switching",fill="Month") + scale_fill_brewer(palette="YlOrRd") + facet_wrap(~Month)
-
-```
-
-Just mean estimate.
-
-```{r}
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Transition",x="Ocean Depth (km)",y="Probability of Feeding",fill="Month") + xlim(0,quantile(mxy$coast,0.75))+ scale_color_brewer(palette="YlOrRd")
-
-#mean env estimate
-ggplot(allplot[allplot$Begin=="Traveling" & allplot$State == "Foraging",]) + geom_line(aes(x=coast,y=mean,ymin=upper,ymax=lower,col=Month),alpha=0.5,size=1) + theme_bw() + labs(col="Month",x="Ocean Depth (km)",y="Probability of Switching",fill="Month") + scale_color_brewer(palette="YlOrRd")
 ```
 
 #Behavioral Prediction
@@ -709,23 +507,7 @@ ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 ### Per Animal
 ```{r,eval=F}
-#ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() 
-```
-
-##Log Odds of Foraging
-
-### Ocean Depth
-
-```{r,fig.height=20}
-#phi and ocean plot
-ggplot(data=mxy,aes(x=ocean,y=logit(phi),col=Month)) + geom_point() + labs(x="Ocean Depth",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + geom_smooth(method="lm")+ scale_color_brewer(palette="YlOrRd")
-```
-
-### Distance From Coast
-
-```{r,fig.height=20}
-#phi and ocean plot
-ggplot(data=mxy,aes(x=coast,y=logit(phi),col=Month)) + geom_point() + labs(x="Distance to coast",y="Estimated Log Odds of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free")+ geom_smooth(method="lm") + scale_color_brewer(palette="YlOrRd")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() 
 ```
 
 ##Autocorrelation in behavior
@@ -754,75 +536,14 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 
 #plot(m)
 
-ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
-```
-
-#Environmental Prediction - Probability of Foraging across time
-
-```{r}
-#get data frame of ice events
-fns<-paste("InputData/SeaIce/",month.abb[1:7],"_2015","LatLong.csv",sep="")
-pols<-lapply(fns,function(x){read.csv(x)})
-names(pols)<-month.abb[1:7]
-```
-
-## Bathymetry
-
-```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-#remove non-water areas
-rice[rice<0]<-NA
-
-#Traveling
-travpar<-calc(rice,function(x){ inv.logit(1-(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x))})
-
-plot(travpar)
-
-#travdf<-data.frame(rasterToPoints(travpar))
-  
-#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1)) + xlim(-75,-50) + ylim(-70,-57.5) 
-```
-
-## Distance to coast
-
-```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta2_mu','alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-#remove non-water areas
-rice[rice<0]<-NA
-
-#Traveling
-travpar<-calc(distc,function(x){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta2_mu[1]` * x)})
-#travdf<-data.frame(rasterToPoints(travpar))
-
-plot(travpar)
-#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9) + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red") + xlim(-75,-50) + ylim(-70,-57.5)
-```
-
-##All variables
-
-```{r}
-meanpar<-pc %>% filter(parameter %in% c('beta_mu',"beta2_mu",'alpha_mu'))  %>% group_by(par) %>% summarize(mean=mean(value)) %>% dcast(...~par)
-
-##Bathymetry
-s<-stack(rice,distc)
-
-#Traveling
-travpar<-calc(s,function(x,y){ 1-inv.logit(meanpar$`alpha_mu[1]` + meanpar$`beta_mu[1]` * x[1] + meanpar$`beta2_mu[1]` * x[2])})
-
-plot(travpar)
-
-travdf<-data.frame(rasterToPoints(travpar))
-
-#ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+ geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-57.5) + labs(x="",y="")
+#ggmap(temp) + labs(fill="Probabilty of Foraging")+ geom_tile(data=feedmap,aes(x=x, y=y,fill=layer),alpha=0.9) + theme_minimal() + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red")
 ```
 
 # Overlap with Krill Fishery
 ```{r}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 
-ggmap(temp) + geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) + theme_inset()
+#ggmap(temp) + geom_tile(data=travdf,aes(x=x, y=y,fill=layer),alpha=0.7) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Probability of Foraging", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(0,8)) + theme_inset()
 ggsave("Figures/KrillOverlap.jpg",height=8,width=8) 
 ```
 
@@ -835,81 +556,248 @@ kdf<-data.frame(ksp,ksuit)
 ggplot(kdf,aes(y=ksuit,x=log(C1KRIcatchKG))) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
 ```
 
-## By Month
+#Time spent in grid cell
 
 ```{r}
-#get the posterior estimates of the env function
-postplot_alpha<-pc %>% filter(parameter %in% c('alpha_mu')) %>% do(dcast(.,Draw+chain~par))
-postplot_beta<-pc %>% filter(parameter %in% c('beta',"beta2")) %>% dcast(.,Month+Draw+chain~parameter+Behavior)
-postall<-merge(postplot_alpha,postplot_beta,by=c("Draw","chain"))
+#raster
+r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
 
-postall$Month<-factor(postall$Month,levels=month.name)
-Months<-unique(postall$Month)
+#res(r)<-0.25
+#put cellindex number
+r[]<-1:ncell(r)
 
-monthras<-list()
-for (x in Months){
+sxy<-split(mxy,mxy$Animal)
+sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
-  monthpar<-postall %>% filter(Month==x)
+#plot(rasterize(j,r,field="Index",fun='count'))
+
+#time in each cell
+timecell<-function(j){
   
-  ##Bathymetry
-  s<-stack(rice,distc)
+  rlej<-rle(x=diff(j$Index))
+  position<-c(1,cumsum(rlej$lengths))
+  timestack<-c()
   
-  #Traveling
-  travpar<-calc(s,function(x){ 1-inv.logit(mean(monthpar$`alpha_mu[1]`) + mean(monthpar$`beta_1` ) * x[1] + mean(monthpar$`beta2_1` * x[2]))})
-  
-  travdf<-data.frame(rasterToPoints(travpar))
-  
-  monthras[[x]]<-travpar
+  #if only one position
+  if(length(position)==1){
+    timestack[1]<-0
+    
+  } else {
+    
+    #time difference between first and last point in the cell
+      for(x in 2:length(position)){
+        timed<-j[position[x-1]:position[x],]
+        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
+    }
+  }
+
+  out<-data.frame(Sum=sum(timestack))
+  return(out)
 }
-names(monthras)<-Months
-```
 
-```{r}
-  #plot
-for(x in 1:length(monthras)){  
-    ggmap(temp) + labs(fill="Mean Probabilty of Foraging")+   geom_tile(data=data.frame(rasterToPoints(monthras[[x]])),aes(x=x, y=y,fill=layer),alpha=0.9)  + scale_color_discrete(guide="none") + scale_fill_continuous(low="blue",high="red",limits=c(0,1))+  ggtitle(names(monthras)[[x]])+theme(axis.text.x=element_blank(),axis.text.y=element_blank()) + xlim(-75,-50) + ylim(-70,-57.5) + labs(x="",y="") + geom_polygon(data=pols[[x]],aes(x=long,y=lat,group=group),fill="whitesmoke")
+#loop through all animals
+sptracks<-lapply(sxy,function(x){
+  k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
+  
+  #get the cells that points are in
+  k$cellvalue<-extract(r,k)
+  
+  #for each cell value, perform time function
+  sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
+  return(sptrack)}
+)
+
+sptracks<-rbind_all(sptracks)
+
+#get sum across animals
+cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
+
+#is there a better way to loop through?
+r[]<-NA
+for(x in 1:nrow(cellvals)){
+r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
+
+plot(r/length(unique(mxy$Animal)))
+map(add=T)
 ```
-
-## Change in foraging areas
-
-Jan verus May
-
-Red = Better Foraging in Jan
-Blue = Better Foraging in May
 
 ```{r}
-diffras<-monthras[[1]]-monthras[[5]]
-diffdf<-as.data.frame(rasterToPoints(diffras))
-ggmap(temp) + geom_tile(data=diffdf,aes(x=x, y=y,fill=layer)) + scale_fill_gradient2("",low='blue',midpoint=0,high='red') + ggtitle("Comparing January and May") 
+#extract
+ksp$ResidencyTime<-extract(r,y=ksp)
+#write to file
+ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
+ggsave("Figures/Observed.svg")
 ```
 
-### Variance in monthly suitability
 
 ```{r}
-plot(varArea<-calc(stack(monthras),sd))
+temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
+
+#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggsave("Figures/ResidenceTime_JustTracks.jpeg",height=9,width=7)
 ```
 
-### Mean suitability
+##Traveling
 
 ```{r}
-plot(varArea<-calc(stack(monthras),mean))
-```
+#For convienance we are calling the traveling state as phi above 0.5
+mxy$State<-factor(mxy$phi>0.5)
+levels(mxy$State)<-c("Foraging","Traveling")
 
-## Monthly Overlap with Krill Fishery
+ssy<-split(mxy,mxy$State)
+
+traveling<-ssy[[2]]
+foraging<-ssy[[1]]
+```
 
 ```{r}
-ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),krill)
-#extract probability of feeding at krill midpoints
-ksuit<-extract(x=stack(monthras),y=ksp)
-kdf<-data.frame(ksp,ksuit)
-mdf<-melt(kdf,measure.vars=names(monthras))
+#raster
+r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
 
-mdf$Month<-factor(mdf$variable,levels=month.name)
+#res(r)<-0.25
+#put cellindex number
+r[]<-1:ncell(r)
 
-ggplot(mdf,aes(y=value,x=log(C1KRIcatchKG),col=Month)) + geom_point() + theme_bw() + labs(x="Log KG Tonnes of Krill Catch",y="Foraging Habitat Suitability") + geom_smooth(method="glm",method.args=list(family="binomial"))
+
+sxy<-split(traveling,traveling$Animal)
+sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
+
+#plot(rasterize(j,r,field="Index",fun='count'))
+
+#time in each cell
+timecell<-function(j){
+  
+  rlej<-rle(x=diff(j$Index))
+  position<-c(1,cumsum(rlej$lengths))
+  timestack<-c()
+  
+  #if only one position
+  if(length(position)==1){
+    timestack[1]<-0
+    
+  } else {
+    
+    #time difference between first and last point in the cell
+      for(x in 2:length(position)){
+        timed<-j[position[x-1]:position[x],]
+        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
+    }
+  }
+
+  out<-data.frame(Sum=sum(timestack))
+  return(out)
+}
+
+#loop through all animals
+sptracks<-lapply(sxy,function(x){
+  k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
+  
+  #get the cells that points are in
+  k$cellvalue<-extract(r,k)
+  
+  #for each cell value, perform time function
+  sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
+  return(sptrack)}
+)
+
+sptracks<-rbind_all(sptracks)
+
+#get sum across animals
+cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
+
+#is there a better way to loop through?
+r[]<-NA
+for(x in 1:nrow(cellvals)){
+r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+}
+
+plot(r/length(unique(traveling$Animal)))
+map(add=T)
 ```
 
+
+```{r}
+#raster
+r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
+
+#res(r)<-0.25
+#put cellindex number
+r[]<-1:ncell(r)
+
+
+sxy<-split(foraging,foraging$Animal)
+sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
+
+#plot(rasterize(j,r,field="Index",fun='count'))
+
+#time in each cell
+timecell<-function(j){
+  
+  rlej<-rle(x=diff(j$Index))
+  position<-c(1,cumsum(rlej$lengths))
+  timestack<-c()
+  
+  #if only one position
+  if(length(position)==1){
+    timestack[1]<-0
+    
+  } else {
+    
+    #time difference between first and last point in the cell
+      for(x in 2:length(position)){
+        timed<-j[position[x-1]:position[x],]
+        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
+    }
+  }
+
+  out<-data.frame(Sum=sum(timestack))
+  return(out)
+}
+
+#loop through all animals
+sptracks<-lapply(sxy,function(x){
+  k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
+  
+  #get the cells that points are in
+  k$cellvalue<-extract(r,k)
+  
+  #for each cell value, perform time function
+  sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
+  return(sptrack)}
+)
+
+sptracks<-rbind_all(sptracks)
+
+#get sum across animals
+cellvals<-sptracks %>% group_by(cellvalue) %>% summarize(Sum=sum(Sum))
+
+#is there a better way to loop through?
+r[]<-NA
+for(x in 1:nrow(cellvals)){
+r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
+}
+
+plot(r/length(unique(foraging$Animal)))
+map(add=T)
+```
+```{r}
+#extract
+ksp$ResidencyTime<-extract(r,y=ksp)
+#write to file
+ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
+ggsave("Figures/Observed.svg")
+```
+
+
+```{r}
+temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
+
+#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+#ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=layer),alpha=0.9) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggsave("Figures/TravelingResidenceTime_JustTracks.jpeg",height=9,width=7)
+```
 
 ```{r}
 #check out the memory sizing
@@ -917,5 +805,5 @@ lsos()
 #notify end of run
 #size of the run
 gc()
-save.image("SingleSpecies.RData")
+#save.image("SingleSpecies.RData")
 ```

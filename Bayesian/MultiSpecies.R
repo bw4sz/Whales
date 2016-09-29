@@ -31,7 +31,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t-1],state[i,g,t-1]] * coast[i,g,t]
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] 
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -50,7 +50,7 @@ cat("
     }
     
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] 
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -93,14 +93,6 @@ cat("
     gamma[1] <- gamma[2] + dev 		## gamma for state 1
     
     
-    #Monthly Covaraites
-    for(x in 1:Months){
-    beta[x,1]= 0
-    beta[x,2]<-0
-    beta2[x,1] = 0
-    beta2[x,2]<-0
-    }
-    
     ##Behavioral States
     
     #Hierarchical structure across motnhs
@@ -111,25 +103,6 @@ cat("
     #Variance
     alpha_tau[1] ~ dt(0,1,1)I(0,)
     alpha_tau[2] ~ dt(0,1,1)I(0,)
-    
-    #Slopes
-    ## Ocean Depth
-    beta_mu[1] = 0
-    beta_mu[2] = 0
-    
-    # Distance coast
-    beta2_mu[1] = 0
-    beta2_mu[2] = 0
-    
-    #Monthly Variance
-    #Ocean
-    beta_tau[1] = 0
-    beta_tau[2] = 0
-    
-    #Coast
-    beta2_tau[1] = 0
-    beta2_tau[2]  = 0
-    
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
