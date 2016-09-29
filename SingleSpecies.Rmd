@@ -144,6 +144,14 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month) + scale_color_discrete(guide="none")
 ```
 
+##CCAMLR Units
+```{r}
+ccamlr<-readShapePoly("InputData/SSMU_2013/CROPCCAMLR.shp")
+fccamlr<-fortify(ccamlr,region="S")
+m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id,col=SS))
+```
+
 ##Distance
 
 ```{r,fig.height=3,eval=F}
@@ -486,7 +494,7 @@ behav_chains<-behav_chains %>% arrange(step)
 
 #Label Behaviors
 behav_chains$Behavior<-as.factor(behav_chains$Behavior)
-levels(behav_chains$Behavior)<-c("Traveling","Foraging")
+levels(behav_chains$Behavior)<-c("Traveling","Area Restricted Search")
 
 #mean transition probability
 mean_phi<-behav_chains %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value))
@@ -508,20 +516,20 @@ rm(behav_chains)
 
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging")  + theme_inset()
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Area Restricted Search State")  + theme_inset()
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 ```
 
 ### Per Animal
 ```{r,eval=F}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Foraging") + facet_wrap(~individual.local.identifier) + theme_inset() 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Area Restricted Search State") + facet_wrap(~individual.local.identifier) + theme_inset() 
 ```
 
 ##Autocorrelation in behavior
 
 ```{r,fig.height=20,fig.width=13}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Foraging") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Foraging") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Area Restricted Search State") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Area Restricted Search State") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + ylim(0,1)
 ```
 
 ##Behavioral description
@@ -778,7 +786,7 @@ ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=var
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
 mxy$bstate<-factor(mxy$state)
-levels(mxy$bstate)<-c("Traveling","Foraging")
+levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=bstate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
 ggsave("Figures/TravelingResidenceTime_JustTracks.jpeg",height=9,width=7)
 ```
