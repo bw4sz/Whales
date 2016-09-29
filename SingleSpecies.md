@@ -10,14 +10,11 @@ Ben Weinstein
 
 
 
-#Descriptive Statistics
-
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ##By Month
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ##Distance
 
@@ -66,28 +63,12 @@ $$\begin{matrix}
 \end{matrix}
 $$
 
-##Environment
-
-Behavioral states are a function of local environmental conditions. The first environmental condition is ocean depth. I then build a function for preferential foraging in shallow waters.
-
-It generally follows the form, conditional on behavior at t -1:
-
-$$Behavior_t \sim Multinomial([\phi_{traveling},\phi_{foraging}])$$
 
 With the probability of switching states:
 
-$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}} + \beta_{Month,1} * Ocean_{y[t,]} + \beta_{Month,2} * Coast_{y[t,]}$$
+$$logit(\phi_{traveling}) = \alpha_{Behavior_{t-1}}$$
 
-$$logit(\phi_{foraging}) = \alpha_{Behavior_{t-1}} $$
-
-Following Bestley in preferring to describe the switch into feeding, but no estimating the resumption of traveling.
-
-The effect of the environment is temporally variable such that
-
-$$ \beta_{Month,2} \sim ~ Normal(\beta_{\mu},\beta_\tau)$$
-
-
-
+$$\phi_{foraging} = 1 - \phi_{traveling} $$
 
 ##Continious tracks
 
@@ -100,11 +81,11 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 How did the filter change the extent of tracks?
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
 
 
 sink("Bayesian/Multi_RW.jags")
@@ -140,7 +121,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] + beta[Month[i,g,t-1],state[i,g,t-1]] * ocean[i,g,t] + beta2[Month[i,g,t-1],state[i,g,t-1]] * coast[i,g,t]
+    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] 
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -159,7 +140,7 @@ cat("
     }
     
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] + beta[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * ocean[i,g,steps[i,g]] + beta2[Month[i,g,steps[i,g]-1],state[i,g,steps[i,g]-1]] * coast[i,g,steps[i,g]]
+    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] 
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -202,14 +183,6 @@ cat("
     gamma[1] <- gamma[2] + dev 		## gamma for state 1
     
     
-    #Monthly Covaraites
-    for(x in 1:Months){
-    beta[x,1]~dnorm(beta_mu[1],beta_tau[1])
-    beta[x,2]<-0
-    beta2[x,1]~dnorm(beta2_mu[1],beta2_tau[1])
-    beta2[x,2]<-0
-    }
-    
     ##Behavioral States
     
     #Hierarchical structure across motnhs
@@ -220,25 +193,6 @@ cat("
     #Variance
     alpha_tau[1] ~ dt(0,1,1)I(0,)
     alpha_tau[2] ~ dt(0,1,1)I(0,)
-    
-    #Slopes
-    ## Ocean Depth
-    beta_mu[1] ~ dnorm(0,0.386)
-    beta_mu[2] = 0
-    
-    # Distance coast
-    beta2_mu[1] ~ dnorm(0,0.386)
-    beta2_mu[2] = 0
-    
-    #Monthly Variance
-    #Ocean
-    beta_tau[1] ~ dt(0,1,1)I(0,)
-    beta_tau[2] = 0
-    
-    #Coast
-    beta2_tau[1] ~ dt(0,1,1)I(0,)
-    beta2_tau[2]  = 0
-    
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
@@ -261,8 +215,8 @@ sink()
 
 
 ```
-##       user     system    elapsed 
-##    425.838      2.132 142562.746
+##    user  system elapsed 
+##    2.67    0.09  144.86
 ```
 
 
@@ -270,122 +224,49 @@ sink()
 ##Chains
 
 ```
-##                         Type      Size    PrettySize  Rows Columns
-## jagM          rjags.parallel 473946664  [1] "452 Mb"     6      NA
-## data                    list  74728304 [1] "71.3 Mb"    11      NA
-## argos                  array  47265240 [1] "45.1 Mb"    34      21
-## obs                    array  47265240 [1] "45.1 Mb"    34      21
-## mdat              data.frame  26066656 [1] "24.9 Mb" 57230      57
-## j                      array  23640224 [1] "22.5 Mb"    34      21
-## d     SpatialPointsDataFrame  22387960 [1] "21.4 Mb" 49938      64
-## oxy               data.frame  21585864 [1] "20.6 Mb" 49938      64
-## sxy                     list  18067424 [1] "17.2 Mb"   188      NA
-## mxy               grouped_df  16758528   [1] "16 Mb" 34484      69
+##                         Type     Size    PrettySize  Rows Columns
+## mdat              data.frame 24692824 [1] "23.5 Mb" 57230      54
+## m                      ggmap 13116672 [1] "12.5 Mb"  1280    1280
+## d     SpatialPointsDataFrame  3459904  [1] "3.3 Mb"  8124      61
+## oxy               data.frame  3326832  [1] "3.2 Mb"  8124      61
+## jagM          rjags.parallel  2373272  [1] "2.3 Mb"     6      NA
+## sxy                     list  1904000  [1] "1.8 Mb"    21      NA
+## mxy               grouped_df  1787056  [1] "1.7 Mb"  3820      66
+## data                    list  1081312    [1] "1 Mb"     9      NA
+## argos                  array   691176  [1] "675 Kb"     2      12
+## obs                    array   691176  [1] "675 Kb"     2      12
 ```
 
 ```
-##             used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1640746  87.7    3205452  171.2   3205452  171.2
-## Vcells 110859996 845.8  205553718 1568.3 205553518 1568.3
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1460639 78.1    3886542 207.6  3886542 207.6
+## Vcells 8502722 64.9   24806718 189.3 60480683 461.5
 ```
 
-```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1500843  80.2    3205452  171.2   3205452  171.2
-## Vcells 18261485 139.4  164442974 1254.7 205553518 1568.3
-```
+![](SingleSpecies_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+
+
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
-
-
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
-
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 ## Parameter Summary
 
 ```
-##    parameter         par         mean        lower        upper
-## 1   alpha_mu alpha_mu[1] -0.587529796 -1.015184420 -0.152447154
-## 2   alpha_mu alpha_mu[2] -1.563433562 -1.936021183 -1.231049424
-## 3       beta   beta[1,1] -0.471920667 -1.819158184  0.920936875
-## 4       beta   beta[2,1] -0.799143679 -2.216653731  0.221961056
-## 5       beta   beta[3,1]  0.020219959 -1.139794932  0.931900321
-## 6       beta   beta[4,1]  0.383622121 -0.566287958  1.565239780
-## 7       beta   beta[5,1] -0.188857597 -1.370726940  1.285232410
-## 8       beta   beta[6,1] -0.132707742 -2.129637079  1.674876693
-## 9       beta   beta[1,2]  0.000000000  0.000000000  0.000000000
-## 10      beta   beta[2,2]  0.000000000  0.000000000  0.000000000
-## 11      beta   beta[3,2]  0.000000000  0.000000000  0.000000000
-## 12      beta   beta[4,2]  0.000000000  0.000000000  0.000000000
-## 13      beta   beta[5,2]  0.000000000  0.000000000  0.000000000
-## 14      beta   beta[6,2]  0.000000000  0.000000000  0.000000000
-## 15     beta2  beta2[1,1]  0.025974964  0.010584399  0.045291144
-## 16     beta2  beta2[2,1]  0.020849719  0.008934419  0.035986856
-## 17     beta2  beta2[3,1]  0.017808854  0.004823071  0.030612541
-## 18     beta2  beta2[4,1]  0.022402314  0.008914916  0.039013603
-## 19     beta2  beta2[5,1]  0.095173797  0.031976100  0.177862765
-## 20     beta2  beta2[6,1]  0.009560674 -0.152089119  0.116002149
-## 21     beta2  beta2[1,2]  0.000000000  0.000000000  0.000000000
-## 22     beta2  beta2[2,2]  0.000000000  0.000000000  0.000000000
-## 23     beta2  beta2[3,2]  0.000000000  0.000000000  0.000000000
-## 24     beta2  beta2[4,2]  0.000000000  0.000000000  0.000000000
-## 25     beta2  beta2[5,2]  0.000000000  0.000000000  0.000000000
-## 26     beta2  beta2[6,2]  0.000000000  0.000000000  0.000000000
-## 27  beta2_mu beta2_mu[1]  0.032250858 -0.018777087  0.091527106
-## 28  beta2_mu beta2_mu[2]  0.000000000  0.000000000  0.000000000
-## 29   beta_mu  beta_mu[1] -0.148457488 -1.080190552  0.839051942
-## 30   beta_mu  beta_mu[2]  0.000000000  0.000000000  0.000000000
-## 31     gamma    gamma[1]  0.929247370  0.895830063  0.959317558
-## 32     gamma    gamma[2]  0.170241902  0.133220235  0.206685932
-## 33     theta    theta[1] -0.027871011 -0.052277094 -0.006148731
-## 34     theta    theta[2]  0.226868230  0.141164584  0.320152731
+##   parameter         par        mean        lower      upper
+## 1  alpha_mu alpha_mu[1]  2.42370753  2.196926797  2.7081927
+## 2  alpha_mu alpha_mu[2] -2.27771811 -2.900654004 -1.6469218
+## 3     gamma    gamma[1]  0.80230224  0.741749236  0.8593515
+## 4     gamma    gamma[2]  0.11076147  0.009213097  0.2013641
+## 5     theta    theta[1]  0.03936701 -0.014165665  0.1280827
+## 6     theta    theta[2]  3.81522576  2.217518225  5.2836334
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
-
-#Behavior and environment
-
-##Hierarchical 
-
-### Ocean Depth
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
-
-### Distance to Coast
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-28-2.png)<!-- -->
-
-###Interaction
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
-
-## By Month
-
-### Depth
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
-
-Just the probability of feeding when traveling.
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
-
-Just mean estimate.
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
-
-### Coast
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
-
-Zooming in on the top right plot.
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-3.png)<!-- -->
-
-Just mean estimate.
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -393,97 +274,69 @@ Just mean estimate.
 
 ##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ### Per Animal
 
 
-##Log Odds of Foraging
-
-### Ocean Depth
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
-
-### Distance From Coast
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
-
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ##Behavioral description
 
 ##Location of Behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
-#Environmental Prediction - Probability of Foraging across time
-
-
-
-## Bathymetry
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
-
-## Distance to coast
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
-
-##All variables
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 # Overlap with Krill Fishery
-![](SingleSpecies_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
-
-## By Month
 
 
+#Time spent in grid cell
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 
 
-## Change in foraging areas
+##Traveling
 
-Jan verus May
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
 
-Red = Better Foraging in Jan
-Blue = Better Foraging in May
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
 
-### Variance in monthly suitability
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
-### Mean suitability
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-53-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
-## Monthly Overlap with Krill Fishery
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-54-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
 
 
 ```
-##                           Type     Size    PrettySize    Rows Columns
-## pc                      tbl_df 90898112 [1] "86.7 Mb" 1613600      12
-## mdat                data.frame 26066656 [1] "24.9 Mb"   57230      57
-## d       SpatialPointsDataFrame 22387960 [1] "21.4 Mb"   49938      64
-## oxy                 data.frame 21585864 [1] "20.6 Mb"   49938      64
-## sxy                       list 18067424 [1] "17.2 Mb"     188      NA
-## mxy                 data.frame 15224248 [1] "14.5 Mb"   32477      70
-## temp                     ggmap 13116048 [1] "12.5 Mb"    1280    1280
-## allplot             grouped_df  2710232  [1] "2.6 Mb"   52056       7
-## msp     SpatialPointsDataFrame  1823384  [1] "1.7 Mb"   32477       5
-## coast                    array  1087976    [1] "1 Mb"      34      21
+##                            Type     Size     PrettySize  Rows Columns
+## mdat                 data.frame 24692824  [1] "23.5 Mb" 57230      54
+## temp                      ggmap 13116192  [1] "12.5 Mb"  1280    1280
+## d        SpatialPointsDataFrame  3459904   [1] "3.3 Mb"  8124      61
+## oxy                  data.frame  3326832   [1] "3.2 Mb"  8124      61
+## jagM             rjags.parallel  2373272   [1] "2.3 Mb"     6      NA
+## mxy                  data.frame  1635416   [1] "1.6 Mb"  3543      69
+## pc                       tbl_df  1479728   [1] "1.4 Mb" 26640      10
+## data                       list  1081312     [1] "1 Mb"     9      NA
+## sxy                        list   871192 [1] "850.8 Kb"     2      NA
+## foraging             data.frame   840856 [1] "821.1 Kb"  1818      68
 ```
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  1630073  87.1    6860029  366.4  14442815  771.4
-## Vcells 33767586 257.7  207377168 1582.2 405033533 3090.2
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1513442 80.9    3886542 207.6  3886542 207.6
+## Vcells 8976384 68.5   24806718 189.3 60480683 461.5
 ```
