@@ -786,15 +786,15 @@ ggsave("Figures/TravelingResidenceTime_JustTracks.jpeg",height=9,width=7)
 ```
 
 ```{r}
-ggmap(temp) + geom_tile(data.frame(rasterToPoints(r)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) 
 ```
 
 ```{r}
-ggmap(temp) + geom_tile(data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Foraging") 
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Foraging") 
 ```
 
 ```{r}
-ggmap(temp) + geom_tile(data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,layer=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling")
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling")
 ```
 
 ```{r}
@@ -803,5 +803,5 @@ lsos()
 #notify end of run
 #size of the run
 gc()
-#save.image("SingleSpecies.RData")
+save.image("SingleSpecies.RData")
 ```
