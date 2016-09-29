@@ -619,7 +619,6 @@ plot(r/length(unique(mxy$Animal)))
 ksp$ResidencyTime<-extract(r,y=ksp)
 #write to file
 ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
-ggsave("Figures/Observed.svg")
 ```
 
 ```{r}
