@@ -30,6 +30,7 @@ library(stringr)
 library(R2jags)
 library(move)
 library(maps)
+library(maptools)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
@@ -147,9 +148,14 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + fac
 ##CCAMLR Units
 ```{r}
 ccamlr<-readShapePoly("InputData/SSMU_2013/CROPCCAMLR.shp")
-fccamlr<-fortify(ccamlr,region="S")
+
+ccamlr$Unit<-gsub(x=ccamlr$SSMUname,pattern="Antarctic Peninsula ",rep="")
+
+fccamlr<-fortify(ccamlr,region="Unit")
+
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id,col=SS))
+
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id),col="black",alpha=0.01) 
 ```
 
 ##Distance
@@ -516,7 +522,7 @@ rm(behav_chains)
 
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Area Restricted Search State")  + theme_inset()
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.5)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1.1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 ```
 

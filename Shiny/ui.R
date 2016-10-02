@@ -14,6 +14,7 @@ ui <- fluidPage(
 #side bar
   sidebarPanel(width=2,selectInput("year","Year",c("All",unique(d$Year))),
   selectInput("month","Month",c("All",month.name[month.name %in% d$Month])),
+  selectInput("ind","Individual",c("All",unique(d$Animal))),
   img(src = "stockimage.png", height = 225, width = 150)),
   p("Please note that the map may take a few seconds to load"),
   br(),
