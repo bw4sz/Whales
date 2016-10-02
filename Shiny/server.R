@@ -25,7 +25,9 @@ server <- function(input, output, session) {
     #Month
     if(input$month=="All"){mn<-month.name} else{mn<-input$month}
     
-    y <-  d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn) %>%
+    if(input$ind=="All"){i<-unique(d$Animal)} else{i<-input$ind}
+    
+    y <-  d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) %>%
       do(res = wrapper(.))
     
     #break if there is no data
