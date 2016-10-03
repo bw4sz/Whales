@@ -9,6 +9,8 @@ server <- function(input, output, session) {
   #Read in data
   d<-read.csv("WhaleDat.csv")
   
+  #ice data
+  
   ##Base map
   wrapper <- function(df) {
     df  %>% select(x,y) %>% as.data.frame %>% Line %>% list %>% return
@@ -23,7 +25,7 @@ server <- function(input, output, session) {
     #Month
     if(input$month=="All"){mn<-month.name} else{mn<-input$month}
     
-    if(input$ind=="All"){i<-unique(d$Animal)} else{mn<-input$month}
+    if(input$ind=="All"){i<-unique(d$Animal)} else{i<-input$ind}
     
     y <-  d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) %>%
       do(res = wrapper(.))
@@ -43,17 +45,23 @@ server <- function(input, output, session) {
     return(spl)
   })
   
+  
   m <- leaflet(d) %>% addTiles() %>% fitBounds(~min(x),~min(y),~max(x),~max(y))
 observe({
   
+  
   #check if there is data for the month year combination
   addD<-filteredData()
+  
+  #color new data
+  pal<-colorFactor(topo.colors(10),addD$Animal)
+  
   if(is.null(addD)){
     #clear screen
     leafletProxy("mymap",data=addD) %>% clearShapes()
   }else{
     #add tracks
-    proxy<-leafletProxy("mymap",data=addD) %>% clearShapes() %>% addPolylines(popup=~as.character(Animal),weight=2)  
+    proxy<-leafletProxy("mymap",data=addD) %>% clearShapes() %>% addPolylines(popup=~as.character(Animal),color=~pal(Animal),weight=2)  
   }
 })
   output$mymap <- renderLeaflet(m)
