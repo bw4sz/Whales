@@ -121,6 +121,7 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
+mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
 
 ```
 
@@ -367,7 +368,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4000,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=3000,n.thin=10,DIC=FALSE))
 }
 
 ```
@@ -522,7 +523,12 @@ rm(behav_chains)
 
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
-ggmap(temp)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.5)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
+
+#label states
+mxy$bstate<-factor(mxy$state)
+levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
+
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.5)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 ```
 
@@ -798,8 +804,6 @@ ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=7,width=7,dpi=300)
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-mxy$bstate<-factor(mxy$state)
-levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=bstate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + labs(col="Behavior")
 ggsave("Figures/TravelingResidenceTime_Krill.jpeg",height=9,width=7)
 ```
