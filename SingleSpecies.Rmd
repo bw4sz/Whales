@@ -368,7 +368,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=4000,n.burnin=3000,n.thin=10,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=28000,n.thin=10,DIC=FALSE))
 }
 
 ```
@@ -435,7 +435,7 @@ rm(splitpc)
 
 ```
 
-```{r,fig.height=20}
+```{r,fig.height=10}
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
@@ -448,7 +448,7 @@ ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wra
 pc$Behavior<-as.factor(pc$Behavior)
 ```
 
-```{r,fig.height=20}
+```{r,fig.height=10}
 #Plot
 ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=3) + theme_bw()  + ggtitle("Estimated parameters")
 ```
