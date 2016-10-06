@@ -101,13 +101,11 @@ mxy<-mxy[!is.na(mxy$x),]
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
 
 d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
-#give it a geospatial layer
-
 
 mxy<-as.data.frame(d)
 
 #set datestamp
-mxy$timestamp<-as.POSIXct(mxy$timestamp,format="%Y-%m-%d %H:%M:%S.000")
+mxy$timestamp<-as.POSIXct(mxy$timestamp)
 
 #month and year columns
 mxy$Month<-months(mxy$timestamp)
@@ -163,7 +161,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ##Distance
 
 ```{r,fig.height=3,eval=F}
-moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
+moved<-move(x=mxy$x,y=mxy$y,time=mxy$timestamp,proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
 dstat<-melt(move::distanceSummary(moved))
 
 dstat<-droplevels(dstat[dstat$variable %in% c("TravDist","AverDist","FarthDist"),])
@@ -369,7 +367,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=2800,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -397,7 +395,7 @@ gc()
 #bind chains
 pc<-melt(jagM$BUGSoutput$sims.array)
 
-#rm(jagM)
+rm(jagM)
 
 colnames(pc)<-c("Draw","chain","par","value")
 
