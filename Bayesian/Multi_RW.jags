@@ -87,12 +87,10 @@
     
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
-    gamma[2] ~ dunif(0,0.5)		## gamma for state 2: foraging
-    gamma[1] ~ dunif(0.5,1)   ## gamma for state 1: traveling
-
-    #as opposed to jonsen
-    #dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    #gamma[1] <- gamma[2] + dev 		## gamma for state 1
+    #from jonsen 2016
+    gamma[1] ~ dbeta(5,2)   ## gamma for state 1: traveling
+    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[2] <- gamma[1] * dev 		## gamma for state 1
     
     
     ##Behavioral States
