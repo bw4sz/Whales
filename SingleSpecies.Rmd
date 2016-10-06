@@ -79,7 +79,7 @@ lsos <- function(..., n=10) {
 
 ```{r}
 #read data
-mdat<-read.csv("InputData/Antarctic Humpback overlap with krill fisheries -3085052751565071394.csv")
+mdat<-read.csv("InputData/FilteredData.csv",row.names=1)
 #standardize column names to match the simulation
 #Create an animal tag.
 mxy <- as(mdat, "data.frame")
@@ -87,7 +87,7 @@ mxy$Animal<-mxy$individual.local.identifier
 mxy$x<-mxy$location.long
 mxy$y<-mxy$location.lat
 
-#remove minke whales
+#make sure to remove minke whales, should be already gone, but justfor safety
 minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
@@ -143,7 +143,8 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ```{r,fig.height=12}
 mxy$Month<-factor(mxy$Month,levels=month.name)
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month) + scale_color_discrete(guide="none")
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + scale_color_discrete(guide="none") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.ticks.x=element_blank())
+ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 ```
 
 ##CCAMLR Units
@@ -341,7 +342,7 @@ mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Animal,Track)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Animal,Track)),size=.5) + scale_color_discrete(guide="none") + theme_inset() 
 ```
 
 ```{r,fig.height=15}
