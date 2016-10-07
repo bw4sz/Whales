@@ -367,7 +367,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -797,6 +797,11 @@ ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Uni
 
 ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable,ncol=1) + scale_color_brewer(palette="Accent")
 ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=7,width=7,dpi=300)
+
+mdf<-as.data.frame(mksp) 
+
+camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% arrange(s) %>% ungroup() %>% mutate(Behavior=variable) %>% select(-variable) %>%  dcast(...~Behavior,value.var="s") %>% arrange(All)
+write.csv(camdf,"Figures/CCAMLR_days.csv")
 ```
 
 
