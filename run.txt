@@ -1,10 +1,10 @@
 
 
-processing file: DataExploration.Rmd
-  |                                                                         |                                                                 |   0%  |                                                                         |..                                                               |   2%
+processing file: SingleSpecies.Rmd
+  |                                                                         |                                                                 |   0%  |                                                                         |.                                                                |   1%
    inline R code fragments
 
-  |                                                                         |...                                                              |   5%
+  |                                                                         |..                                                               |   2%
 label: unnamed-chunk-1 (with options) 
 List of 3
  $ warning: logi FALSE
@@ -74,148 +74,310 @@ rgdal: version: 1.1-10, (SVN revision 622)
  Loaded PROJ.4 runtime: Rel. 4.8.0, 6 March 2012, [PJ_VERSION: 480]
  Path to PROJ.4 shared files: (autodetected)
  Linking to sp version: 1.2-3 
-Loading required package: foreach
 
-Attaching package: 'foreach'
+ # maps v3.1: updated 'world': all lakes moved to separate new #
+ # 'lakes' database. Type '?world' or 'news(package="maps")'.  #
 
-The following object is masked from 'package:chron':
 
-    times
+Checking rgeos availability: TRUE
+  |                                                                         |..                                                               |   3%
+  ordinary text without R code
 
-Loading required package: iterators
-Loading required package: snow
+  |                                                                         |...                                                              |   5%
+label: unnamed-chunk-2 (with options) 
+List of 1
+ $ eval: symbol F
+
+  |                                                                         |....                                                             |   6%
+  ordinary text without R code
+
+  |                                                                         |.....                                                            |   7%
+label: unnamed-chunk-3
   |                                                                         |.....                                                            |   8%
   ordinary text without R code
 
-  |                                                                         |......                                                           |  10%
-label: unnamed-chunk-2 (with options) 
-List of 1
- $ eval: symbol T
+  |                                                                         |......                                                           |   9%
+label: unnamed-chunk-4
+  |                                                                         |.......                                                          |  10%
+  ordinary text without R code
 
   |                                                                         |........                                                         |  12%
+label: unnamed-chunk-5
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.633878,-63.682907&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |........                                                         |  13%
   ordinary text without R code
 
-  |                                                                         |..........                                                       |  15%
-label: unnamed-chunk-3
-  |                                                                         |...........                                                      |  18%
-  ordinary text without R code
-
-  |                                                                         |.............                                                    |  20%
-label: unnamed-chunk-4
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-  |                                                                         |...............                                                  |  22%
-  ordinary text without R code
-
-  |                                                                         |................                                                 |  25%
-label: unnamed-chunk-5 (with options) 
+  |                                                                         |.........                                                        |  14%
+label: unnamed-chunk-6 (with options) 
 List of 1
  $ fig.height: num 12
 
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.689743,-63.775106&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.633878,-63.682907&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..........                                                       |  15%
+  ordinary text without R code
+
+  |                                                                         |...........                                                      |  16%
+label: unnamed-chunk-7
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.633878,-63.682907&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |...........                                                      |  17%
+  ordinary text without R code
+
+  |                                                                         |............                                                     |  19%
+label: unnamed-chunk-8 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ eval      : symbol F
+
+  |                                                                         |.............                                                    |  20%
+  ordinary text without R code
+
+  |                                                                         |..............                                                   |  21%
+label: unnamed-chunk-9 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ eval      : symbol F
+
+  |                                                                         |..............                                                   |  22%
+  ordinary text without R code
+
+  |                                                                         |...............                                                  |  23%
+label: unnamed-chunk-10 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ eval      : symbol F
+
+  |                                                                         |................                                                 |  24%
+  ordinary text without R code
+
+  |                                                                         |.................                                                |  26%
+label: unnamed-chunk-11 (with options) 
+List of 2
+ $ fig.height: num 2
+ $ eval      : symbol F
+
+  |                                                                         |.................                                                |  27%
+  ordinary text without R code
+
   |                                                                         |..................                                               |  28%
+label: unnamed-chunk-12
+  |                                                                         |...................                                              |  29%
   ordinary text without R code
 
   |                                                                         |....................                                             |  30%
-label: unnamed-chunk-6
-  |                                                                         |.....................                                            |  32%
+label: unnamed-chunk-13
+Using jStep as value column: use value.var to override.
+  |                                                                         |....................                                             |  31%
+  ordinary text without R code
+
+  |                                                                         |.....................                                            |  33%
+label: unnamed-chunk-14
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.674573,-63.856459&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |......................                                           |  34%
   ordinary text without R code
 
   |                                                                         |.......................                                          |  35%
-label: unnamed-chunk-7
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.686643,-63.88896&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
-  |                                                                         |........................                                         |  38%
+label: unnamed-chunk-15 (with options) 
+List of 1
+ $ fig.height: num 15
+
+  |                                                                         |.......................                                          |  36%
+  ordinary text without R code
+
+  |                                                                         |........................                                         |  37%
+label: unnamed-chunk-16 (with options) 
+List of 2
+ $ fig.height: num 3
+ $ fig.width : num 5
+
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+  |                                                                         |.........................                                        |  38%
   ordinary text without R code
 
   |                                                                         |..........................                                       |  40%
-label: unnamed-chunk-8
-  |                                                                         |............................                                     |  42%
+label: unnamed-chunk-17 (with options) 
+List of 2
+ $ child: chr "Bayesian/MultiSpecies.R"
+ $ eval : symbol T
+
+
+
+processing file: ./Bayesian/MultiSpecies.R
+  |                                                                         |                                                                 |   0%  |                                                                         |.................................................................| 100%
   ordinary text without R code
 
-  |                                                                         |.............................                                    |  45%
-label: unnamed-chunk-9 (with options) 
+
+  |                                                                         |..........................                                       |  41%
+  ordinary text without R code
+
+  |                                                                         |...........................                                      |  42%
+label: unnamed-chunk-18 (with options) 
+List of 1
+ $ eval: symbol T
+
+  |                                                                         |............................                                     |  43%
+  ordinary text without R code
+
+  |                                                                         |.............................                                    |  44%
+label: unnamed-chunk-19 (with options) 
 List of 1
  $ eval: symbol F
+
+  |                                                                         |.............................                                    |  45%
+  ordinary text without R code
+
+  |                                                                         |..............................                                   |  47%
+label: unnamed-chunk-20 (with options) 
+List of 1
+ $ eval: symbol T
 
   |                                                                         |...............................                                  |  48%
   ordinary text without R code
 
+  |                                                                         |................................                                 |  49%
+label: unnamed-chunk-21 (with options) 
+List of 1
+ $ fig.height: num 10
+
   |                                                                         |................................                                 |  50%
-label: unnamed-chunk-10
+  ordinary text without R code
+
+  |                                                                         |.................................                                |  51%
+label: unnamed-chunk-22 (with options) 
+List of 1
+ $ eval: symbol F
+
   |                                                                         |..................................                               |  52%
   ordinary text without R code
 
-  |                                                                         |....................................                             |  55%
-label: unnamed-chunk-11 (with options) 
+  |                                                                         |...................................                              |  53%
+label: unnamed-chunk-23 (with options) 
 List of 1
- $ fig.height: num 20
-
-  |                                                                         |.....................................                            |  58%
-  ordinary text without R code
-
-  |                                                                         |.......................................                          |  60%
-label: unnamed-chunk-12 (with options) 
-List of 1
- $ fig.height: num 20
+ $ fig.height: num 10
 
 `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-  |                                                                         |.........................................                        |  62%
+  |                                                                         |....................................                             |  55%
   ordinary text without R code
 
-  |                                                                         |..........................................                       |  65%
-label: unnamed-chunk-13 (with options) 
+  |                                                                         |....................................                             |  56%
+label: unnamed-chunk-24
+  |                                                                         |.....................................                            |  57%
+  ordinary text without R code
+
+  |                                                                         |......................................                           |  58%
+label: unnamed-chunk-25 (with options) 
 List of 2
  $ fig.height: num 10
  $ fig.width : num 15
 
-  |                                                                         |............................................                     |  68%
+  |                                                                         |.......................................                          |  59%
   ordinary text without R code
 
-  |                                                                         |..............................................                   |  70%
-label: unnamed-chunk-14
+  |                                                                         |.......................................                          |  60%
+label: unnamed-chunk-26
+  |                                                                         |........................................                         |  62%
+  ordinary text without R code
+
+  |                                                                         |.........................................                        |  63%
+label: unnamed-chunk-27
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-64.674573,-63.856459&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..........................................                       |  64%
+  ordinary text without R code
+
+  |                                                                         |..........................................                       |  65%
+label: unnamed-chunk-28 (with options) 
+List of 1
+ $ eval: symbol F
+
+  |                                                                         |...........................................                      |  66%
+  ordinary text without R code
+
+  |                                                                         |............................................                     |  67%
+label: unnamed-chunk-29 (with options) 
+List of 2
+ $ fig.height: num 20
+ $ fig.width : num 13
+
+  |                                                                         |.............................................                    |  69%
+  ordinary text without R code
+
+  |                                                                         |.............................................                    |  70%
+label: unnamed-chunk-30
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.75,-62.5&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |..............................................                   |  71%
+  ordinary text without R code
+
   |                                                                         |...............................................                  |  72%
+label: unnamed-chunk-31
+  |                                                                         |................................................                 |  73%
   ordinary text without R code
 
-  |                                                                         |.................................................                |  75%
-label: unnamed-chunk-15
-  |                                                                         |..................................................               |  78%
+  |                                                                         |................................................                 |  74%
+label: unnamed-chunk-32
+  |                                                                         |.................................................                |  76%
   ordinary text without R code
 
+  |                                                                         |..................................................               |  77%
+label: unnamed-chunk-33
+  |                                                                         |...................................................              |  78%
+  ordinary text without R code
+
+  |                                                                         |...................................................              |  79%
+label: unnamed-chunk-34
   |                                                                         |....................................................             |  80%
-label: unnamed-chunk-16
-  |                                                                         |......................................................           |  82%
   ordinary text without R code
 
+  |                                                                         |.....................................................            |  81%
+label: unnamed-chunk-35
+  |                                                                         |......................................................           |  83%
+  ordinary text without R code
+
+  |                                                                         |......................................................           |  84%
+label: unnamed-chunk-36
   |                                                                         |.......................................................          |  85%
-label: unnamed-chunk-17
-  |                                                                         |.........................................................        |  88%
   ordinary text without R code
 
+  |                                                                         |........................................................         |  86%
+label: unnamed-chunk-37
+  |                                                                         |.........................................................        |  87%
+  ordinary text without R code
+
+  |                                                                         |.........................................................        |  88%
+label: unnamed-chunk-38
   |                                                                         |..........................................................       |  90%
-label: unnamed-chunk-18
+  ordinary text without R code
+
+  |                                                                         |...........................................................      |  91%
+label: unnamed-chunk-39
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-63.210999,-63.164993&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |............................................................     |  92%
   ordinary text without R code
 
+  |                                                                         |............................................................     |  93%
+label: unnamed-chunk-40
+  |                                                                         |.............................................................    |  94%
+  ordinary text without R code
+
   |                                                                         |..............................................................   |  95%
-label: unnamed-chunk-19
+label: unnamed-chunk-41
+  |                                                                         |...............................................................  |  97%
+  ordinary text without R code
+
   |                                                                         |...............................................................  |  98%
+label: unnamed-chunk-42
+  |                                                                         |................................................................ |  99%
   ordinary text without R code
 
   |                                                                         |.................................................................| 100%
-label: unnamed-chunk-20
+label: unnamed-chunk-43
 
-output file: DataExploration.knit.md
+output file: SingleSpecies.knit.md
 
-/usr/local/bin/pandoc +RTS -K512m -RTS DataExploration.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output DataExploration.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmptRGGMS/rmarkdown-str5a11d337a17.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+/usr/local/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpXd9wi4/rmarkdown-str58d36c96a59.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
 
-Output created: DataExploration.html
-Warning messages:
-1: Removed 52 rows containing missing values (geom_path). 
-2: Removed 19 rows containing missing values (geom_path). 
-3: Removed 1 rows containing missing values (geom_path). 
-4: Removed 7928 rows containing missing values (geom_path). 
-5: Removed 6240 rows containing missing values (geom_path). 
-6: Removed 662 rows containing missing values (geom_path). 
-7: Removed 542 rows containing missing values (geom_path). 
-8: Removed 7474 rows containing missing values (geom_path). 
-9: Removed 6 rows containing missing values (geom_path). 
-10: Removed 6 rows containing missing values (geom_path). 
+Output created: SingleSpecies.html
+There were 26 warnings (use warnings() to see them)

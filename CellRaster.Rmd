@@ -19,6 +19,7 @@ library(gridExtra)
 library(stringr)
 library(move)
 library(maps)
+library(ctmm)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
@@ -144,7 +145,7 @@ ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpoint
 
 ```{r}
 #raster
-r<-raster(extent(d)*c(2,1.1),nrow=100,ncol=100)
+r<-raster(extent(d)*c(2,1.1),nrow=200,ncol=200)
 
 #res(r)<-0.25
 #put cellindex number
@@ -223,5 +224,15 @@ ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x, y=y,fill=lay
 ggsave("Figures/ResidenceTime_JustTracks.jpeg",height=9,width=7)
 ```
 
+#Compare to more complex utilization dsitribution
 
+```{r}
+moved<-move(x=mxy$x,y=mxy$y,time=as.POSIXct(mxy$timestamp),proj=CRS("+proj=longlat +ellps=WGS84"),animal=mxy$Animal,data=as.data.frame(mxy),sensor=mxy$Animal,removeDuplicatedTimestamps=T)
 
+data2 <- spTransform(moved, CRSobj="+proj=aeqd +ellps=WGS84", center=TRUE)
+
+#projectr raster
+projection(r)<-CRS("+proj=aeqd +ellps=WGS84 +lon_0=-63.164993285 +lat_0=-63.210998535 ")
+r2<-projectRaster(from=r,crs=CRS("+proj=aeqd +ellps=WGS84"))
+bb<-brownian.bridge.dyn(object=data2,raster=r,location.error=12)
+plot(bb)

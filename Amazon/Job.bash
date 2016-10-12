@@ -5,7 +5,7 @@ rm -rf /var/tmp/aws-mon.bak
 mv /var/tmp/aws-mon /var/tmp/aws-mon.bak
 
 #clone
-git clone git@github.com:bw4sz/Whales.git --depth 1
+git clone git@github.com:bw4sz/Whales.git -b NOBETA --single-branch --depth 1
 
 cd Whales||sudo halt
 
@@ -21,7 +21,7 @@ iid=$(ec2metadata --instance-id)
 git checkout -b $iid
 
 #render script
-Rscript -e "rmarkdown::render('DataExploration.Rmd')" &> run.txt
+Rscript -e "rmarkdown::render('SingleSpecies.Rmd')" &> run.txt
 
 #push results
 git add --all

@@ -28,4 +28,4 @@ ggmap(m)+ geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=id),col="black",size=1
 ggsave("Figures/CCAMLRmap.jpeg")
 m2<-mapview(ccamlr,legend=T,zcol="Unit",color=pal,alpha.regions=0.75,layer.name="Unit")
 saveWidget(m2@map, "CCAMLR.html", selfcontained = FALSE)
-webshot::webshot("CCAMLR.html", file = "Figures/CAMMLR.png",cliprect = "viewport")
+webshot::webshot("CCAMLR.html", file = "Figures/CAMMLR.jpeg",cliprect = "viewport")
