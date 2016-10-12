@@ -228,8 +228,7 @@ $$\alpha_{i,2,1} = \text{Probability of switching from Foraging to traveling}$$
 $$\begin{matrix}
   \alpha_{i,1,1} & 1-\alpha_{i,1,1} \\
   \alpha_{i,2,1} & 1-\alpha_{i,2,1} \\
-\end{matrix}
-$$
+\end{matrix}$$
 
 
 With the probability of switching states:
@@ -245,7 +244,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=6
+step_length=12
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -273,7 +272,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=6)
+sxy<-lapply(sxy,timed,step_length=12)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -285,7 +284,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
 return(x)
 })
 
@@ -294,6 +293,7 @@ mxy<-rbind_all(sxy)
 #refactor animal
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
+
 
 ```{r}
 #total number of steps per track/animal
@@ -331,6 +331,7 @@ obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~step~jStep~variable)
 ```
 
+
 How did the filter change the extent of tracks?
 
 ```{r}
@@ -346,10 +347,12 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Anim
 ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~individual.local.identifier,scales="free",ncol=4)
 ```
 
+
 ```{r,fig.height=3,fig.width=5}
 ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
+
 
 ```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
@@ -371,11 +374,13 @@ if(newModel){
 
 ```
 
+
 ```{r,eval=F}
 #update function
 recompile(jagM)
 jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0) 
 ```
+
 
 ##Chains
 ```{r,eval=T}
@@ -433,11 +438,11 @@ rm(splitpc)
 
 ```
 
+
 ```{r,fig.height=10}
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
-
 
 ```{r,eval=F}
 #write.csv
