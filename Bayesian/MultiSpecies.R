@@ -77,7 +77,7 @@ cat("
     Sigma <- inverse(iSigma)
     
     ##Mean Angle
-    tmp[1] ~ dbeta(10, 10)
+    tmp[1] ~ dbeta(20, 20)
     tmp[2] ~ dbeta(10, 10)
     
     # prior for theta in 'traveling state'
