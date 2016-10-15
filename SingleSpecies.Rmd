@@ -91,7 +91,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -99,9 +99,11 @@ mxy<-mxy[!is.na(mxy$x),]
 #crop by extent
 d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
 
-d<-crop(d,y=extent(c(-75,-50,-70,-57.5)))
+cropoly<-readShapePoly("InputData/CutPolygon.shp",proj4string=CRS("+proj=longlat +datum=WGS84"))
 
-mxy<-as.data.frame(d)
+b<-d[!is.na(d %over% cropoly)[,2],]
+
+mxy<-b@data
 
 #set datestamp
 mxy$timestamp<-as.POSIXct(mxy$timestamp)
@@ -119,6 +121,7 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
+
 
 ```
 
@@ -368,7 +371,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4500,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=19000,n.thin=8,DIC=FALSE))
 }
 
 ```
