@@ -559,7 +559,7 @@ ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),s
 Compared to CMLRR regions
 
 ```{r}
-ggmap(m)+ geom_polygon(data=f,aes(x=long,y=lat,group=id,alpha=0.5))+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging")  + theme_inset() 
+ggmap(m)+ geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id,alpha=0.5))+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging")  + theme_inset() 
 ggsave("Figures/SpatialPred_regions.jpg",height=5,width=5)
 
 ```
