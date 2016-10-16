@@ -18,7 +18,6 @@ six hours
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
 library(boot)
-library(raster)
 library(reshape2)
 library(ggplot2)
 library(MASS)
@@ -32,6 +31,7 @@ library(move)
 library(tidyr)
 library(maps)
 library(maptools)
+library(raster)
 
 #New model to be run, flag turned off if just updating.
 newModel<-T
@@ -249,7 +249,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=6
+step_length=12
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -277,7 +277,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=6)
+sxy<-lapply(sxy,timed,step_length=12)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -289,7 +289,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
 return(x)
 })
 
@@ -371,7 +371,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=900,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -653,8 +653,8 @@ ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG))
 ```
 
 ```{r}
-traveling<-mxy %>% filter(state==1)
-foraging<-mxy %>% filter(state==2)
+traveling<-mxy %>% filter(bstate=="Traveling")
+foraging<-mxy %>% filter(bstate=="Area-restricted Search")
 ```
 
 ##Traveling
