@@ -372,7 +372,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4900,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -498,22 +498,11 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 #Behavioral Prediction
 
 ```{r}
-#We just need Foraging behavior
-behav_chains<-pc[pc$parameter %in% "phi" & pc$Behavior==2,]
-
-#arrange by time - capitalize
-behav_chains$step<-as.numeric(as.character(behav_chains$step))
-behav_chains<-behav_chains %>% arrange(step)
-
-#Label Behaviors
-behav_chains$Behavior<-as.factor(behav_chains$Behavior)
-levels(behav_chains$Behavior)<-c("Traveling","Area Restricted Search")
-
 #mean transition probability
-mean_phi<-behav_chains %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value))
+mean_phi<-pc %>% filter(parameter=="phi",Behavior==2) %>% mutate(step=as.numeric(as.character(step))) %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value)) %>% arrange(Animal,Track,step)
 
 #mode state for each position
-mode_state<-pc %>% filter(pc$parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Foraging")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0) %>% mutate(ratio=Foraging/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Foraging","Traveling")))
+mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Foraging")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0) %>% mutate(ratio=Foraging/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Foraging","Traveling")))
 
 
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
@@ -522,8 +511,6 @@ mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
 
 #ensure order for plotting
 mxy<-mxy %>% arrange(Animal,Track,step,jStep)
-
-rm(behav_chains)
 
 #make factor
 mxy$bstate<-factor(mxy$state)
@@ -607,7 +594,7 @@ r<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 #put cellindex number
 r[]<-1:ncell(r)
 
-sxy<-split(mxy,mxy$Animal)
+sxy<-split(mxy,mxy$Animal,drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
 #plot(rasterize(j,r,field="Index",fun='count'))
@@ -641,7 +628,7 @@ sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
   #get the cells that points are in
-  k$cellvalue<-extract(r,k)
+  k$cellvalue<-raster::extract(r,k)
   
   #for each cell value, perform time function
   sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
@@ -664,7 +651,7 @@ plot(r/length(unique(mxy$Animal)))
 
 ```{r}
 #extract
-ksp$ResidencyTime<-extract(r,y=ksp)
+ksp$ResidencyTime<-raster::extract(r,y=ksp)
 #write to file
 ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
 ```
