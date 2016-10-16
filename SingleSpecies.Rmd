@@ -502,8 +502,7 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 mean_phi<-pc %>% filter(parameter=="phi",Behavior==2) %>% mutate(step=as.numeric(as.character(step))) %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value)) %>% arrange(Animal,Track,step)
 
 #mode state for each position
-mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Foraging")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0) %>% mutate(ratio=Foraging/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Foraging","Traveling")))
-
+mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Area-restricted Search")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0)%>% mutate(ratio=`Area-restricted Search`/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Area-restricted Search","Traveling")))
 
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
 
@@ -514,17 +513,12 @@ mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 #make factor
 mxy$bstate<-factor(mxy$state)
-levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 ```
 
 ##Spatial Prediction
 
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
-
-#label states
-mxy$bstate<-factor(mxy$state)
-levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
@@ -706,7 +700,7 @@ sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
   #get the cells that points are in
-  k$cellvalue<-extract(rtraveling,k)
+  k$cellvalue<-raster::extract(rtraveling,k)
   
   #for each cell value, perform time function
   sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
@@ -771,7 +765,7 @@ sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
   
   #get the cells that points are in
-  k$cellvalue<-extract(rforaging,k)
+  k$cellvalue<-raster::extract(rforaging,k)
   
   #for each cell value, perform time function
   sptrack<-as.data.frame(k) %>% group_by(Animal,cellvalue) %>% do(timecell(.))
@@ -801,7 +795,7 @@ plot(s,nr=1,addfun=function(){map(add=T)})
 
 ```{r}
 #extract krill values
-ksp<-data.frame(ksp,extract(s,y=ksp))
+ksp<-data.frame(ksp,raster::extract(s,y=ksp))
 mksp<-melt(ksp,measure.vars=names(s))
 
 #write to file
