@@ -2,6 +2,7 @@
 Ben Weinstein  
 `r Sys.time()`  
 
+six hours
 
 
 
@@ -82,7 +83,6 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 
 
-
 How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
@@ -90,7 +90,6 @@ How did the filter change the extent of tracks?
 ![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
-
 
 
 sink("Bayesian/Multi_RW.jags")
@@ -184,9 +183,9 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[2] ~ dunif(0, 0.2)		## gamma for state 2
-    #dev[m] ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    gamma[1] ~  dunif(0.3, 1.5)		## gamma for state 1
+    gamma[2] ~ dbeta(1.5, 2)		## gamma for state 2
+    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] <-  gamma[2] + dev
     
     ##Behavioral States
     
@@ -220,36 +219,33 @@ sink()
 
 
 ```
-##      user    system   elapsed 
-##   362.170     1.729 68269.238
+##    user  system elapsed 
+##    1.49    0.31  178.45
 ```
-
-
 
 
 
 ##Chains
 
 ```
-##                         Type      Size    PrettySize  Rows Columns
-## jagM          rjags.parallel 718295888  [1] "685 Mb"     6      NA
-## data                    list  98589376   [1] "94 Mb"     9      NA
-## argos                  array  64822160 [1] "61.8 Mb"    41      15
-## obs                    array  64822160 [1] "61.8 Mb"    41      15
-## j                      array  32418856 [1] "30.9 Mb"    41      15
-## b     SpatialPointsDataFrame  16418080 [1] "15.7 Mb" 46421      47
-## mdat              data.frame  16339200 [1] "15.6 Mb" 49859      47
-## mxy               grouped_df  14007880 [1] "13.4 Mb" 45503      52
-## sxy                     list  13968744 [1] "13.3 Mb"   118      NA
-## m                      ggmap  13116000 [1] "12.5 Mb"  1280    1280
+##                           Type     Size     PrettySize  Rows Columns
+## mdat                data.frame 16339200  [1] "15.6 Mb" 49859      47
+## m                        ggmap 13116768  [1] "12.5 Mb"  1280    1280
+## b       SpatialPointsDataFrame  4875992   [1] "4.7 Mb"  3354      47
+## fccamlr             data.frame  1649608   [1] "1.6 Mb" 41160       7
+## mxy                 grouped_df  1052984     [1] "1 Mb"  3351      52
+## sxy                       list   997816 [1] "974.4 Kb"     6      NA
+## d       SpatialPointsDataFrame   939008   [1] "917 Kb"  3354      47
+## oxy                 data.frame   882256 [1] "861.6 Kb"  3354      47
+## jagM            rjags.parallel   797088 [1] "778.4 Kb"     6      NA
+## data                      list   763904   [1] "746 Kb"     9      NA
 ```
 
 ```
-##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1728381   92.4    3205452  171.2   3205452  171.2
-## Vcells 162396088 1239.0  305914654 2334.0 265376812 2024.7
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1550824 82.9    2637877 140.9  2637877 140.9
+## Vcells 6288524 48.0   21809148 166.4 34060434 259.9
 ```
-
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
@@ -264,13 +260,13 @@ sink()
 ## Parameter Summary
 
 ```
-##   parameter         par        mean       lower       upper
-## 1  alpha_mu alpha_mu[1] -2.42457635 -3.29843295 -1.74781476
-## 2  alpha_mu alpha_mu[2] -1.49429763 -1.71709984 -1.25777321
-## 3     gamma    gamma[1]  1.33042798  1.22304637  1.43671316
-## 4     gamma    gamma[2]  0.19623052  0.18885202  0.19981976
-## 5     theta    theta[1]  0.01671501 -0.01960704  0.04981802
-## 6     theta    theta[2]  6.20915101  6.17413375  6.24091698
+##   parameter         par      mean         lower     upper
+## 1  alpha_mu alpha_mu[1] 1.1735037  0.5006648078 1.4087372
+## 2  alpha_mu alpha_mu[2] 0.8849096 -0.1648161635 1.7561340
+## 3     gamma    gamma[1] 0.3899531  0.2743375103 0.4945797
+## 4     gamma    gamma[2] 0.2817842  0.1115130083 0.3993051
+## 5     theta    theta[1] 0.1618540 -0.0002855062 0.3042748
+## 6     theta    theta[2] 3.2022379  2.7643205743 3.5888261
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
@@ -279,22 +275,28 @@ sink()
 
 
 
-##Spatial Prediction
+Relationship between phi and state
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
-Compared to CMLRR regions
+##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-28-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
-### Per Animal
+## Confidence
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
+## By individual
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
+
+## Compared to CMLRR regions
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
-
-##Behavioral description
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 ##Location of Behavior
 
@@ -305,49 +307,49 @@ Compared to CMLRR regions
 
 #Time spent in grid cell
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 
 
 ##Traveling
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-39-2.png)<!-- -->
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-41-2.png)<!-- -->
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
+
 
 ```
-##                           Type      Size    PrettySize    Rows Columns
-## pc                      tbl_df 125835184  [1] "120 Mb" 2407750      10
-## data                      list  98589376   [1] "94 Mb"       9      NA
-## argos                    array  64822160 [1] "61.8 Mb"      41      15
-## obs                      array  64822160 [1] "61.8 Mb"      41      15
-## ssm   SpatialPolygonsDataFrame  60340504 [1] "57.5 Mb"      17       6
-## j                        array  32418856 [1] "30.9 Mb"      41      15
-## csmm  SpatialPolygonsDataFrame  26291800 [1] "25.1 Mb"       8       6
-## b       SpatialPointsDataFrame  16418080 [1] "15.7 Mb"   46421      47
-## mdat                data.frame  16339200 [1] "15.6 Mb"   49859      47
-## sxy                       list  13823352 [1] "13.2 Mb"      41      NA
+##                             Type     Size     PrettySize  Rows Columns
+## mdat                  data.frame 16339200  [1] "15.6 Mb" 49859      47
+## temp                       ggmap 13116816  [1] "12.5 Mb"  1280    1280
+## b         SpatialPointsDataFrame  4875992   [1] "4.7 Mb"  3354      47
+## fccamlr               data.frame  1649608   [1] "1.6 Mb" 41160       7
+## mxy                   data.frame  1098264     [1] "1 Mb"  3252      58
+## traveling             data.frame   987104   [1] "964 Kb"  2917      58
+## d         SpatialPointsDataFrame   939008   [1] "917 Kb"  3354      47
+## oxy                   data.frame   882256 [1] "861.6 Kb"  3354      47
+## mdf                   data.frame   785592 [1] "767.2 Kb"  5709      23
+## mksp                  data.frame   785592 [1] "767.2 Kb"  5709      23
 ```
 
 ```
-##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
-## Ncells  2501438 133.6    4703850 251.3   4703850  251.3
-## Vcells 46143113 352.1  125302641 956.0 305914654 2334.0
+##           used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells 1620386 86.6    2637877 140.9  2637877 140.9
+## Vcells 6219133 47.5   21016781 160.4 34060434 259.9
 ```
