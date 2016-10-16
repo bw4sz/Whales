@@ -372,7 +372,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=19000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=900,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -559,29 +559,17 @@ ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),s
 Compared to CMLRR regions
 
 ```{r}
-ssm<-readShapePoly("InputData/SSMU_2013/SSMU_2013.shp")
-csmm<-crop(ssm,d)
-plot(csmm)
-f<-fortify(csmm)
-
-ggmap(m)+ geom_polygon(data=f,aes(x=long,y=lat,fill=id,alpha=0.5))+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging")  + theme_inset() 
+ggmap(m)+ geom_polygon(data=f,aes(x=long,y=lat,group=id,alpha=0.5))+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging")  + theme_inset() 
 ggsave("Figures/SpatialPred_regions.jpg",height=5,width=5)
 
-```
-
-### Per Animal
-```{r,eval=F}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=Track),size=.5)   + scale_color_continuous(low='blue',high='red',limits=c(0,1)) + labs(col="Probability of Area Restricted Search State") + facet_wrap(~individual.local.identifier) + theme_inset() 
 ```
 
 ##Autocorrelation in behavior
 
 ```{r,fig.height=20,fig.width=13}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phi)) + geom_line(aes(group=Track),size=2.5) + labs("Probability of Area Restricted Search State") + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Liklihood of Area Restricted Search State") + facet_wrap(~individual.local.identifier,ncol=3,scales="free") + ylim(0,1)
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=bstate)) + geom_line(aes(group=Track),size=1) + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Behavior") + facet_wrap(~individual.local.identifier,ncol=3,scales="free")
 ```
-
-##Behavioral description
 
 ##Location of Behavior
 
