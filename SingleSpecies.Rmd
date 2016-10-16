@@ -13,6 +13,7 @@ output:
     ]
 ---
 
+six hours
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
@@ -248,7 +249,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=12
+step_length=6
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -276,7 +277,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=12)
+sxy<-lapply(sxy,timed,step_length=6)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -288,7 +289,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
 return(x)
 })
 
