@@ -28,6 +28,7 @@ library(gridExtra)
 library(stringr)
 library(R2jags)
 library(move)
+library(tidyr)
 library(maps)
 library(maptools)
 
@@ -91,7 +92,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("112699","121207","131151"),]
+mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -512,7 +513,8 @@ levels(behav_chains$Behavior)<-c("Traveling","Area Restricted Search")
 mean_phi<-behav_chains %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value))
 
 #mode state for each position
-mode_state<-pc %>% filter(pc$parameter %in% "state") %>% group_by(Animal,Track,step) %>% summarize(state=as.numeric(names(which.max(table(value)))))
+mode_state<-pc %>% filter(pc$parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Foraging")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0) %>% mutate(ratio=Foraging/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Foraging","Traveling")))
+
 
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
 
@@ -522,6 +524,10 @@ mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
 mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 rm(behav_chains)
+
+#make factor
+mxy$bstate<-factor(mxy$state)
+levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 ```
 
 ##Spatial Prediction
@@ -533,8 +539,21 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 mxy$bstate<-factor(mxy$state)
 levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.5)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
+```
+
+## Confidence
+```{r}
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)   + theme_inset() +scale_color_continuous(low='blue',high='red')
+```
+
+## By individual
+
+```{r}
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset() + facet_wrap(~individual.local.identifier,scales="free")
+
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + theme_inset() +scale_color_continuous(low='blue',high='red')
 ```
 
 Compared to CMLRR regions
