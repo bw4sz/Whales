@@ -248,7 +248,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=4
+step_length=12
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -276,7 +276,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=4)
+sxy<-lapply(sxy,timed,step_length=12)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -288,7 +288,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
 return(x)
 })
 
@@ -335,7 +335,6 @@ obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~step~jStep~variable)
 ```
 
-
 How did the filter change the extent of tracks?
 
 ```{r}
@@ -355,7 +354,6 @@ ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,co
 ggplot(data=steps_all,aes(x=n*step_length/24)) + geom_histogram() + labs(x="Days") + ggtitle("Track Length")
 ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per Animal")
 ```
-
 
 ```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
@@ -377,13 +375,11 @@ if(newModel){
 
 ```
 
-
 ```{r,eval=F}
 #update function
 recompile(jagM)
 jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0) 
 ```
-
 
 ##Chains
 ```{r,eval=T}
@@ -440,7 +436,6 @@ pc<-rbind_all(splitpc)
 rm(splitpc)
 
 ```
-
 
 ```{r,fig.height=10}
 #plot all but phi and state
@@ -530,6 +525,12 @@ mxy$bstate<-factor(mxy$state)
 levels(mxy$bstate)<-c("Traveling","Area Restricted Search")
 ```
 
+Relationship between phi and state
+
+```{r}
+ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavior",x="Probability of switching")
+```
+
 ##Spatial Prediction
 
 ```{r}
@@ -556,7 +557,7 @@ ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),
 ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + theme_inset() +scale_color_continuous(low='blue',high='red')
 ```
 
-Compared to CMLRR regions
+## Compared to CMLRR regions
 
 ```{r}
 ggmap(m)+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),alpha=0.5,col="black")+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.5)   + scale_color_continuous(low='blue',high='red') + labs(col="Probability of Foraging") 
