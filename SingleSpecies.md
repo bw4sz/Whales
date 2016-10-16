@@ -89,7 +89,6 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
-
 ![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
 
 
@@ -173,7 +172,7 @@ cat("
     Sigma <- inverse(iSigma)
     
     ##Mean Angle
-    tmp[1] ~ dbeta(10, 10)
+    tmp[1] ~ dbeta(20, 20)
     tmp[2] ~ dbeta(10, 10)
     
     # prior for theta in 'traveling state'
@@ -185,10 +184,9 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[1] ~ dbeta(5,2)   ## gamma for state 1: traveling
-    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    gamma[2] <- gamma[1] * dev 		## gamma for state 1
-    
+    gamma[2] ~ dunif(0, 0.2)		## gamma for state 2
+    #dev[m] ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] ~  dunif(0.3, 1.5)		## gamma for state 1
     
     ##Behavioral States
     
@@ -223,7 +221,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##   421.377     3.302 45427.143
+##   362.170     1.729 68269.238
 ```
 
 
@@ -233,23 +231,23 @@ sink()
 ##Chains
 
 ```
-##                         Type       Size     PrettySize  Rows Columns
-## jagM          rjags.parallel 1522200512   [1] "1.4 Gb"     6      NA
-## data                    list  106341512 [1] "101.4 Mb"     9      NA
-## argos                  array   69920064  [1] "66.7 Mb"    41      15
-## obs                    array   69920064  [1] "66.7 Mb"    41      15
-## j                      array   34968200  [1] "33.3 Mb"    41      15
-## mdat              data.frame   16339200  [1] "15.6 Mb" 49859      47
-## mxy               grouped_df   15777992    [1] "15 Mb" 48723      54
-## sxy                     list   15726544    [1] "15 Mb"   123      NA
-## d     SpatialPointsDataFrame   14373352  [1] "13.7 Mb" 49859      49
-## oxy               data.frame   13572520  [1] "12.9 Mb" 49859      49
+##                         Type      Size    PrettySize  Rows Columns
+## jagM          rjags.parallel 718295888  [1] "685 Mb"     6      NA
+## data                    list  98589376   [1] "94 Mb"     9      NA
+## argos                  array  64822160 [1] "61.8 Mb"    41      15
+## obs                    array  64822160 [1] "61.8 Mb"    41      15
+## j                      array  32418856 [1] "30.9 Mb"    41      15
+## b     SpatialPointsDataFrame  16418080 [1] "15.7 Mb" 46421      47
+## mdat              data.frame  16339200 [1] "15.6 Mb" 49859      47
+## mxy               grouped_df  14007880 [1] "13.4 Mb" 45503      52
+## sxy                     list  13968744 [1] "13.3 Mb"   118      NA
+## m                      ggmap  13116000 [1] "12.5 Mb"  1280    1280
 ```
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1743990   93.2    3205452  171.2   3205452  171.2
-## Vcells 266741616 2035.1  550872977 4202.9 476553410 3635.9
+## Ncells   1728381   92.4    3205452  171.2   3205452  171.2
+## Vcells 162396088 1239.0  305914654 2334.0 265376812 2024.7
 ```
 
 
@@ -267,12 +265,12 @@ sink()
 
 ```
 ##   parameter         par        mean       lower       upper
-## 1  alpha_mu alpha_mu[1] -0.52156167 -0.91448547 -0.14420363
-## 2  alpha_mu alpha_mu[2] -1.44659642 -1.72554890 -1.13807985
-## 3     gamma    gamma[1]  0.98811826  0.96991406  0.99784163
-## 4     gamma    gamma[2]  0.22477019  0.19500863  0.25394408
-## 5     theta    theta[1] -0.02917987 -0.06758932  0.01336358
-## 6     theta    theta[2]  3.19744268  0.15000598  6.22479804
+## 1  alpha_mu alpha_mu[1] -2.42457635 -3.29843295 -1.74781476
+## 2  alpha_mu alpha_mu[2] -1.49429763 -1.71709984 -1.25777321
+## 3     gamma    gamma[1]  1.33042798  1.22304637  1.43671316
+## 4     gamma    gamma[2]  0.19623052  0.18885202  0.19981976
+## 5     theta    theta[1]  0.01671501 -0.01960704  0.04981802
+## 6     theta    theta[2]  6.20915101  6.17413375  6.24091698
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
@@ -335,21 +333,21 @@ Compared to CMLRR regions
 
 
 ```
-##                           Type      Size     PrettySize    Rows Columns
-## pc                      tbl_df 269622488 [1] "257.1 Mb" 5172000      10
-## data                      list 106341512 [1] "101.4 Mb"       9      NA
-## argos                    array  69920064  [1] "66.7 Mb"      41      15
-## obs                      array  69920064  [1] "66.7 Mb"      41      15
-## ssm   SpatialPolygonsDataFrame  60340504  [1] "57.5 Mb"      17       6
-## j                        array  34968200  [1] "33.3 Mb"      41      15
-## csmm  SpatialPolygonsDataFrame  28125776  [1] "26.8 Mb"       8       6
-## mdat                data.frame  16339200  [1] "15.6 Mb"   49859      47
-## sxy                       list  15206392  [1] "14.5 Mb"      41      NA
-## mxy                 data.frame  15202512  [1] "14.5 Mb"   46847      57
+##                           Type      Size    PrettySize    Rows Columns
+## pc                      tbl_df 125835184  [1] "120 Mb" 2407750      10
+## data                      list  98589376   [1] "94 Mb"       9      NA
+## argos                    array  64822160 [1] "61.8 Mb"      41      15
+## obs                      array  64822160 [1] "61.8 Mb"      41      15
+## ssm   SpatialPolygonsDataFrame  60340504 [1] "57.5 Mb"      17       6
+## j                        array  32418856 [1] "30.9 Mb"      41      15
+## csmm  SpatialPolygonsDataFrame  26291800 [1] "25.1 Mb"       8       6
+## b       SpatialPointsDataFrame  16418080 [1] "15.7 Mb"   46421      47
+## mdat                data.frame  16339200 [1] "15.6 Mb"   49859      47
+## sxy                       list  13823352 [1] "13.2 Mb"      41      NA
 ```
 
 ```
-##            used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells  2521144 134.7    5497235  293.6   5684620  303.6
-## Vcells 65505334 499.8  180510056 1377.2 549704172 4194.0
+##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
+## Ncells  2501438 133.6    4703850 251.3   4703850  251.3
+## Vcells 46143113 352.1  125302641 956.0 305914654 2334.0
 ```
