@@ -371,7 +371,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=20000,n.burnin=19500,n.thin=2,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=49000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -455,6 +455,18 @@ pc$Behavior<-as.factor(pc$Behavior)
 ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=3) + theme_bw()  + ggtitle("Estimated parameters")
 ```
 
+Look at the convergence of phi, just for an example
+
+```{r}
+pc %>% filter(Animal==1,step %in% 25:30,Track==1) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
+```
+
+Same section of chain for state
+
+```{r}
+pc %>% filter(Animal==1,step %in% 25:30,Track==1) %>% filter(parameter=="state") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
+```
+
 ###Compare to priors
 
 ```{r}
@@ -524,9 +536,12 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
+
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + scale_color_continuous(low='red',high="blue",limits=c(0,1))
+
 ```
 
-## Confidence
+## Confidence in state estimate
 ```{r}
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)   + theme_inset() +scale_color_continuous(low='blue',high='red')
 ```

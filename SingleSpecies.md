@@ -183,9 +183,9 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[2] ~ dbeta(1.5, 2)		## gamma for state 2
-    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    gamma[1] <-  gamma[2] + dev
+    gamma[2] ~ dunif(0,0.5)		## gamma for state 2
+    #dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] ~ dunif(0.5,2)	
     
     ##Behavioral States
     
@@ -219,8 +219,8 @@ sink()
 
 
 ```
-##    user  system elapsed 
-##   0.461   0.006 552.923
+##     user   system  elapsed 
+##    0.535    0.024 2215.302
 ```
 
 
@@ -229,6 +229,7 @@ sink()
 
 ```
 ##                           Type     Size     PrettySize  Rows Columns
+## jagM            rjags.parallel 16900448  [1] "16.1 Mb"     6      NA
 ## mdat                data.frame 16339200  [1] "15.6 Mb" 49859      47
 ## m                        ggmap 13116768  [1] "12.5 Mb"  1280    1280
 ## jagM            rjags.parallel  7041248   [1] "6.7 Mb"     6      NA
@@ -243,8 +244,8 @@ sink()
 
 ```
 ##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1541013 82.3    2637877 140.9  2637877 140.9
-## Vcells 7058392 53.9   21787340 166.3 33439945 255.2
+## Ncells 1541011 82.3    2637877 140.9  2637877 140.9
+## Vcells 8290796 63.3   21787340 166.3 33439945 255.2
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -260,13 +261,13 @@ sink()
 ## Parameter Summary
 
 ```
-##   parameter         par      mean       lower     upper
-## 1  alpha_mu alpha_mu[1] 1.4397461  0.48649463 2.2798116
-## 2  alpha_mu alpha_mu[2] 0.7999115 -0.92041167 2.9630465
-## 3     gamma    gamma[1] 0.4224409  0.30516789 0.5448894
-## 4     gamma    gamma[2] 0.2960219  0.14531697 0.4228653
-## 5     theta    theta[1] 0.1240580 -0.04942822 0.3302026
-## 6     theta    theta[2] 3.0856457  2.48220867 3.6767675
+##   parameter         par       mean       lower     upper
+## 1  alpha_mu alpha_mu[1] 0.95480125 -1.19586522 2.2197526
+## 2  alpha_mu alpha_mu[2] 0.12084861 -1.52038098 1.9629351
+## 3     gamma    gamma[1] 0.56231003  0.50248085 0.7032269
+## 4     gamma    gamma[2] 0.26571136  0.03108296 0.4804118
+## 5     theta    theta[1] 0.07682063 -0.11377090 0.2444992
+## 6     theta    theta[2] 3.00735077  2.23689663 3.6732276
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
@@ -336,13 +337,13 @@ Relationship between phi and state
 
 ```
 ##                             Type     Size     PrettySize   Rows Columns
+## pc                        tbl_df 16976688  [1] "16.2 Mb" 325500      10
 ## mdat                  data.frame 16339200  [1] "15.6 Mb"  49859      47
 ## temp                       ggmap 13116816  [1] "12.5 Mb"   1280    1280
-## pc                        tbl_df  6821088   [1] "6.5 Mb" 130200      10
 ## b         SpatialPointsDataFrame  4875992   [1] "4.7 Mb"   3354      47
 ## fccamlr               data.frame  1649608   [1] "1.6 Mb"  41160       7
 ## mxy                   data.frame  1098264     [1] "1 Mb"   3252      58
-## traveling             data.frame  1054832     [1] "1 Mb"   3121      58
+## traveling             data.frame   993280   [1] "970 Kb"   2936      58
 ## d         SpatialPointsDataFrame   939008   [1] "917 Kb"   3354      47
 ## oxy                   data.frame   882256 [1] "861.6 Kb"   3354      47
 ## mdf                   data.frame   785592 [1] "767.2 Kb"   5709      23
@@ -350,6 +351,6 @@ Relationship between phi and state
 
 ```
 ##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1611803 86.1    2637877 140.9  2637877 140.9
-## Vcells 7012886 53.6   20979846 160.1 33439945 255.2
+## Ncells 1611827 86.1    2637877 140.9  2637877 140.9
+## Vcells 8300563 63.4   26224808 200.1 33439945 255.2
 ```
