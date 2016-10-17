@@ -92,7 +92,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
+mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -559,7 +559,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)  +sca
 ## By individual
 
 ```{r}
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset() + facet_wrap(~individual.local.identifier,scales="free")
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + facet_wrap(~individual.local.identifier,scales="free") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 
 ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + theme_inset() +scale_color_continuous(low='blue',high='red')
 ```
