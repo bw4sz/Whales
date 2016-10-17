@@ -75,6 +75,9 @@ newModel<-F
 lsos <- function(..., n=10) {
     .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
 }
+
+#ggplot theme
+mytheme<-theme(axis.text.x=element_blank(),axis.ticks.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank())
 ```
 
 ```{r}
@@ -136,7 +139,7 @@ d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=lon
 #Plot
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=4,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + theme_inset()
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + 
 ```
 
 ##By Month
@@ -343,7 +346,7 @@ mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 pp<-c(mean(mxy$x),mean(mxy$y))
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Animal,Track)),size=.5) + scale_color_discrete(guide="none") + theme_inset() 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Animal,Track)),size=.5) + scale_color_discrete(guide="none") + mytheme
 ```
 
 ```{r,fig.height=15}
@@ -541,7 +544,7 @@ ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavi
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + mytheme + labs(col="Behavior")
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + scale_color_continuous(low='red',high="blue",limits=c(0,1))
@@ -561,7 +564,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)  +sca
 ```{r}
 ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + facet_wrap(~individual.local.identifier,scales="free") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + theme_inset() +scale_color_continuous(low='blue',high='red')
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + mytheme +scale_color_continuous(low='blue',high='red')
 ```
 
 ## Compared to CMLRR regions
