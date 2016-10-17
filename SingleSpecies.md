@@ -183,9 +183,9 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[2] ~ dunif(0,0.5)		## gamma for state 2
-    #dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    gamma[1] ~ dunif(0.5,2)	
+    gamma[2] ~ dbeta(1,4)		## gamma for state 2
+    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[1] <- gamma[2] + dev
     
     ##Behavioral States
     
@@ -220,7 +220,7 @@ sink()
 
 ```
 ##     user   system  elapsed 
-##    0.535    0.024 2215.302
+##     0.98     0.05 12775.95
 ```
 
 
@@ -232,7 +232,6 @@ sink()
 ## jagM            rjags.parallel 16900448  [1] "16.1 Mb"     6      NA
 ## mdat                data.frame 16339200  [1] "15.6 Mb" 49859      47
 ## m                        ggmap 13116768  [1] "12.5 Mb"  1280    1280
-## jagM            rjags.parallel  7041248   [1] "6.7 Mb"     6      NA
 ## b       SpatialPointsDataFrame  4875992   [1] "4.7 Mb"  3354      47
 ## fccamlr             data.frame  1649608   [1] "1.6 Mb" 41160       7
 ## mxy                 grouped_df  1052984     [1] "1 Mb"  3351      52
@@ -244,8 +243,8 @@ sink()
 
 ```
 ##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1541011 82.3    2637877 140.9  2637877 140.9
-## Vcells 8290796 63.3   21787340 166.3 33439945 255.2
+## Ncells 1541070 82.4    2637877 140.9  2637877 140.9
+## Vcells 8291019 63.3   21787689 166.3 33440164 255.2
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
@@ -254,23 +253,31 @@ sink()
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
-###Compare to priors
+Look at the convergence of phi, just for an example
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+Same section of chain for state
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
+###Compare to priors
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ## Parameter Summary
 
 ```
-##   parameter         par       mean       lower     upper
-## 1  alpha_mu alpha_mu[1] 0.95480125 -1.19586522 2.2197526
-## 2  alpha_mu alpha_mu[2] 0.12084861 -1.52038098 1.9629351
-## 3     gamma    gamma[1] 0.56231003  0.50248085 0.7032269
-## 4     gamma    gamma[2] 0.26571136  0.03108296 0.4804118
-## 5     theta    theta[1] 0.07682063 -0.11377090 0.2444992
-## 6     theta    theta[2] 3.00735077  2.23689663 3.6732276
+##   parameter         par      mean       lower     upper
+## 1  alpha_mu alpha_mu[1] 1.2241607 -1.01729391 2.7139383
+## 2  alpha_mu alpha_mu[2] 0.6261111 -1.96205707 3.2486023
+## 3     gamma    gamma[1] 0.4281891  0.29380202 0.5934416
+## 4     gamma    gamma[2] 0.1902060  0.01868696 0.3941885
+## 5     theta    theta[1] 0.1413886 -0.09508713 0.3651382
+## 6     theta    theta[2] 3.0483059  1.98838844 3.8317466
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -278,26 +285,26 @@ sink()
 
 Relationship between phi and state
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 ##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
 
-## Confidence
-![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+## Confidence in state estimate
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ## By individual
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
 
 ## Compared to CMLRR regions
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
 
 ##Location of Behavior
 
@@ -308,49 +315,49 @@ Relationship between phi and state
 
 #Time spent in grid cell
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-37-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
 
 
 ##Traveling
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-40-2.png)<!-- -->
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-41-2.png)<!-- -->
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-43-2.png)<!-- -->
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
+
 
 ```
-##                             Type     Size     PrettySize   Rows Columns
-## pc                        tbl_df 16976688  [1] "16.2 Mb" 325500      10
-## mdat                  data.frame 16339200  [1] "15.6 Mb"  49859      47
-## temp                       ggmap 13116816  [1] "12.5 Mb"   1280    1280
-## b         SpatialPointsDataFrame  4875992   [1] "4.7 Mb"   3354      47
-## fccamlr               data.frame  1649608   [1] "1.6 Mb"  41160       7
-## mxy                   data.frame  1098264     [1] "1 Mb"   3252      58
-## traveling             data.frame   993280   [1] "970 Kb"   2936      58
-## d         SpatialPointsDataFrame   939008   [1] "917 Kb"   3354      47
-## oxy                   data.frame   882256 [1] "861.6 Kb"   3354      47
-## mdf                   data.frame   785592 [1] "767.2 Kb"   5709      23
+##                             Type     Size      PrettySize   Rows Columns
+## pc                        tbl_df 16976688   [1] "16.2 Mb" 325500      10
+## mdat                  data.frame 16339200   [1] "15.6 Mb"  49859      47
+## temp                       ggmap 13116816   [1] "12.5 Mb"   1280    1280
+## b         SpatialPointsDataFrame  4875992    [1] "4.7 Mb"   3354      47
+## fccamlr               data.frame  1649608    [1] "1.6 Mb"  41160       7
+## mxy                   data.frame  1098264      [1] "1 Mb"   3252      58
+## traveling             data.frame  1042880 [1] "1018.4 Kb"   3085      58
+## d         SpatialPointsDataFrame   939008    [1] "917 Kb"   3354      47
+## oxy                   data.frame   882256  [1] "861.6 Kb"   3354      47
+## mdf                   data.frame   785592  [1] "767.2 Kb"   5709      23
 ```
 
 ```
 ##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1611827 86.1    2637877 140.9  2637877 140.9
-## Vcells 8300563 63.4   26224808 200.1 33439945 255.2
+## Ncells 1612084 86.1    2637877 140.9  2637877 140.9
+## Vcells 8294522 63.3   25240216 192.6 33440164 255.2
 ```
