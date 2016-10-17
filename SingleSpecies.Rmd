@@ -92,7 +92,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
+#mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -437,7 +437,7 @@ rm(splitpc)
 
 ```
 
-```{r,fig.height=10}
+```{r,fig.height=8,fig.width=14}
 #plot all but phi and state
 ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
@@ -487,9 +487,9 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),para
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,1,10),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,1,4),parameter='gamma',Behavior=2,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,1.5,5),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,1,4) + runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,gamma1prior,gamma2prior))
 
