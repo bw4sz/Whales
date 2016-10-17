@@ -13,7 +13,6 @@ output:
     ]
 ---
 
-six hours
 ```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(knitr)
 opts_chunk$set(echo=F,warning=F,message=F,fig.width = 11,fig.height = 5,cache=F)
@@ -93,7 +92,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
+#mxy<-mxy[mxy$Animal %in% c("131143","131142"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -371,7 +370,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=50000,n.burnin=48000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=8,DIC=FALSE))
 }
 
 ```
@@ -471,7 +470,6 @@ Overall relationship between phi and state, nice test of convergence.
 
 ```{r}
 a<-pc %>% filter(parameter %in% c("state","phi")) %>% filter((parameter == "phi"&Behavior==2)|parameter =="state") %>% dplyr::select(Draw,chain,Animal,Track,step,value,parameter) %>% spread(key=parameter,value=value)
-ggplot(a,aes(x=phi,y=state-1)) + geom_point() + geom_smooth(method.args=list(family="binomial"))
 ggplot(a,aes(x=phi,fill=as.factor(state-1))) + geom_density(alpha=0.7) + labs(fill="Behavior")
 
 ```
@@ -535,7 +533,7 @@ mxy$bstate<-factor(mxy$state)
 Relationship between phi and state
 
 ```{r}
-ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavior",x="Probability of switching")
+ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavior",x="Probability of switching to ARS")
 ```
 
 ##Spatial Prediction
@@ -543,7 +541,7 @@ ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavi
 ```{r}
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)   + theme_inset()+ geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) 
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + scale_color_continuous(low='red',high="blue",limits=c(0,1))
@@ -551,8 +549,11 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),siz
 ```
 
 ## Confidence in state estimate
+
+Red is traveling, blue is foraging, midpoint is 0
+
 ```{r}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)   + theme_inset() +scale_color_continuous(low='blue',high='red')
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)  +scale_color_gradient2(low='blue',high='red',midpoint = 0) 
 ```
 
 ## By individual
