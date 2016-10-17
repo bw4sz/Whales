@@ -89,8 +89,8 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[2] ~ dbeta(1,4)		## gamma for state 2
-    dev ~ dunif(0.5,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[2] ~ dbeta(1.5,2)		## gamma for state 2
+    dev ~ dunif(0.3,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[1] <- gamma[2] + dev
     
     ##Behavioral States
