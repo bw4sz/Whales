@@ -88,7 +88,11 @@ How did the filter change the extent of tracks?
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
+Look at the observations were defined into tracks.
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
 
 
 sink("Bayesian/Multi_RW.jags")
@@ -182,8 +186,8 @@ cat("
     ##Move persistance
     # prior for gamma (autocorrelation parameter)
     #from jonsen 2016
-    gamma[2] ~ dbeta(1,4)		## gamma for state 2
-    dev ~ dunif(0.5,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    gamma[2] ~ dbeta(1,5)		## gamma for state 2
+    dev ~ dunif(0.1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[1] <- gamma[2] + dev
     
     ##Behavioral States
@@ -218,8 +222,8 @@ sink()
 
 
 ```
-##     user   system  elapsed 
-##    0.545    0.024 1095.956
+##    user  system elapsed 
+##   1.012   0.040 993.276
 ```
 
 
@@ -228,59 +232,59 @@ sink()
 
 ```
 ##                           Type     Size     PrettySize  Rows Columns
-## jagM            rjags.parallel 16900448  [1] "16.1 Mb"     6      NA
+## jagM            rjags.parallel 50102120  [1] "47.8 Mb"     6      NA
 ## mdat                data.frame 16339200  [1] "15.6 Mb" 49859      47
-## m                        ggmap 13116768  [1] "12.5 Mb"  1280    1280
+## m                        ggmap 13116672  [1] "12.5 Mb"  1280    1280
 ## b       SpatialPointsDataFrame  4875992   [1] "4.7 Mb"  3354      47
 ## fccamlr             data.frame  1649608   [1] "1.6 Mb" 41160       7
-## mxy                 grouped_df  1052984     [1] "1 Mb"  3351      52
-## sxy                       list   998200 [1] "974.8 Kb"     6      NA
+## mxy                 grouped_df  1057728     [1] "1 Mb"  3323      52
+## sxy                       list  1003648 [1] "980.1 Kb"     7      NA
+## data                      list   991216   [1] "968 Kb"     9      NA
 ## d       SpatialPointsDataFrame   939008   [1] "917 Kb"  3354      47
 ## oxy                 data.frame   882256 [1] "861.6 Kb"  3354      47
-## data                      list   763904   [1] "746 Kb"     9      NA
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1541099 82.4    2637877 140.9  2637877 140.9
-## Vcells 8291181 63.3   21787946 166.3 33440326 255.2
+##            used (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1548523 82.8    2637877 140.9  2637877 140.9
+## Vcells 12577714 96.0   29035403 221.6 35853897 273.6
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
-
-Look at the convergence of phi, just for an example
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
+Look at the convergence of phi, just for an example
+
+
+
 Same section of chain for state
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
 
 Overall relationship between phi and state, nice test of convergence.
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ###Compare to priors
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ## Parameter Summary
 
 ```
-##   parameter         par        mean        lower     upper
-## 1  alpha_mu alpha_mu[1] -0.09059916 -1.868576149 1.7767322
-## 2  alpha_mu alpha_mu[2] -0.17745880 -2.757812799 2.4934582
-## 3     gamma    gamma[1]  0.62927285  0.528077062 0.7829601
-## 4     gamma    gamma[2]  0.04514859  0.003024629 0.1169890
-## 5     theta    theta[1]  0.06250127 -0.153341793 0.2768952
-## 6     theta    theta[2]  2.93269074  1.865698540 4.2051617
+##   parameter         par        mean       lower     upper
+## 1  alpha_mu alpha_mu[1]  0.42421981 -0.85965380 1.7541179
+## 2  alpha_mu alpha_mu[2]  1.97746199  0.35549643 3.8562231
+## 3     gamma    gamma[1]  0.41402005  0.30382823 0.5136270
+## 4     gamma    gamma[2]  0.22186943  0.06316513 0.3459807
+## 5     theta    theta[1] -0.05967522 -0.25514637 0.1543776
+## 6     theta    theta[2]  2.40109592  1.76169833 3.2409506
 ```
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 #Behavioral Prediction
 
@@ -288,29 +292,29 @@ Overall relationship between phi and state, nice test of convergence.
 
 Relationship between phi and state
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-31-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
 
 ## Confidence in state estimate
 
 Red is traveling, blue is foraging, midpoint is 0
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ## By individual
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
 
 ## Compared to CMLRR regions
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
 
 ##Autocorrelation in behavior
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 ##Location of Behavior
 
@@ -321,25 +325,23 @@ Red is traveling, blue is foraging, midpoint is 0
 
 #Time spent in grid cell
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-39-2.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
 
 
 ##Traveling
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-41-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-42-2.png)<!-- -->
 
-
-![](SingleSpecies_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-45-2.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
@@ -347,23 +349,25 @@ Red is traveling, blue is foraging, midpoint is 0
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
+
 
 ```
-##                           Type     Size     PrettySize   Rows Columns
-## pc                      tbl_df 16976688  [1] "16.2 Mb" 325500      10
-## mdat                data.frame 16339200  [1] "15.6 Mb"  49859      47
-## temp                     ggmap 13116816  [1] "12.5 Mb"   1280    1280
-## b       SpatialPointsDataFrame  4875992   [1] "4.7 Mb"   3354      47
-## a                       tbl_df  4387064   [1] "4.2 Mb" 109500       7
-## fccamlr             data.frame  1649608   [1] "1.6 Mb"  41160       7
-## mxy                 data.frame  1098264     [1] "1 Mb"   3252      58
-## d       SpatialPointsDataFrame   939008   [1] "917 Kb"   3354      47
-## sxy                       list   906512 [1] "885.3 Kb"      2      NA
-## oxy                 data.frame   882256 [1] "861.6 Kb"   3354      47
+##                             Type     Size     PrettySize   Rows Columns
+## pc                        tbl_df 44264960  [1] "42.2 Mb" 850000      10
+## mdat                  data.frame 16339200  [1] "15.6 Mb"  49859      47
+## temp                       ggmap 13116816  [1] "12.5 Mb"   1280    1280
+## a                         tbl_df 11448600  [1] "10.9 Mb" 286000       7
+## b         SpatialPointsDataFrame  4875992   [1] "4.7 Mb"   3354      47
+## fccamlr               data.frame  1649608   [1] "1.6 Mb"  41160       7
+## mxy                   data.frame  1098472     [1] "1 Mb"   3247      58
+## traveling             data.frame  1016264 [1] "992.4 Kb"   3000      58
+## data                        list   991216   [1] "968 Kb"      9      NA
+## d         SpatialPointsDataFrame   939008   [1] "917 Kb"   3354      47
 ```
 
 ```
-##           used (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells 1612557 86.2    2637877 140.9  2637877 140.9
-## Vcells 8944830 68.3   25240513 192.6 33440326 255.2
+##            used  (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1614274  86.3    3205452 171.2  3205452 171.2
+## Vcells 13575074 103.6   34922483 266.5 35853897 273.6
 ```
