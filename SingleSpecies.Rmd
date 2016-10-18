@@ -469,7 +469,7 @@ ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histog
 Look at the convergence of phi, just for an example
 
 ```{r}
-#pc %>% filter(Animal==1,step %in% 2:10,Track==1,Behavior==2) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
+pc %>% filter(Animal==1,step %in% 2:10,Track==1,Behavior==2) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
 ```
 
 Same section of chain for state
@@ -541,8 +541,8 @@ mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 mxy$bstate<-factor(mxy$state)
 
 #make phi a factor
-mxy$phistate<-as.factor(mxy$phi>0.5)
-levels(mxy$phistate)<-c("Traveling","Area-restricted Search")
+mxy$phistate<-cut(mxy$phi,c(0,0.5,1),labels=c("Traveling","Area-restricted Search"))
+
 ```
 
 Relationship between phi and state
@@ -695,10 +695,9 @@ traveling<-mxy %>% filter(phistate=="Traveling")
 foraging<-mxy %>% filter(phistate=="Area-restricted Search")
 ```
 
-##Traveling
-
 ```{r}
 #raster
+if(!nrow(traveling)==0){
 rtraveling<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
 #res(rtraveling)<-0.25
@@ -757,12 +756,13 @@ rtraveling[]<-NA
 for(x in 1:nrow(cellvals)){
   rtraveling[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
-
-plot(rtraveling/length(unique(traveling$Animal)))
-plot(rtraveling)
+}
 ```
 
+## ARS
+
 ```{r}
+if(!nrow(foraging)==0){
 #raster
 rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
@@ -822,14 +822,10 @@ for(x in 1:nrow(cellvals)){
   rforaging[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
 
-plot(r/length(unique(foraging$Animal)))
-map(add=T)
-```
-
-```{r}
 s<-stack(r,rforaging,rtraveling)
 names(s)<-c("All","Area Restricted Search","Traveling")
 plot(s,nr=1,addfun=function(){map(add=T)})
+}
 ```
 
 ```{r}
