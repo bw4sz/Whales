@@ -556,7 +556,6 @@ ggplot(mxy,aes(x=phi,fill=bstate)) + geom_density(alpha=0.5) + labs(fill="Behavi
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color="bw")
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + mytheme + labs(col="Behavior")
-ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1)
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
