@@ -460,13 +460,13 @@ ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histog
 Look at the convergence of phi, just for an example
 
 ```{r}
-pc %>% filter(Animal==1,step %in% 25:30,Track==1,Behavior==2) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
+#pc %>% filter(Animal==1,step %in% 2:10,Track==1,Behavior==2) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
 ```
 
 Same section of chain for state
 
 ```{r}
-pc %>% filter(Animal==1,step %in% 25:30,Track==1) %>% filter(parameter=="state") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
+#pc %>% filter(Animal==1,step %in% 25:30,Track==1) %>% filter(parameter=="state") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
 ```
 
 Overall relationship between phi and state, nice test of convergence.
