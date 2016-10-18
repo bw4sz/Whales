@@ -251,7 +251,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=24
+step_length=12
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -270,7 +270,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=48) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=24) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -291,7 +291,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"24 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
 return(x)
 })
 
@@ -472,12 +472,6 @@ Look at the convergence of phi, just for an example
 pc %>% filter(Animal==1,step %in% 2:10,Track==1,Behavior==2) %>% filter(parameter=="phi") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
 ```
 
-Same section of chain for state
-
-```{r}
-#pc %>% filter(Animal==1,step %in% 25:30,Track==1) %>% filter(parameter=="state") %>% ggplot(.,aes(x=Draw,y=value,col=as.factor(chain))) + geom_line() + facet_wrap(~step)
-```
-
 Overall relationship between phi and state, nice test of convergence.
 
 ```{r}
@@ -499,9 +493,9 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),para
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,1,4),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,1,4) + runif(todraw,0.5,1),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,5,2) * runif(todraw,0,0.75),parameter='gamma',Behavior=1,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,gamma1prior,gamma2prior))
 
