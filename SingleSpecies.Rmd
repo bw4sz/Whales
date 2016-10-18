@@ -301,7 +301,6 @@ mxy<-rbind_all(sxy)
 mxy$Animal<-as.numeric(as.factor(mxy$Animal))
 ```
 
-
 ```{r}
 #total number of steps per track/animal
 steps_all<-mxy %>% group_by(Animal,Track) %>% summarize(n=length(unique(step)))
@@ -762,7 +761,6 @@ plot(rtraveling/length(unique(traveling$Animal)))
 plot(rtraveling)
 ```
 
-
 ```{r}
 #raster
 rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
@@ -849,7 +847,6 @@ mdf<-as.data.frame(mksp)
 camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% arrange(s) %>% ungroup() %>% mutate(Behavior=variable) %>% dplyr::select(-variable) %>%  dcast(...~Behavior,value.var="s") %>% arrange(All)
 write.csv(camdf,"Figures/CCAMLR_days.csv")
 ```
-
 
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
