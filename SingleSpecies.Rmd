@@ -270,7 +270,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=12) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=18) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -279,7 +279,7 @@ timed<-function(d,step_length){
   return(d)
   }
 
-sxy<-lapply(sxy,timed,step_length=4)
+sxy<-lapply(sxy,timed,step_length=step_length)
 
 #Format matrices for jags
 mxy<-rbind_all(sxy)
@@ -291,7 +291,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"9 hours"))
 return(x)
 })
 
@@ -353,10 +353,14 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Anim
 ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~individual.local.identifier,scales="free",ncol=4)
 ```
 
-```{r}
-  cl<-rainbow(100)
-  cl<-sample(cl)
-  p<-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=as.numeric(step),group=paste(Track,step)),size=1) + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.ticks.x=element_blank()) + scale_color_gradientn(colours = cl) + theme_bw() + facet_wrap(~Animal,scales="free") + mytheme
+Look at the observations were defined into tracks.
+
+```{r,fig.height=20}
+cl<-rainbow(100)
+cl<-sample(cl)
+p<-ggplot() + geom_path(data=mxy, aes(x=x, y=y,group=1),size=0.1,col="black") + labs(col="step")
+p<-p+geom_path(data=mxy, aes(x=x, y=y,col=as.numeric(step),group=paste(Track,step)),size=1) + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.ticks.x=element_blank()) + scale_color_gradientn(colours = cl) + theme_bw() + facet_wrap(~Animal,scales="free") 
+p + mytheme
 ```
 
 ```{r,fig.height=3,fig.width=5}
@@ -379,7 +383,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=8,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=8000,n.burnin=5000,n.thin=6,DIC=FALSE))
 }
 
 ```
