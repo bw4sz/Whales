@@ -251,7 +251,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=9
+step_length=4
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -291,7 +291,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"9 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
 return(x)
 })
 
