@@ -251,7 +251,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=48
+step_length=9
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -270,7 +270,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=72) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=18) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -291,7 +291,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"48 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"9 hours"))
 return(x)
 })
 
@@ -382,7 +382,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=15000,n.burnin=10000,n.thin=5,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=9000,n.thin=5,DIC=FALSE))
 }
 
 ```
@@ -532,6 +532,7 @@ mean_phi<-pc %>% filter(parameter=="phi",Behavior==2) %>% mutate(step=as.numeric
 mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Area-restricted Search")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0)%>% mutate(ratio=`Area-restricted Search`/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Area-restricted Search","Traveling")))
 
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
+mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
 
 #ensure order for plotting
 mxy<-mxy %>% arrange(Animal,Track,step,jStep)
