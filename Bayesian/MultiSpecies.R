@@ -31,7 +31,7 @@ cat("
     for(t in 2:(steps[i,g]-1)){
     
     #Behavioral State at time T
-    logit(phi[i,g,t,1]) <- alpha_mu[state[i,g,t-1]] 
+    phi[i,g,t,1] <- alpha_mu[state[i,g,t-1]] 
     phi[i,g,t,2] <- 1-phi[i,g,t,1]
     state[i,g,t] ~ dcat(phi[i,g,t,])
     
@@ -50,7 +50,7 @@ cat("
     }
     
     #Final behavior state
-    logit(phi[i,g,steps[i,g],1]) <- alpha_mu[state[i,g,steps[i,g]-1]] 
+    phi[i,g,steps[i,g],1] <- alpha_mu[state[i,g,steps[i,g]-1]] 
     phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
     state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
     
@@ -98,12 +98,8 @@ cat("
     ##Behavioral States
     
     #Intercepts
-    alpha_mu[1] ~ dnorm(0,0.386)
-    alpha_mu[2] ~ dnorm(0,0.386)
-    
-    #Variance
-    alpha_tau[1] ~ dt(0,1,1)I(0,)
-    alpha_tau[2] ~ dt(0,1,1)I(0,)
+    alpha_mu[1] ~ dbeta(1,1)
+    alpha_mu[2] ~ dbeta(1,1)
     
     #Probability of behavior switching 
     lambda[1] ~ dbeta(1,1)
