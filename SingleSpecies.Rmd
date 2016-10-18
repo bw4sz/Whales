@@ -251,7 +251,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=9
+step_length=12
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -270,7 +270,7 @@ timed<-function(d,step_length){
   }
   
   #remove tracks that are shorter than three days
-  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=18) %>% .$Track
+  track_time<-d %>% group_by(Track) %>% summarize(mt=difftime(max(as.POSIXct(timestamp)),min(as.POSIXct(timestamp)),units="hours")) %>% filter(mt>=24) %>% .$Track
   
   d<-d[d$Track %in% track_time,]
   
@@ -291,7 +291,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"9 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"12 hours"))
 return(x)
 })
 
