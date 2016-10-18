@@ -98,7 +98,6 @@ cat("
 
     ##Behavioral States
     
-    #Hierarchical structure across motnhs
     #Intercepts
     alpha_mu[1] ~ dnorm(0,0.386)
     alpha_mu[2] ~ dnorm(0,0.386)
