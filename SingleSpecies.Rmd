@@ -673,8 +673,8 @@ r[]<-NA
 for(x in 1:nrow(cellvals)){
   r[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
-plot(r)
-plot(r/length(unique(mxy$Animal)))
+s<-stack(r)
+names(s)[[1]]<-"All Behavior"
 ```
 
 ```{r}
@@ -750,6 +750,8 @@ rtraveling[]<-NA
 for(x in 1:nrow(cellvals)){
   rtraveling[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
+s[[2]]<-rtraveling
+names(s)[[2]]<-"Traveling"
 }
 ```
 
@@ -815,14 +817,15 @@ rforaging[]<-NA
 for(x in 1:nrow(cellvals)){
   rforaging[cellvals$cellvalue[x]]<-cellvals$Sum[x]
 }
-
-s<-stack(r,rforaging,rtraveling)
-names(s)<-c("All","Area Restricted Search","Traveling")
-plot(s,nr=1,addfun=function(){map(add=T)})
+s[[3]]<-rforaging
+names(s)[[3]]<-"Area-restricted Search"
 }
 ```
 
 ```{r}
+
+plot(s,nr=1,addfun=function(){map(add=T)})
+
 #extract krill values
 ksp<-data.frame(ksp,raster::extract(s,y=ksp))
 mksp<-melt(ksp,measure.vars=names(s))
