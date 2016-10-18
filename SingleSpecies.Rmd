@@ -533,13 +533,15 @@ mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value
 
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
 
-mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
-
 #ensure order for plotting
 mxy<-mxy %>% arrange(Animal,Track,step,jStep)
 
 #make factor
 mxy$bstate<-factor(mxy$state)
+
+#make phi a factor
+mxy$phistate<-as.factor(mxy$phi>0.5)
+levels(mxy$phistate)<-c("Traveling","Area-restricted Search")
 ```
 
 Relationship between phi and state
@@ -556,24 +558,23 @@ m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",colo
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + mytheme + labs(col="Behavior")
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phi,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1) + scale_color_continuous(low='red',high="blue",limits=c(0,1))
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1)
+ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
-```
-
-## Confidence in state estimate
-
-Red is traveling, blue is foraging, midpoint is 0
-
-```{r}
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=Animal),size=.5)  +scale_color_gradient2(low='blue',high='red',midpoint = 0) 
 ```
 
 ## By individual
 
 ```{r}
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.2)  + facet_wrap(~individual.local.identifier,scales="free") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),size=.5)  + facet_wrap(~individual.local.identifier,scales="free") + mytheme
 
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=ratio,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + mytheme +scale_color_continuous(low='blue',high='red')
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + mytheme 
+```
+
+Overlay phi and state
+
+```{r}
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=(phistate==bstate),group=paste(Animal,Track)),size=.5) + facet_wrap(~individual.local.identifier,scales="free") + mytheme 
 ```
 
 ## Compared to CMLRR regions
@@ -587,7 +588,7 @@ ggsave("Figures/SpatialPred_regions.jpg",height=5,width=5)
 
 ```{r,fig.height=20,fig.width=13}
 #create proper time stamp
-ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=bstate)) + geom_line(aes(group=Track),size=1) + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Behavior") + facet_wrap(~individual.local.identifier,ncol=3,scales="free")
+ggplot(data=mxy,aes(x=as.POSIXct(timestamp),y=phistate)) + geom_line(aes(group=Track),size=1) + theme_bw() + scale_color_continuous(low='light blue',high='black') + labs(x="Time",y="Behavior") + facet_wrap(~individual.local.identifier,ncol=3,scales="free")
 ```
 
 ##Location of Behavior
@@ -690,8 +691,8 @@ ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG))
 ```
 
 ```{r}
-traveling<-mxy %>% filter(bstate=="Traveling")
-foraging<-mxy %>% filter(bstate=="Area-restricted Search")
+traveling<-mxy %>% filter(phistate=="Traveling")
+foraging<-mxy %>% filter(phistate=="Area-restricted Search")
 ```
 
 ##Traveling
@@ -851,7 +852,7 @@ write.csv(camdf,"Figures/CCAMLR_days.csv")
 ```{r}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
-ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=bstate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + labs(col="Behavior") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
+ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=phistate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + labs(col="Behavior") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ggsave("Figures/TravelingResidenceTime_Krill.jpeg",height=9,width=7)
 ```
 
