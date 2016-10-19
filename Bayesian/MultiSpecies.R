@@ -95,18 +95,19 @@ cat("
     
     #individual level
     for(i in 1:ind){
-      gamma[1,i] ~ dnorm(gamma_mu[1],gamma_tau[1])		## gamma for state 1
-      gamma[2,i] ~ dnorm(gamma_mu[2],gamma_tau[1])
+      gamma_mu[1,i] ~ dbeta(5,2)		## gamma for state 1
+      dev[i] ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+      gamma_mu[2,i] <- gamma_mu[1] * dev
     }
 
     
-    gamma_mu[1] ~ dbeta(5,2)		## gamma for state 1
-    dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
-    gamma_mu[2] <- gamma_mu[1] * dev
+    #gamma_mu[1] ~ dbeta(5,2)		## gamma for state 1
+    #dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
+    #gamma_mu[2] <- gamma_mu[1] * dev
 
     #variance in autocorrelation
-    gamma_tau[1]~dgamma(0.0001,0.0001)
-    gamma_tau[2]~dgamma(0.0001,0.0001)
+    #gamma_tau[1]~dgamma(0.0001,0.0001)
+    #gamma_tau[2]~dgamma(0.0001,0.0001)
 
     #Intercepts
     alpha_mu[1] ~ dbeta(1,1)
