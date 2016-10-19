@@ -43,7 +43,7 @@ cat("
     T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
     
     #Correlation in movement change
-    d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t],i] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
+    d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
     
     #Gaussian Displacement
     y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
