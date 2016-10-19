@@ -1,6 +1,6 @@
 library(ggplot2)
 library(gridExtra)
-te<-function(step_length=4,hr="4 hours",mintime=12){
+te<-function(step_length=12,hr="12 hours",mintime=48){
   #read data
   mdat<-read.csv("InputData/FilteredData.csv",row.names=1)
   #standardize column names to match the simulation
