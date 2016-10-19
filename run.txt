@@ -107,7 +107,7 @@ label: unnamed-chunk-4
 
   |                                                                         |.......                                                          |  10%
 label: unnamed-chunk-5
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.74289,-65.271196&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.345314,-64.552518&zoom=4&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |.......                                                          |  11%
   ordinary text without R code
 
@@ -116,13 +116,13 @@ label: unnamed-chunk-6 (with options)
 List of 1
  $ fig.height: num 12
 
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.74289,-65.271196&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.345314,-64.552518&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |.........                                                        |  14%
   ordinary text without R code
 
   |                                                                         |.........                                                        |  15%
 label: unnamed-chunk-7
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.74289,-65.271196&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.345314,-64.552518&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |..........                                                       |  16%
   ordinary text without R code
 
@@ -175,7 +175,7 @@ Using jStep as value column: use value.var to override.
 
   |                                                                         |...................                                              |  29%
 label: unnamed-chunk-14
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.740475,-65.265603&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.344584,-64.55092&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |....................                                             |  30%
   ordinary text without R code
 
@@ -308,7 +308,7 @@ label: unnamed-chunk-30
 
   |                                                                         |..........................................                       |  65%
 label: unnamed-chunk-31
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.740475,-65.265603&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.344584,-64.55092&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
   |                                                                         |...........................................                      |  66%
   ordinary text without R code
 
@@ -376,18 +376,38 @@ label: unnamed-chunk-42
 
   |                                                                         |..........................................................       |  90%
 label: unnamed-chunk-43
-Quitting from lines 826-840 (SingleSpecies.Rmd) 
-Error in raster::extract(s, y = ksp) : object 's' not found
-Calls: <Anonymous> ... withVisible -> eval -> eval -> data.frame -> <Anonymous>
-In addition: Warning messages:
-1: In .fun(.value[0], ...) :
-  no non-missing arguments to min; returning Inf
-2: In rbind_all(splitpc) : Unequal factor levels: coercing to character
-3: Removed 6000 rows containing non-finite values (stat_density). 
-4: In rbind_all(list(a1prior, a2prior, gamma1prior, gamma2prior)) :
-  Unequal factor levels: coercing to character
-5: In rbind_all(list(a1prior, a2prior, gamma1prior, gamma2prior)) :
-  Unequal factor levels: coercing to character
-6: Removed 1885 rows containing missing values (geom_point). 
+  |                                                                         |...........................................................      |  91%
+  ordinary text without R code
 
-Execution halted
+  |                                                                         |............................................................     |  92%
+label: unnamed-chunk-44
+Warning: bounding box given to google - spatial extent only approximate.
+converting bounding box to center/zoom specification. (experimental)
+Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=-65.627001,-65.540009&zoom=5&size=640x640&scale=2&maptype=satellite&language=en-EN&sensor=false
+  |                                                                         |............................................................     |  93%
+  ordinary text without R code
+
+  |                                                                         |.............................................................    |  94%
+label: unnamed-chunk-45
+  |                                                                         |..............................................................   |  95%
+  ordinary text without R code
+
+  |                                                                         |..............................................................   |  96%
+label: unnamed-chunk-46
+  |                                                                         |...............................................................  |  97%
+  ordinary text without R code
+
+  |                                                                         |................................................................ |  98%
+label: unnamed-chunk-47
+  |                                                                         |................................................................ |  99%
+  ordinary text without R code
+
+  |                                                                         |.................................................................| 100%
+label: unnamed-chunk-48
+
+output file: SingleSpecies.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpveOwI5/rmarkdown-str587c04aa21.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+
+Output created: SingleSpecies.html
+There were 17 warnings (use warnings() to see them)
