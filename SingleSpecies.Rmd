@@ -95,7 +95,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Year %in% c(2015,2016) ,]
+mxy<-mxy[mxy$Year %in% c(2013,2015,2016) ,]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -382,7 +382,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=3000,n.burnin=2900,n.thin=1,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4900,n.thin=1,DIC=FALSE))
 }
 
 ```
