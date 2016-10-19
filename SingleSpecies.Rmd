@@ -33,7 +33,7 @@ library(maptools)
 library(raster)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-T
 ```
 
 ```{r,eval=F}
