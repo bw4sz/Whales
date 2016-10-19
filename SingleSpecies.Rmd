@@ -33,10 +33,10 @@ library(maptools)
 library(raster)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -382,7 +382,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=30000,n.burnin=25000,n.thin=10,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=5000,n.burnin=4500,n.thin=5,DIC=FALSE))
 }
 
 ```
@@ -394,7 +394,7 @@ jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0)
 ```
 
 ##Chains
-```{r,eval=T}
+```{r,eval=F}
 
 #check memory size
 lsos()
@@ -838,7 +838,7 @@ ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=7,width=7,dpi=300)
 
 mdf<-as.data.frame(mksp) 
 
-camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% arrange(s) %>% ungroup() %>% mutate(Behavior=variable) %>% dplyr::select(-variable) %>%  dcast(...~Behavior,value.var="s") %>% arrange(All)
+camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% arrange(s) %>% ungroup() %>% mutate(Behavior=variable) %>% dplyr::select(-variable) %>%  dcast(...~Behavior,value.var="s") %>% arrange(All.Behavior)
 write.csv(camdf,"Figures/CCAMLR_days.csv")
 ```
 
