@@ -36,7 +36,7 @@ library(raster)
 newModel<-F
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -394,7 +394,7 @@ jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0)
 ```
 
 ##Chains
-```{r,eval=F}
+```{r,eval=T}
 
 #check memory size
 lsos()
