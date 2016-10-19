@@ -95,7 +95,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-#mxy<-mxy[mxy$Animal %in% c("131143","131142","131144","131147","121210"),]
+mxy<-mxy[mxy$Animal %in% c("131143","131142","131144","131147","121210"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -147,7 +147,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 ```{r,fig.height=12}
 mxy$Month<-factor(mxy$Month,levels=month.name)
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + scale_color_discrete(guide="none") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.ticks.x=element_blank())
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + scale_color_discrete(guide="none") + labs(x="",y="") + mytheme
 ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 ```
 
@@ -161,7 +161,7 @@ fccamlr<-fortify(ccamlr,region="Unit")
 
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 
-ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id),col="black",alpha=0.01) 
+ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id),col="black",alpha=0.01) + mytheme
 ```
 
 ##Distance
@@ -379,10 +379,10 @@ R <- diag(c(1,1))
 data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
 
 #paramters to track
-pt<-c("theta","gamma","phi","alpha_mu","state")
+pt<-c("theta","gamma","gamma_mu","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=15000,n.burnin=13000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=1000,n.burnin=900,n.thin=2,DIC=FALSE))
 }
 
 ```
@@ -421,9 +421,18 @@ pc$parameter<-data.frame(str_match(pc$par,"(\\w+)"))[,-1]
 splitpc<-split(pc,pc$parameter)
 
 #single index
-splitpc[c("alpha_mu","gamma","theta")]<-lapply(splitpc[c("alpha_mu","gamma","theta")],function(x){
+splitpc[c("alpha_mu","gamma_mu","theta")]<-lapply(splitpc[c("alpha_mu","gamma_mu","theta")],function(x){
     sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+)]"))[,3]
     pc<-data.frame(x,Behavior=sv)
+    return(pc)
+})
+
+#double index
+#single index
+splitpc[c("gamma")]<-lapply(splitpc[c("gamma")],function(x){
+    sv<-data.frame(str_match(x$par,"(\\w+)\\[(\\d+),(\\d+)]"))[,3:4]
+    colnames(sv)<-c("Behavior","Animal")
+    pc<-data.frame(x,sv)
     return(pc)
 })
 
@@ -451,7 +460,7 @@ rm(splitpc)
 
 ```{r,fig.height=8,fig.width=14}
 #plot all but phi and state
-ggplot(pc[!pc$parameter %in% c("phi","state"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
+ggplot(pc[!pc$parameter %in% c("phi","state","gamma"),],aes(x=Draw,y=value)) + facet_wrap(~par,scales="free",ncol=3) + geom_line(aes(col=as.factor(chain))) + labs(col="Chain")
 ```
 
 ```{r,eval=F}
@@ -463,7 +472,12 @@ pc$Behavior<-as.factor(pc$Behavior)
 
 ```{r,fig.height=10}
 #Plot
-ggplot(data=pc[!pc$parameter %in% c("phi","state"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=3) + theme_bw()  + ggtitle("Estimated parameters")
+ggplot(data=pc[!pc$parameter %in% c("phi","state","gamma"),],aes(x=value)) + geom_histogram() + facet_wrap(~par,scales='free',ncol=3) + theme_bw()  + ggtitle("Estimated parameters")
+```
+
+### Variation in autocorrelation by individual
+```{r,fig.height=10}
+ggplot(data=pc[pc$parameter %in% c("gamma"),],aes(x=Animal,y=value,fill=Behavior)) + geom_violin()  + theme_bw()  + ggtitle("Estimated parameters") + coord_flip()
 ```
 
 Look at the convergence of phi, just for an example
@@ -493,9 +507,9 @@ a1prior<-data.frame(Draw=1:todraw,par='alpha[1]',value=rnorm(todraw,0,1.67),para
 
 a2prior<-data.frame(Draw=1:todraw,par='alpha[2]',value=rnorm(todraw,0,1.67),parameter='alpha_mu',Behavior=2,Estimate="Prior")
 
-gamma1prior<-data.frame(Draw=1:todraw,par='gamma[1]',value=rbeta(todraw,5,2),parameter='gamma',Behavior=2,Estimate="Prior")
+gamma1prior<-data.frame(Draw=1:todraw,par='gamma_mu[1]',value=rbeta(todraw,5,2),parameter='gamma_mu',Behavior=2,Estimate="Prior")
 
-gamma2prior<-data.frame(Draw=1:todraw,par='gamma[2]',value=rbeta(todraw,5,2) * runif(todraw,0,0.75),parameter='gamma',Behavior=1,Estimate="Prior")
+gamma2prior<-data.frame(Draw=1:todraw,par='gamma_mu[2]',value=rbeta(todraw,5,2) * runif(todraw,0,0.75),parameter='gamma_mu',Behavior=1,Estimate="Prior")
 
 prs<-rbind_all(list(a1prior,a2prior,gamma1prior,gamma2prior))
 
@@ -509,7 +523,7 @@ rm(allp)
 
 ## Parameter Summary
 ```{r,fig.height=10,fig.width=15}
-psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
+psum<-pc %>% filter(!parameter %in% c("phi","state","gamma")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 
 as.data.frame(psum)
 
