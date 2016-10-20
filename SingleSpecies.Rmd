@@ -95,7 +95,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Year %in% c(2012,2015,2016) ,]
+mxy<-mxy[mxy$Year %in% c(2013) ,]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -349,7 +349,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal),group=paste(Anim
 ```
 
 ```{r,fig.height=15}
-ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y),size=2,alpha=0.7)  + facet_wrap(~individual.local.identifier,scales="free",ncol=4)
+ggplot() +  geom_path(data=oxy,col='blue',aes(x=x,y=y)) +  geom_path(data=mxy,col='red',aes(x=x,y=y,group=paste(Animal,Track)),size=2,alpha=0.7)  + facet_wrap(~individual.local.identifier,scales="free",ncol=4)
 ```
 
 Look at the observations were defined into tracks.
@@ -522,7 +522,7 @@ ggplot(psum,aes(x=par,y=mean,ymax=upper,ymin=lower)) + geom_linerange() + geom_p
 
 ```{r}
 #mean transition probability
-mean_phi<-pc %>% filter(parameter=="phi",Behavior==2) %>% mutate(step=as.numeric(as.character(step))) %>% group_by(Animal,Track,step) %>% summarize(phi=mean(value)) %>% arrange(Animal,Track,step)
+mean_phi<-pc %>% filter(parameter=="phi",Behavior==2) %>% mutate(step=as.numeric(as.character(step))) %>% group_by(Animal,Track,step) %>% summarize(phi=median(value)) %>% arrange(Animal,Track,step)
 
 #mode state for each position
 mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value==1,"Traveling","Area-restricted Search")) %>% group_by(Animal,Track,step,bstate) %>% summarize(n=n()) %>% spread(key=bstate,value=n,fill=0)%>% mutate(ratio=`Area-restricted Search`/Traveling) %>% mutate(state=as.character(ifelse(ratio>=1,"Area-restricted Search","Traveling")))
@@ -530,14 +530,15 @@ mode_state<-pc %>% filter(parameter %in% "state") %>% mutate(bstate=ifelse(value
 mxy<-merge(mxy,mean_phi,by=c("step","Track","Animal"))
 mxy<-merge(mxy,mode_state,by=c("step","Track","Animal"))
 
-#ensure order for plotting
-mxy<-mxy %>% arrange(Animal,Track,step,jStep)
-
 #make factor
 mxy$bstate<-factor(mxy$state)
 
 #make phi a factor
 mxy$phistate<-cut(mxy$phi,c(0,0.5,1),labels=c("Traveling","Area-restricted Search"))
+
+#ensure order for plotting
+mxy<-mxy %>% arrange(Animal,Track,step,jStep)
+
 
 ```
 
