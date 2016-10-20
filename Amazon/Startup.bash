@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # spawn instance and store id
-instance_id=$(aws ec2 run-instances --image-id ami-a9ce15c9 --security-group-ids sg-923a98f6 --count 1 --instance-type r3.large --key-name rstudio --instance-initiated-shutdown-behavior stop --query 'Instances[0].{d:InstanceId}' --output text --iam-instance-profile Name="Ben")
+instance_id=$(aws ec2 run-instances --image-id ami-a9ce15c9 --security-group-ids sg-923a98f6 --count 1 --instance-type t2.large --key-name rstudio --instance-initiated-shutdown-behavior stop --query 'Instances[0].{d:InstanceId}' --output text --iam-instance-profile Name="Ben")
 
 # wait until instance is up and running
 aws ec2 wait instance-running --instance-ids $instance_id
