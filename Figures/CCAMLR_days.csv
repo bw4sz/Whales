@@ -1,10 +1,10 @@
 "","Unit","All.Behavior","Traveling","Area.restricted.Search"
-"1","Drake Passage East",0,0,0
-"2","Drake Passage West",0,0,0
-"3","East (partly in 485)",0,0,0
-"4","Elephant Island",0,0,0
-"5",NA,0,0,0
-"6","Bransfield Strait East",0.173333333333333,0,0.173333333333333
-"7","Pelagic Area",0.755428240740741,0.24287037037037,0.51255787037037
-"8","Bransfield Strait West",189.455509259259,1.61144675925926,187.8440625
-"9","West",278.689467592593,0.44375,276.711550925926
+"1","Bransfield Strait East",0,0,0
+"2","Drake Passage East",0,0,0
+"3","Drake Passage West",0,0,0
+"4","East (partly in 485)",0,0,0
+"5","Elephant Island",0,0,0
+"6",NA,0,0,0
+"7","Pelagic Area",0.0398611111111111,0.0398611111111111,0
+"8","West",8.38869212962963,8.38869212962963,0
+"9","Bransfield Strait West",18.05625,18.05625,0
