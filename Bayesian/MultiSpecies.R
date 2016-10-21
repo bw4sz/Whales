@@ -92,7 +92,7 @@ cat("
 
     ##Behavioral States
     
-    gamma[1] ~ dbeta(5,5)		## gamma for state 1
+    gamma[1] ~ dbeta(3,2)		## gamma for state 1
     dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[2] <- gamma[1] * dev
 
