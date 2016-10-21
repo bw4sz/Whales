@@ -95,7 +95,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab set of animals
-mxy<-mxy[mxy$Year %in% c(2013,2012,2015,2016) ,]
+mxy<-mxy[mxy$Year %in% c(2015,2016) ,]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
