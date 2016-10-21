@@ -36,7 +36,7 @@ library(raster)
 newModel<-T
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -248,7 +248,7 @@ Specify a duration, calculate the number of tracks and the number of removed poi
 
 ```{r}
 ##Time is the beginning of the first point.
-step_length=12
+step_length=4
 
 sxy<-split(mxy,mxy$Animal)
 
@@ -288,7 +288,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"4 hours"))
 return(x)
 })
 
@@ -379,7 +379,7 @@ data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=Mont
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10000,n.burnin=8000,n.thin=5,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=40000,n.burnin=38000,n.thin=4,DIC=FALSE))
 }
 
 ```
@@ -603,7 +603,7 @@ temp <- get_map(location=bbox(m),source="google",zoom=5,maptype="satellite",colo
 ```
 
 # Overlap with Krill Fishery
-```{r,eval=F}
+```{r,eval=T}
 krill<-read.csv("InputData/CCAMLR_aggregated_catch_C1.csv")
 ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),krill)
 
@@ -614,7 +614,7 @@ ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpoint
 
 #Time spent in grid cell
 
-```{r,eval=F}
+```{r,eval=T}
 #raster
 r<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 
@@ -677,19 +677,19 @@ s<-stack(r)
 names(s)[[1]]<-"All Behavior"
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #extract
 ksp$ResidencyTime<-raster::extract(r,y=ksp)
 #write to file
 ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 traveling<-mxy %>% filter(phistate=="Traveling")
 foraging<-mxy %>% filter(phistate=="Area-restricted Search")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #raster
 if(!nrow(traveling)==0){
 rtraveling<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
@@ -757,7 +757,7 @@ names(s)[[2]]<-"Traveling"
 
 ## ARS
 
-```{r,eval=F}
+```{r,eval=T}
 if(!nrow(foraging)==0){
 #raster
 rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
@@ -822,7 +822,7 @@ names(s)[[3]]<-"Area-restricted Search"
 }
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 
 plot(s,nr=1,addfun=function(){map(add=T)})
 
@@ -842,24 +842,24 @@ camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% a
 write.csv(camdf,"Figures/CCAMLR_days.csv")
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 temp <- get_map(location=bbox(r),source="google",zoom=5,maptype="satellite",color = "bw",scale = 2)
 
 ggmap(temp) + geom_path(data=mxy,aes(x=x,y=y,col=phistate,group=paste(Animal,Track)),size=.5) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + labs(col="Behavior") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ggsave("Figures/TravelingResidenceTime_Krill.jpeg",height=9,width=7)
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(r)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red") + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ggsave("Figures/ResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area Restricted Search") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ggsave("Figures/ARSResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
 ggsave("Figures/TravelingResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 ```
