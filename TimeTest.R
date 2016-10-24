@@ -104,7 +104,7 @@ te<-function(step_length=12,hr="12 hours",mintime=48){
   p<-ggplot() + geom_path(data=mxy, aes(x=x, y=y,group=1),size=0.1,col="black") + labs(col="step")
   p<-p+geom_path(data=mxy, aes(x=x, y=y,col=as.numeric(step),group=paste(Track,step)),size=1) + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.ticks.x=element_blank()) + scale_color_gradientn(colours = cl) + theme_bw() + facet_wrap(~Animal,scales="free") 
   print(p)
-  return(p)
+  return(mxy)
 }
 
-p6<-te(step_length = 9,hr="9 hours",12)
+p6<-te(step_length = 6,hr="6 hours",48)
