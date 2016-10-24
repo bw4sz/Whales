@@ -36,7 +36,7 @@ library(raster)
 newModel<-F
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
@@ -160,6 +160,15 @@ fccamlr<-fortify(ccamlr,region="Unit")
 m <- get_map(location=pp,source="google",zoom=5,scale=2,maptype="satellite",color = "bw")
 
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scale_color_discrete(guide="none") + geom_polygon(data=fccamlr,aes(x=long,y=lat,group=id),col="black",alpha=0.01) + mytheme
+```
+
+```{r}
+#format better
+m <- get_map(location=bbox(ccamlr),zoom=5,scale=2,maptype="satellite",color = "bw")
+fccamlr$Unit<-as.factor(fccamlr$id)
+levels(fccamlr$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
+ggmap(m) + geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=Unit),alpha=0.9) + mytheme + scale_fill_brewer(palette="Accent")
+ggsave("Figures/Units.jpeg",height=6,width=6)
 ```
 
 ##Distance
@@ -392,7 +401,7 @@ jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0)
 ```
 
 ##Chains
-```{r,eval=F}
+```{r,eval=T}
 
 #check memory size
 lsos()
