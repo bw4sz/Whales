@@ -570,6 +570,10 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=bstate,group=paste(Animal,Track)),
 ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),col="black",size=1)
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
+#Black and white version
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.6) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill="grey10") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior")
+ggsave("Figures/SpatialPred_BW.jpg",height=5,width=5)
+
 ```
 
 ## By individual
