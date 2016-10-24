@@ -167,8 +167,13 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 m <- get_map(location=bbox(ccamlr),zoom=5,scale=2,maptype="satellite",color = "bw")
 fccamlr$Unit<-as.factor(fccamlr$id)
 levels(fccamlr$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
-ggmap(m) + geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=Unit),alpha=0.9) + mytheme + scale_fill_brewer(palette="Accent")
+ggmap(m) + geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=Unit),alpha=0.9) + mytheme + scale_fill_brewer(palette="Accent") 
 ggsave("Figures/Units.jpeg",height=6,width=6)
+
+#black and white
+ggplot() + geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=Unit),size=1,col="black")  + borders(fill="grey10") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8))
+ggsave("Figures/ccamlrbw.svg",width=7,units="in",height=4)
+
 ```
 
 ##Distance
