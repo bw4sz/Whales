@@ -188,7 +188,7 @@ cat("
 
     ##Behavioral States
     
-    gamma[1] ~ dbeta(5,5)		## gamma for state 1
+    gamma[1] ~ dbeta(3,2)		## gamma for state 1
     dev ~ dbeta(1,1)			## a random deviate to ensure that gamma[1] > gamma[2]
     gamma[2] <- gamma[1] * dev
 
@@ -216,34 +216,11 @@ cat("
 sink()
 
 
-```
-##      user    system   elapsed 
-##    20.823     0.695 24718.106
-```
 
 
 
 ##Chains
 
-```
-##                         Type      Size     PrettySize  Rows Columns
-## jagM          rjags.parallel 354861032 [1] "338.4 Mb"     6      NA
-## mdat              data.frame  16339200  [1] "15.6 Mb" 49859      47
-## data                    list  14105720  [1] "13.5 Mb"     9      NA
-## m                      ggmap  13116288  [1] "12.5 Mb"  1280    1280
-## b     SpatialPointsDataFrame  10701640  [1] "10.2 Mb" 25091      47
-## argos                  array   9260672   [1] "8.8 Mb"    21       6
-## obs                    array   9260672   [1] "8.8 Mb"    21       6
-## mxy               grouped_df   7255344   [1] "6.9 Mb" 23663      52
-## sxy                     list   6953232   [1] "6.6 Mb"    36      NA
-## d     SpatialPointsDataFrame   6938736   [1] "6.6 Mb" 25091      47
-```
-
-```
-##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
-## Ncells  1580079  84.4    2637877 140.9   2637877 140.9
-## Vcells 61681646 470.6  114936432 876.9 114925337 876.9
-```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
@@ -266,13 +243,15 @@ Overall relationship between phi and state, nice test of convergence.
 ## Parameter Summary
 
 ```
-##   parameter         par       mean         lower      upper
-## 1  alpha_mu alpha_mu[1] 0.57597024  0.4400966682 0.70019434
-## 2  alpha_mu alpha_mu[2] 0.30449303  0.1863435927 0.43768515
-## 3     gamma    gamma[1] 0.75048928  0.6798433794 0.82293756
-## 4     gamma    gamma[2] 0.01887031  0.0009137666 0.05506863
-## 5     theta    theta[1] 0.03020135 -0.0119840171 0.07316943
-## 6     theta    theta[2] 2.61004306  1.1215576228 4.05296924
+##   parameter         par         mean        lower      upper
+## 1  alpha_mu alpha_mu[1]  0.691784472  0.542486233 0.81114649
+## 2  alpha_mu alpha_mu[2]  0.415731285  0.299324803 0.55386080
+## 3     gamma  gamma[1,1]  0.609425466  0.525158842 0.72703889
+## 4     gamma  gamma[2,1]  0.105290542  0.038834660 0.18342178
+## 5     gamma  gamma[1,2]  0.650936503  0.574041611 0.72449164
+## 6     gamma  gamma[2,2]  0.059591969  0.008450074 0.13682887
+## 7     theta    theta[1] -0.007926251 -0.070318245 0.04229884
+## 8     theta    theta[2]  2.001343390  1.053388828 3.02916701
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
@@ -316,7 +295,7 @@ Overlay phi and state
 
 
 
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
 
 
@@ -326,33 +305,33 @@ Overlay phi and state
 
 
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-43-3.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
 
+![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
-
-
-
-
-
+![](SingleSpecies_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
 
 
 ```
-##                         Type      Size     PrettySize    Rows Columns
-## pc                    tbl_df 169000760 [1] "161.2 Mb" 3244800      10
-## a                     tbl_df  43977616  [1] "41.9 Mb" 1099200       7
-## mdat              data.frame  16339200  [1] "15.6 Mb"   49859      47
-## data                    list  14105720  [1] "13.5 Mb"       9      NA
-## temp                   ggmap  13116144  [1] "12.5 Mb"    1280    1280
-## b     SpatialPointsDataFrame  10701640  [1] "10.2 Mb"   25091      47
-## argos                  array   9260672   [1] "8.8 Mb"      21       6
-## obs                    array   9260672   [1] "8.8 Mb"      21       6
-## mxy               data.frame   7687072   [1] "7.3 Mb"   22816      59
-## sxy                     list   6953232   [1] "6.6 Mb"      36      NA
+##                         Type     Size    PrettySize   Rows Columns
+## pc                    tbl_df 39877016   [1] "38 Mb" 619800      12
+## b     SpatialPointsDataFrame 16418080 [1] "15.7 Mb"  46421      47
+## mdat              data.frame 16339200 [1] "15.6 Mb"  49859      47
+## temp                   ggmap 13116528 [1] "12.5 Mb"   1280    1280
+## d     SpatialPointsDataFrame 12825928 [1] "12.2 Mb"  46421      47
+## oxy               data.frame 12080104 [1] "11.5 Mb"  46421      47
+## a                     tbl_df  8432712    [1] "8 Mb" 210600       7
+## data                    list  6648128  [1] "6.3 Mb"      9      NA
+## argos                  array  5729072  [1] "5.5 Mb"     12       7
+## obs                    array  4252248  [1] "4.1 Mb"     25       8
 ```
 
 ```
-##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
-## Ncells  1585359  84.7    3886542 207.6   3886542 207.6
-## Vcells 38968340 297.4  114936432 876.9 114925337 876.9
+##            used  (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  1624013  86.8    3205452 171.2  3205452 171.2
+## Vcells 16901757 129.0   47757828 364.4 93213757 711.2
 ```
