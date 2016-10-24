@@ -33,14 +33,14 @@ library(maptools)
 library(raster)
 
 #New model to be run, flag turned off if just updating.
-newModel<-F
+newModel<-T
 ```
 
 ```{r,eval=F}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
-newModel<-F
+newModel<-T
 ```
 
 ```{r}
@@ -847,8 +847,9 @@ mdf<-as.data.frame(mksp)
 mdf$Unit<-as.factor(mksp$Unit)
 levels(mdf$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
 
-ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable,ncol=1) + scale_color_brewer(palette="Accent")
-ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=7,width=7,dpi=300)
+levels(mdf$variable)<-c("All Behaviors","Traveling","Area-restricted Search")
+ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable,nrow=1) + scale_color_brewer(palette="Accent")
+ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=3,width=8,dpi=300)
 
 mdf<-as.data.frame(mksp) 
 
