@@ -148,7 +148,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + fac
 ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 
 #black and white
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill="grey10") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + scale_color_discrete(guide="none")
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),size=0.3,col="black")  + borders(fill="grey90") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + scale_color_discrete(guide="none")
 ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 ```
 

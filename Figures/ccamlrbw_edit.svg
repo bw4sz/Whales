@@ -13,8 +13,8 @@
    inkscape:version="0.91 r13725"
    sodipodi:docname="ccamlrbw_edit.svg"
    inkscape:export-filename="C:\Users\Ben\Documents\Whales\Figures\CCAMLR_BW.png"
-   inkscape:export-xdpi="95.440002"
-   inkscape:export-ydpi="95.440002">
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
   <metadata
      id="metadata204">
     <rdf:RDF>
@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -41,7 +41,7 @@
      id="namedview202"
      showgrid="false"
      inkscape:zoom="1.8472687"
-     inkscape:cx="250.91732"
+     inkscape:cx="249.83464"
      inkscape:cy="144"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
