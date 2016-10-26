@@ -77,7 +77,7 @@ lsos <- function(..., n=10) {
 }
 
 #ggplot theme
-mytheme<-theme(axis.text.x=element_blank(),axis.ticks.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank())
+mytheme<-theme(axis.text.x=element_blank(),axis.ticks.x=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank(),panel.grid=element_blank())
 ```
 
 ```{r}
@@ -148,8 +148,10 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + fac
 ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 
 #black and white
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5)  + facet_wrap(~Month,nrow = 2) + geom_path(data=fccamlr,aes(x=long,y=lat,group=id),size=0.3,col="black")  + borders(fill="grey90") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + scale_color_discrete(guide="none")
-ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,group=Animal),size=.5)  + facet_wrap(~Month,nrow = 2)  + borders(fill="grey90") + coord_cartesian(ylim = c(-70,-61),xlim=c(-53,-73)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + scale_color_discrete(guide="none")
+ggsave("Figures/MonthTracks_BW.jpeg",height=4, width=6)
+
+#geom_path(data=fccamlr,aes(x=long,y=lat,group=id),size=0.3,col="black") 
 ```
 
 ##CCAMLR Units
@@ -575,8 +577,8 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 #Black and white version
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=.6) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill="grey10") + coord_cartesian(ylim = c(-68.9,-60),xlim=c(-51.396,-70)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior")
-ggsave("Figures/SpatialPred_BW.jpg",height=5,width=5)
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=1,alpha=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill="grey70",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior")
+ggsave("Figures/SpatialPred_BW.jpg",height=5,width=7)
 
 ```
 
@@ -883,13 +885,30 @@ ggsave("Figures/ResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 ```
 
 ```{r,eval=T}
-ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area Restricted Search") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area Restricted Search") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) 
 ggsave("Figures/ARSResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
+
+#BW version
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,160)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggsave("Figures/ARSResidencyDays_Krill_BW.jpeg",height=4,width=6,dpi=300)
+
+#BW version journal 
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="grey95",high="black",limits=c(0,160)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggsave("Figures/ARSResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
+
+
 ```
 
 ```{r,eval=T}
-ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="blue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-ggsave("Figures/TravelingResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
+ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,150)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) 
+ggsave("Figures/TravelingResidencyDays_Krill.jpeg",height=4,width=6,dpi=300)
+
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,160)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggsave("Figures/TravelingResidencyDays_Krill_BW.jpeg",height=4,width=6,dpi=300)
+
+  ggplot() + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="grey95",high="black",limits=c(0,160)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggsave("Figures/TravelingResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
+
 ```
 
 ```{r}

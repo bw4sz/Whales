@@ -107,4 +107,4 @@ te<-function(step_length=12,hr="12 hours",mintime=48){
   return(mxy)
 }
 
-p6<-te(step_length = 6,hr="6 hours",48)
+p6<-te(step_length = 6,hr="6 hours",12)
