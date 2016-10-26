@@ -149,7 +149,7 @@ ggsave("Figures/MonthTracks.jpeg",height=6, width=9)
 
 #black and white
 ggplot()+geom_path(data=mxy, aes(x=x, y=y,group=Animal),size=.5)  + facet_wrap(~Month,nrow = 2)  + borders(fill="grey90") + coord_cartesian(ylim = c(-70,-61),xlim=c(-53,-73)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + scale_color_discrete(guide="none")
-ggsave("Figures/MonthTracks_BW.jpeg",height=4, width=6)
+ggsave("Figures/MonthTracks_BW.jpeg",height=4, width=5)
 
 #geom_path(data=fccamlr,aes(x=long,y=lat,group=id),size=0.3,col="black") 
 ```
@@ -577,7 +577,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 #Black and white version
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=1,alpha=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill="grey70",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior")
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill=NA,alpha=0.9) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior") + scale_color_manual(values=c("grey10","grey60"))
 ggsave("Figures/SpatialPred_BW.jpg",height=5,width=7)
 
 ```
@@ -791,10 +791,9 @@ rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 #put cellindex number
 rforaging[]<-1:ncell(rforaging)
 
-sxy<-split(foraging,foraging$Animal)
+sxy<-split(foraging,foraging$Animal,foraging$Track,drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
-#plot(rasterize(j,r,field="Index",fun='count'))
 
 #time in each cell
 timecell<-function(j){
@@ -865,11 +864,22 @@ levels(mdf$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Pas
 levels(mdf$variable)<-c("All Behaviors","Traveling","Area-restricted Search")
 ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable,nrow=1) + scale_color_brewer(palette="Accent")
 ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=3,width=8,dpi=300)
+```
 
-mdf<-as.data.frame(mksp) 
+### Time by management unit
 
-camdf<-mdf %>% group_by(Unit,variable) %>% summarize(s=sum(value,na.rm=T)) %>% arrange(s) %>% ungroup() %>% mutate(Behavior=variable) %>% dplyr::select(-variable) %>%  dcast(...~Behavior,value.var="s") %>% arrange(All.Behavior)
-write.csv(camdf,"Figures/CCAMLR_days.csv")
+```{r}
+d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=longlat +datum=WGS84"))
+projection(ccamlr)<-CRS("+proj=longlat +datum=WGS84")
+b<-over(d,ccamlr)
+mxy<-data.frame(mxy,b)
+
+
+test<-mxy %>% group_by(Animal,Track) %>% mutate(Index=1:n()) %>% group_by(Animal,Unit,Track,phistate) %>%  do(timecell(.)) %>% group_by(Unit,phistate) %>% summarize(s=sum(Sum)) %>% spread(key=phistate,value=s)
+
+test$Unit[test$Unit %in% NA]<-"Outside Units"
+
+write.csv(test,"Figures/CCAMLR_days.csv")
 ```
 
 ```{r,eval=T}
