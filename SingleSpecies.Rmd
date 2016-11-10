@@ -309,7 +309,7 @@ sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=TRUE)
 
 sxy<-lapply(sxy,function(x){
 #How many observations in each step length segment
-x$step<-as.numeric(cut(as.POSIXct(x$timestamp),"6 hours"))
+x$step<-as.numeric(cut(as.POSIXct(x$timestamp),paste(step_length,"hours")))
 return(x)
 })
 

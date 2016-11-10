@@ -6,12 +6,12 @@ cat("
     pi <- 3.141592653589
     
     ##argos observation error##
-    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    argos_prec[1:2,1:2] <- argos_cov[,]
     
     #Constructing the covariance matrix
-    argos_cov[1,1] <- 1
-    argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    argos_cov[1,1] <- argos_sigma
+    argos_cov[1,2] <- 0
+    argos_cov[2,1] <- 0
     argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
@@ -105,14 +105,11 @@ cat("
     lambda[2] <- 1 - lambda[1]
     
     ##Argos priors##
-    #longitudinal argos error
-    argos_sigma ~ dunif(0,10)
+    #longitudinal argos precision
+    argos_sigma <- 5
     
-    #latitidunal argos error
-    argos_alpha~dunif(0,10)
-    
-    #correlation in argos error
-    rho ~ dunif(-1, 1)
+    #latitidunal argos precision
+    argos_alpha <- 5
     
     
     }"
