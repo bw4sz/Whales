@@ -14,13 +14,13 @@ Ben Weinstein
 
 ##By Month
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 ##CCAMLR Units
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ##Distance
 
@@ -105,12 +105,12 @@ cat("
     pi <- 3.141592653589
     
     ##argos observation error##
-    argos_prec[1:2,1:2] <- inverse(argos_sigma*argos_cov[,])
+    argos_prec[1:2,1:2] <- argos_cov[,]
     
     #Constructing the covariance matrix
-    argos_cov[1,1] <- 1
-    argos_cov[1,2] <- sqrt(argos_alpha) * rho
-    argos_cov[2,1] <- sqrt(argos_alpha) * rho
+    argos_cov[1,1] <- argos_sigma
+    argos_cov[1,2] <- 0
+    argos_cov[2,1] <- 0
     argos_cov[2,2] <- argos_alpha
     
     for(i in 1:ind){
@@ -204,14 +204,11 @@ cat("
     lambda[2] <- 1 - lambda[1]
     
     ##Argos priors##
-    #longitudinal argos error
-    argos_sigma ~ dunif(0,10)
+    #longitudinal argos precision
+    argos_sigma <- 5
     
-    #latitidunal argos error
-    argos_alpha~dunif(0,10)
-    
-    #correlation in argos error
-    rho ~ dunif(-1, 1)
+    #latitidunal argos precision
+    argos_alpha <- 5
     
     
     }"
@@ -221,7 +218,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##   470.616     6.648 78503.867
+##   501.391     3.893 27397.507
 ```
 
 
@@ -244,8 +241,8 @@ sink()
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1787004   95.5    3886542  207.6   3886542  207.6
-## Vcells 445620039 3399.9 1016841010 7757.9 877735132 6696.6
+## Ncells   1790130   95.7    3886542  207.6   3886542  207.6
+## Vcells 446407878 3405.9 1017786417 7765.1 878522978 6702.6
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -269,13 +266,13 @@ Overall relationship between phi and state, nice test of convergence.
 ## Parameter Summary
 
 ```
-##   parameter         par        mean       lower      upper
-## 1  alpha_mu alpha_mu[1]  0.53525611  0.46232512 0.60860130
-## 2  alpha_mu alpha_mu[2]  0.14592664  0.10773869 0.19289520
-## 3     gamma    gamma[1]  0.92465146  0.87442694 0.97070532
-## 4     gamma    gamma[2]  0.15682682  0.11400094 0.19948345
-## 5     theta    theta[1] -0.01457927 -0.04076998 0.01156162
-## 6     theta    theta[2]  0.24227712  0.14759083 0.35587027
+##   parameter         par       mean        lower      upper
+## 1  alpha_mu alpha_mu[1] 0.91073361  0.885179024 0.93531258
+## 2  alpha_mu alpha_mu[2] 0.04558698  0.033074171 0.05958549
+## 3     gamma    gamma[1] 0.85174917  0.821631872 0.88228115
+## 4     gamma    gamma[2] 0.31339704  0.236373730 0.39744742
+## 5     theta    theta[1] 0.01481494 -0.007603755 0.03756657
+## 6     theta    theta[2] 3.14837447  2.931923821 3.37828681
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
@@ -290,7 +287,7 @@ Relationship between phi and state
 
 ##Spatial Prediction
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-32-3.png)<!-- -->
 
 ## By individual
 
@@ -331,31 +328,35 @@ Overlay phi and state
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
+### Time by management unit
+
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-48-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-48-3.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-49-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-49-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-49-3.png)<!-- -->
 
 
 ```
-##                         Type      Size     PrettySize     Rows Columns
-## pc                    tbl_df 598231464 [1] "570.5 Mb" 11490000      10
-## a                     tbl_df 157774144 [1] "150.5 Mb"  3944000       7
-## data                    list  61113336  [1] "58.3 Mb"        9      NA
-## argos                  array  39720952  [1] "37.9 Mb"       33      20
-## obs                    array  39720952  [1] "37.9 Mb"       33      20
-## j                      array  19867968  [1] "18.9 Mb"       33      20
-## b     SpatialPointsDataFrame  16418080  [1] "15.7 Mb"    46421      47
-## mdat              data.frame  16339200  [1] "15.6 Mb"    49859      47
-## temp                   ggmap  13116528  [1] "12.5 Mb"     1280    1280
-## d     SpatialPointsDataFrame  12825928  [1] "12.2 Mb"    46421      47
+##             Type      Size     PrettySize     Rows Columns
+## pc        tbl_df 598231464 [1] "570.5 Mb" 11490000      10
+## a         tbl_df 157774144 [1] "150.5 Mb"  3944000       7
+## data        list  61113336  [1] "58.3 Mb"        9      NA
+## argos      array  39720952  [1] "37.9 Mb"       33      20
+## obs        array  39720952  [1] "37.9 Mb"       33      20
+## j          array  19867968  [1] "18.9 Mb"       33      20
+## mdat  data.frame  16339200  [1] "15.6 Mb"    49859      47
+## temp       ggmap  13116528  [1] "12.5 Mb"     1280    1280
+## mxy   data.frame  12825688  [1] "12.2 Mb"    29346      68
+## oxy   data.frame  12080104  [1] "11.5 Mb"    46421      47
 ```
 
 ```
 ##             used  (Mb) gc trigger   (Mb)   max used   (Mb)
-## Ncells   1648930  88.1    5103933  272.6    9968622  532.4
-## Vcells 119714036 913.4  333198460 2542.2 1009712613 7703.5
+## Ncells   1678464  89.7    5103933  272.6    9968622  532.4
+## Vcells 118670061 905.4  333508252 2544.5 1010500452 7709.6
 ```
