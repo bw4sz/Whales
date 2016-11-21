@@ -356,7 +356,7 @@ obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~step~jStep~variable)
 
 #atrgos class crarray
-mxy$argos.lc<-factor(argos.lc,levels=c(3,2,1,0,"A","B"))
+mxy$argos.lc<-factor(mxy$argos.lc,levels=c(3,2,1,0,"A","B"))
 mxy$numargos<-as.numeric(mxy$argos.lc)
 obs_class<-acast(mxy,Animal~Track~step~jStep,value.var="numargos")
 ```
