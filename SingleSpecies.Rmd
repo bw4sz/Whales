@@ -95,7 +95,7 @@ minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
 #grab a test animal
-mxy[mxy$individual.local.identifier %in% c("112746","131142"),]
+mxy<-mxy[mxy$individual.local.identifier %in% c("112746","131142"),]
 
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
@@ -357,7 +357,8 @@ obs<-acast(obs,Animal~Track~step~jStep~variable)
 
 #atrgos class crarray
 mxy$argos.lc<-factor(argos.lc,levels=c(3,2,1,0,"A","B"))
-obs_class<-as.numeric(acast(mxy,Animal~Track~step~jStep,value.var="argos.lc"))
+mxy$numargos<-as.numeric(mxy$argos.lc)
+obs_class<-acast(mxy,Animal~Track~step~jStep,value.var="numargos")
 ```
 
 How did the filter change the extent of tracks?
