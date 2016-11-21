@@ -94,6 +94,9 @@ mxy$y<-mxy$location.lat
 minke<-c("131117","131118","131120","154184")
 mxy<-mxy[!mxy$individual.local.identifier %in% minke,]
 
+#grab a test animal
+mxy[mxy$individual.local.identifier %in% c("112746","131142"),]
+
 #empty coordinates
 mxy<-mxy[!is.na(mxy$x),]
 
@@ -122,8 +125,6 @@ mxy<-mxy[!is.na(mxy$timestamp),]
 #remove duplicates
 mxy<-mxy[!duplicated(data.frame(mxy$timestamp,mxy$Animal)),]
 mxy<-mxy[!mxy$ETOPO1.Elevation>0,]
-
-
 ```
 
 ```{r}
@@ -353,6 +354,10 @@ steps<-acast(steps_all,Animal~Track,value.var="n")
 #obs array
 obs<-melt(mxy,measure.vars=c("x","y"))
 obs<-acast(obs,Animal~Track~step~jStep~variable)
+
+#atrgos class crarray
+mxy$argos.lc<-factor(argos.lc,levels=c(3,2,1,0,"A","B"))
+obs_class<-as.numeric(acast(mxy,Animal~Track~step~jStep,value.var="argos.lc"))
 ```
 
 How did the filter change the extent of tracks?
@@ -394,13 +399,13 @@ source("Bayesian/MultiSpecies.R")
 
 #prior cov shape
 R <- diag(c(1,1))
-data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T))
+data=list(argos=obs,steps=steps,R=R,ind=ind,j=j,idx=idx,tracks=tracks,Month=MonthA,Months=max(MonthA,na.rm=T),argos_class=obs_class)
 
 #paramters to track
 pt<-c("theta","gamma","phi","alpha_mu","state")
 
 if(newModel){
-  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=40000,n.burnin=38000,n.thin=4,DIC=FALSE))
+  system.time(jagM<-jags.parallel(model.file = "Bayesian/Multi_RW.jags",data=data,n.chains=2,parameters.to.save=pt,n.iter=10,n.burnin=0,n.thin=1,DIC=FALSE))
 }
 
 ```
@@ -577,7 +582,7 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)
 ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 
 #Black and white version
-ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill=NA,alpha=0.9) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior") + scale_color_manual(values=c("grey10","grey60"))
+ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill=NA,alpha=0.9) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior") + scale_color_manual(values=c("grey20","grey70"))
 ggsave("Figures/SpatialPred_BW.jpg",height=5,width=7)
 
 ```
@@ -855,15 +860,22 @@ ksp<-data.frame(ksp,raster::extract(s,y=ksp))
 mksp<-melt(ksp,measure.vars=names(s))
 
 #write to file
-ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit))  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable)
+ggplot(as.data.frame(mksp)) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit))  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tons)") + labs(col="Behavior") + facet_wrap(~variable)
 
 mdf<-as.data.frame(mksp) 
 mdf$Unit<-as.factor(mksp$Unit)
 levels(mdf$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
 
 levels(mdf$variable)<-c("All Behaviors","Traveling","Area-restricted Search")
-ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log Metric Tonnes)") + labs(col="Behavior") + facet_wrap(~variable,nrow=1) + scale_color_brewer(palette="Accent")
+ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log KG)") + labs(col="Behavior") + facet_wrap(~variable,nrow=1) + scale_color_brewer(palette="Accent")
 ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=3,width=8,dpi=300)
+
+#correlation
+krillbeh<-split(mdf,mdf$variable)
+x<-krillbeh[[1]]
+
+sapply(krillbeh,function(x){cor(x$value,log(x$C1KRIcatchKG),use="complete.obs")})
+
 ```
 
 ### Time by management unit
@@ -899,13 +911,12 @@ ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,f
 ggsave("Figures/ARSResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 
 #BW version
-ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=log(C1KRIcatchKG/1000))) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
 ggsave("Figures/ARSResidencyDays_Krill_BW.jpeg",height=4,width=6,dpi=300)
 
 #BW version journal 
-ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="grey95",high="black",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=log(C1KRIcatchKG/1000))) + scale_fill_continuous(low="grey95",high="black",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
 ggsave("Figures/ARSResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
-
 
 ```
 
@@ -921,7 +932,7 @@ ggsave("Figures/TravelingResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=3
 
 ```
 
-```{r}
+```{r,eval=F}
 #check out the memory sizing
 lsos()
 #notify end of run
