@@ -449,11 +449,14 @@ List of 1
   ordinary text without R code
 
   |                                                                         |.................................................................| 100%
-label: unnamed-chunk-50
+label: unnamed-chunk-50 (with options) 
+List of 1
+ $ eval: symbol T
+
 
 output file: SingleSpecies.knit.md
 
-/usr/local/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpeHId3a/rmarkdown-str5a11bc0e2a9.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
+/usr/local/bin/pandoc +RTS -K512m -RTS SingleSpecies.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output SingleSpecies.html --smart --email-obfuscation none --self-contained -M2GB +RTS -K64m -RTS --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/default.html --number-sections --variable 'theme:spacelab' --include-in-header /tmp/RtmpcN8Hnb/rmarkdown-str5a16214a401.html --mathjax --variable 'mathjax-url:https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/highlight --variable navigationjs=/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.3/rmarkdown/rmd/h/navigation-1.0 
 
 Output created: SingleSpecies.html
 There were 17 warnings (use warnings() to see them)

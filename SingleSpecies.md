@@ -104,70 +104,76 @@ cat("
     #Constants
     pi <- 3.141592653589
     
-    ##argos observation error##
-    argos_prec[1:2,1:2] <- argos_cov[,]
+    #for each if 6 argos class observation error
     
-    #Constructing the covariance matrix
-    argos_cov[1,1] <- argos_sigma
-    argos_cov[1,2] <- 0
-    argos_cov[2,1] <- 0
-    argos_cov[2,2] <- argos_alpha
+    for(x in 1:6){
+
+      ##argos observation error##
+      argos_prec[x,1:2,1:2] <- argos_cov[x,,]
+      
+      #Constructing the covariance matrix
+      argos_cov[x,1,1] <- argos_sigma[x]
+      argos_cov[x,1,2] <- 0
+      argos_cov[x,2,1] <- 0
+      argos_cov[x,2,2] <- argos_alpha[x]
+    }
     
     for(i in 1:ind){
-    for(g in 1:tracks[i]){
-    
-    ## Priors for first true location
-    #for lat long
-    y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec)
-    
-    #First movement - random walk.
-    y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
-    
-    ###First Behavioral State###
-    state[i,g,1] ~ dcat(lambda[]) ## assign state for first obs
-    
-    #Process Model for movement
-    for(t in 2:(steps[i,g]-1)){
-    
-    #Behavioral State at time T
-    phi[i,g,t,1] <- alpha_mu[state[i,g,t-1]] 
-    phi[i,g,t,2] <- 1-phi[i,g,t,1]
-    state[i,g,t] ~ dcat(phi[i,g,t,])
-    
-    #Turning covariate
-    #Transition Matrix for turning angles
-    T[i,g,t,1,1] <- cos(theta[state[i,g,t]])
-    T[i,g,t,1,2] <- (-sin(theta[state[i,g,t]]))
-    T[i,g,t,2,1] <- sin(theta[state[i,g,t]])
-    T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
-    
-    #Correlation in movement change
-    d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
-    
-    #Gaussian Displacement
-    y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
-    }
-    
-    #Final behavior state
-    phi[i,g,steps[i,g],1] <- alpha_mu[state[i,g,steps[i,g]-1]] 
-    phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
-    state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
-    
-    ##	Measurement equation - irregular observations
-    # loops over regular time intervals (t)    
-    
-    for(t in 2:steps[i,g]){
-    
-    # loops over observed locations within interval t
-    for(u in 1:idx[i,g,t]){ 
-    zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
-    
-    #for each lat and long
-    #argos error
-    argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec)
-    }
-    }
-    }
+      for(g in 1:tracks[i]){
+      
+      ## Priors for first true location
+      #for lat long
+      y[i,g,1,1:2] ~ dmnorm(argos[i,g,1,1,1:2],argos_prec[1,1:2,1:2])
+      
+      #First movement - random walk.
+      y[i,g,2,1:2] ~ dmnorm(y[i,g,1,1:2],iSigma)
+      
+      ###First Behavioral State###
+      state[i,g,1] ~ dcat(lambda[]) ## assign state for first obs
+      
+      #Process Model for movement
+      for(t in 2:(steps[i,g]-1)){
+      
+      #Behavioral State at time T
+      phi[i,g,t,1] <- alpha_mu[state[i,g,t-1]] 
+      phi[i,g,t,2] <- 1-phi[i,g,t,1]
+      state[i,g,t] ~ dcat(phi[i,g,t,])
+      
+      #Turning covariate
+      #Transition Matrix for turning angles
+      T[i,g,t,1,1] <- cos(theta[state[i,g,t]])
+      T[i,g,t,1,2] <- (-sin(theta[state[i,g,t]]))
+      T[i,g,t,2,1] <- sin(theta[state[i,g,t]])
+      T[i,g,t,2,2] <- cos(theta[state[i,g,t]])
+      
+      #Correlation in movement change
+      d[i,g,t,1:2] <- y[i,g,t,] + gamma[state[i,g,t]] * T[i,g,t,,] %*% (y[i,g,t,1:2] - y[i,g,t-1,1:2])
+      
+      #Gaussian Displacement
+      y[i,g,t+1,1:2] ~ dmnorm(d[i,g,t,1:2],iSigma)
+      }
+      
+      #Final behavior state
+      phi[i,g,steps[i,g],1] <- alpha_mu[state[i,g,steps[i,g]-1]] 
+      phi[i,g,steps[i,g],2] <- 1-phi[i,g,steps[i,g],1]
+      state[i,g,steps[i,g]] ~ dcat(phi[i,g,steps[i,g],])
+      
+      ##	Measurement equation - irregular observations
+      # loops over regular time intervals (t)    
+      
+      for(t in 2:steps[i,g]){
+      
+      # loops over observed locations within interval t
+      for(u in 1:idx[i,g,t]){ 
+      zhat[i,g,t,u,1:2] <- (1-j[i,g,t,u]) * y[i,g,t-1,1:2] + j[i,g,t,u] * y[i,g,t,1:2]
+      
+      #for each lat and long
+      #argos error
+      #ag<-
+      argos[i,g,t,u,1:2] ~ dmnorm(zhat[i,g,t,u,1:2],argos_prec[argos_class[i,g,t,u],1:2,1:2])
+      }
+      }
+      }
     }
     ###Priors###
     
@@ -204,12 +210,23 @@ cat("
     lambda[2] <- 1 - lambda[1]
     
     ##Argos priors##
-    #longitudinal argos precision
-    argos_sigma <- 5
+    #longitudinal argos precision, from Jonsen 2005, 2016, represented as precision not sd
     
-    #latitidunal argos precision
-    argos_alpha <- 5
-    
+    #by argos class
+    argos_sigma[1] <- 11.9016
+    argos_sigma[2] <- 10.2775
+    argos_sigma[3] <- 1.228984
+    argos_sigma[4] <- 2.162593
+    argos_sigma[5] <- 3.885832
+    argos_sigma[6] <- 0.0565539
+
+    #latitidunal argos precision, from Jonsen 2005, 2016
+    argos_alpha[1] <- 67.12537
+    argos_alpha[2] <- 14.73474
+    argos_alpha[3] <- 4.718973
+    argos_alpha[4] <- 0.3872023
+    argos_alpha[5] <- 3.836444
+    argos_alpha[6] <- 0.1081156
     
     }"
     ,fill=TRUE)
@@ -218,7 +235,7 @@ sink()
 
 ```
 ##      user    system   elapsed 
-##   501.391     3.893 27397.507
+##   528.134     6.301 20678.711
 ```
 
 
@@ -226,23 +243,23 @@ sink()
 ##Chains
 
 ```
-##                         Type       Size    PrettySize  Rows Columns
-## jagM          rjags.parallel 3180217112    [1] "3 Gb"     6      NA
-## data                    list   61113336 [1] "58.3 Mb"     9      NA
-## argos                  array   39720952 [1] "37.9 Mb"    33      20
-## obs                    array   39720952 [1] "37.9 Mb"    33      20
-## j                      array   19867968 [1] "18.9 Mb"    33      20
-## b     SpatialPointsDataFrame   16418080 [1] "15.7 Mb" 46421      47
-## mdat              data.frame   16339200 [1] "15.6 Mb" 49859      47
-## m                      ggmap   13116240 [1] "12.5 Mb"  1280    1280
-## d     SpatialPointsDataFrame   12825928 [1] "12.2 Mb" 46421      47
-## oxy               data.frame   12080104 [1] "11.5 Mb" 46421      47
+##                               Type       Size    PrettySize  Rows Columns
+## jagM                rjags.parallel 3180217112    [1] "3 Gb"     6      NA
+## data                          list   80981360 [1] "77.2 Mb"    10      NA
+## argos                        array   39720952 [1] "37.9 Mb"    33      20
+## obs                          array   39720952 [1] "37.9 Mb"    33      20
+## argos_class                  array   19867968 [1] "18.9 Mb"    33      20
+## j                            array   19867968 [1] "18.9 Mb"    33      20
+## obs_class                    array   19867968 [1] "18.9 Mb"    33      20
+## b           SpatialPointsDataFrame   16418080 [1] "15.7 Mb" 46421      47
+## mdat                    data.frame   16339200 [1] "15.6 Mb" 49859      47
+## m                            ggmap   13116240 [1] "12.5 Mb"  1280    1280
 ```
 
 ```
 ##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1790130   95.7    3886542  207.6   3886542  207.6
-## Vcells 446407878 3405.9 1017786417 7765.1 878522978 6702.6
+## Ncells   1790210   95.7    3886542  207.6   3886542  207.6
+## Vcells 458848171 3500.8 1032714783 7879.0 890967591 6797.6
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
@@ -267,12 +284,12 @@ Overall relationship between phi and state, nice test of convergence.
 
 ```
 ##   parameter         par       mean        lower      upper
-## 1  alpha_mu alpha_mu[1] 0.91073361  0.885179024 0.93531258
-## 2  alpha_mu alpha_mu[2] 0.04558698  0.033074171 0.05958549
-## 3     gamma    gamma[1] 0.85174917  0.821631872 0.88228115
-## 4     gamma    gamma[2] 0.31339704  0.236373730 0.39744742
-## 5     theta    theta[1] 0.01481494 -0.007603755 0.03756657
-## 6     theta    theta[2] 3.14837447  2.931923821 3.37828681
+## 1  alpha_mu alpha_mu[1] 0.90536385  0.877351886 0.92848037
+## 2  alpha_mu alpha_mu[2] 0.04673335  0.034270429 0.06224137
+## 3     gamma    gamma[1] 0.85421528  0.825441581 0.88482701
+## 4     gamma    gamma[2] 0.29897117  0.225189373 0.36825143
+## 5     theta    theta[1] 0.01277826 -0.009047288 0.03507419
+## 6     theta    theta[2] 3.15056776  2.957943727 3.37065860
 ```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
@@ -328,6 +345,11 @@ Overlay phi and state
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
 
+```
+##          All Behaviors              Traveling Area-restricted Search 
+##             0.09285648            -0.05510307             0.17112208
+```
+
 ### Time by management unit
 
 
@@ -342,21 +364,21 @@ Overlay phi and state
 
 
 ```
-##             Type      Size     PrettySize     Rows Columns
-## pc        tbl_df 598231464 [1] "570.5 Mb" 11490000      10
-## a         tbl_df 157774144 [1] "150.5 Mb"  3944000       7
-## data        list  61113336  [1] "58.3 Mb"        9      NA
-## argos      array  39720952  [1] "37.9 Mb"       33      20
-## obs        array  39720952  [1] "37.9 Mb"       33      20
-## j          array  19867968  [1] "18.9 Mb"       33      20
-## mdat  data.frame  16339200  [1] "15.6 Mb"    49859      47
-## temp       ggmap  13116528  [1] "12.5 Mb"     1280    1280
-## mxy   data.frame  12825688  [1] "12.2 Mb"    29346      68
-## oxy   data.frame  12080104  [1] "11.5 Mb"    46421      47
+##                   Type      Size     PrettySize     Rows Columns
+## pc              tbl_df 598231464 [1] "570.5 Mb" 11490000      10
+## a               tbl_df 157774144 [1] "150.5 Mb"  3944000       7
+## data              list  80981360  [1] "77.2 Mb"       10      NA
+## argos            array  39720952  [1] "37.9 Mb"       33      20
+## obs              array  39720952  [1] "37.9 Mb"       33      20
+## argos_class      array  19867968  [1] "18.9 Mb"       33      20
+## j                array  19867968  [1] "18.9 Mb"       33      20
+## obs_class        array  19867968  [1] "18.9 Mb"       33      20
+## mdat        data.frame  16339200  [1] "15.6 Mb"    49859      47
+## temp             ggmap  13116528  [1] "12.5 Mb"     1280    1280
 ```
 
 ```
 ##             used  (Mb) gc trigger   (Mb)   max used   (Mb)
-## Ncells   1678464  89.7    5103933  272.6    9968622  532.4
-## Vcells 118670061 905.4  333508252 2544.5 1010500452 7709.6
+## Ncells   1679680  89.8    5103933  272.6    9968622  532.4
+## Vcells 121359676 926.0  338399979 2581.8 1030480797 7862.0
 ```
