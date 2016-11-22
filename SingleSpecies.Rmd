@@ -933,7 +933,7 @@ ggsave("Figures/TravelingResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=3
 
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #check out the memory sizing
 lsos()
 #notify end of run
