@@ -534,6 +534,7 @@ rm(allp)
 ```
 
 ## Parameter Summary
+
 ```{r,fig.height=10,fig.width=15}
 psum<-pc %>% filter(!parameter %in% c("phi","state")) %>% group_by(parameter,par) %>% summarize(mean=mean(value),lower=quantile(value,0.05),upper=quantile(value,0.95))
 
@@ -585,7 +586,6 @@ ggsave("Figures/SpatialPred.jpg",height=5,width=5)
 #Black and white version
 ggplot()+geom_path(data=mxy, aes(x=x, y=y,col=phistate,group=paste(Animal,Track)),size=0.8) + geom_path(data=fccamlr,aes(x=long,y=lat,group=Unit),size=0.3,col="black")  + borders(fill=NA,alpha=0.9) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme + scale_fill_manual(values=rep("NA",8)) + labs(col="Behavior") + scale_color_manual(values=c("grey20","grey70"))
 ggsave("Figures/SpatialPred_BW.jpg",height=5,width=7)
-
 ```
 
 ## By individual
@@ -641,6 +641,14 @@ ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpoint
 #get the ccamlr units
 kdat<-ksp %over% ccamlr
 ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpointHalfDegreeLat),data.frame(kdat,data.frame(ksp)))
+
+ksp$Year<-cut(ksp$SeasonAbbreviation,c(1980,2009,2016),labels=c("1980-2009","2009-2016"))
+
+#aggregate total by unit.
+krill_unit<-as.data.frame(ksp) %>% group_by(Unit,Areakm2,Year) %>% summarize(Krill=sum(C1KRIcatchKG)/1000) %>% mutate(Density=Krill/Areakm2)
+
+krill_unit
+ggplot(data=as.data.frame(ksp),aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,col=Unit)) + geom_point()
 ```
 
 #Time spent in grid cell
@@ -711,8 +719,9 @@ names(s)[[1]]<-"All Behavior"
 ```{r,eval=T}
 #extract
 ksp$ResidencyTime<-raster::extract(r,y=ksp)
+
 #write to file
-ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)")
+ggplot(as.data.frame(ksp)) + geom_point(aes(x=ResidencyTime,y=log(C1KRIcatchKG)))  + theme_bw() + labs(x="Residency Time (Days)",y="Krill Catch (Log Metric Tons)") 
 ```
 
 ```{r,eval=T}
@@ -800,31 +809,6 @@ rforaging[]<-1:ncell(rforaging)
 sxy<-split(foraging,foraging$Animal,foraging$Track,drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
-
-#time in each cell
-timecell<-function(j){
-  
-  rlej<-rle(x=diff(j$Index))
-  position<-c(1,cumsum(rlej$lengths))
-  timestack<-c()
-  
-  #if only one position
-  if(length(position)==1){
-    timestack[1]<-0
-    
-  } else {
-    
-    #time difference between first and last point in the cell
-      for(x in 2:length(position)){
-        timed<-j[position[x-1]:position[x],]
-        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
-    }
-  }
-
-  out<-data.frame(Sum=sum(timestack))
-  return(out)
-}
-
 #loop through all animals
 sptracks<-lapply(sxy,function(x){
   k<-SpatialPointsDataFrame(cbind(x$x,x$y),data=x,proj4string=CRS("+proj=longlat +datum=WGS84"))
@@ -868,15 +852,11 @@ mdf$Unit<-as.factor(mksp$Unit)
 levels(mdf$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
 
 levels(mdf$variable)<-c("All Behaviors","Traveling","Area-restricted Search")
-ggplot(mdf) + geom_point(aes(y=value,x=log(C1KRIcatchKG),col=Unit),size=3)  + theme_bw() + labs(y="Residency Time (Days)",x="Krill Catch (Log KG)") + labs(col="Behavior") + facet_wrap(~variable,nrow=1) + scale_color_brewer(palette="Accent")
-ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=3,width=8,dpi=300)
+ggplot(mdf) + geom_point(aes(y=value,x=C1KRIcatchKG/1000,col=Unit),size=3)  + theme_bw() + labs(y="Whale Residency Time (Days)",x="Krill Catch (Metric Tons)") + labs(col="Management unit") + facet_wrap(~variable,ncol=1) + scale_color_brewer(palette="Accent")
+ggsave("Figures/ResidencyTime_ccamlr.jpeg",height=6,width=5,dpi=300)
 
 #correlation
-krillbeh<-split(mdf,mdf$variable)
-x<-krillbeh[[1]]
-
-sapply(krillbeh,function(x){cor(x$value,log(x$C1KRIcatchKG),use="complete.obs")})
-
+krillbeh<-split(mdf,list(mdf$variable,mdf$Year))
 ```
 
 ### Time by management unit
@@ -887,12 +867,16 @@ projection(ccamlr)<-CRS("+proj=longlat +datum=WGS84")
 b<-over(d,ccamlr)
 mxy<-data.frame(mxy,b)
 
-
 test<-mxy %>% group_by(Animal,Track) %>% mutate(Index=1:n()) %>% group_by(Animal,Unit,Track,phistate) %>%  do(timecell(.)) %>% group_by(Unit,phistate) %>% summarize(s=sum(Sum)) %>% spread(key=phistate,value=s)
 
 test$Unit[test$Unit %in% NA]<-"Outside Units"
 
 write.csv(test,"Figures/CCAMLR_days.csv")
+```
+
+```{r}
+unittime<-merge(test,krill_unit)
+unittime<-melt(unittime,measure.vars = c("Traveling","Area-restricted Search"))
 ```
 
 ```{r,eval=T}
@@ -912,11 +896,12 @@ ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,f
 ggsave("Figures/ARSResidencyDays_Krill.jpeg",height=6,width=7,dpi=300)
 
 #BW version
-ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=log(C1KRIcatchKG/1000))) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+p1<-ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+p1
 ggsave("Figures/ARSResidencyDays_Krill_BW.jpeg",height=4,width=6,dpi=300)
 
 #BW version journal 
-ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=log(C1KRIcatchKG/1000))) + scale_fill_continuous(low="grey95",high="black",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+ggplot() + geom_tile(data=data.frame(rasterToPoints(rforaging)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="grey95",high="black",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Area-restricted Search") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
 ggsave("Figures/ARSResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
 
 ```
@@ -925,12 +910,97 @@ ggsave("Figures/ARSResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
 ggmap(temp) + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + theme(axis.text.x=element_blank(),axis.text.y=element_blank()) 
 ggsave("Figures/TravelingResidencyDays_Krill.jpeg",height=4,width=6,dpi=300)
 
-ggplot() + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+p<-ggplot() + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="lightblue",high="red",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
+p
 ggsave("Figures/TravelingResidencyDays_Krill_BW.jpeg",height=4,width=6,dpi=300)
 
   ggplot() + geom_tile(data=data.frame(rasterToPoints(rtraveling)),aes(x=x,y=y,fill=layer)) + geom_point(data=krill,aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,size=C1KRIcatchKG/1000)) + scale_fill_continuous(low="grey95",high="black",limits=c(0,155)) + labs(fill="Days", size="Krill Catch (Metric Tons)") + scale_size_continuous(range=c(1,5)) + ggtitle("Traveling") + labs(x="",y="") + borders(fill="grey90",alpha=0.4) + coord_cartesian(ylim = c(-69,-60),xlim=c(-53,-72)) + theme_bw() + mytheme
 ggsave("Figures/TravelingResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=300)
 
+```
+
+#Randomization tests.
+
+## Randomization I: Do whales use SSMUs non-randomly?
+
+```{r}
+plot(r,main="Total observation time")
+
+null_dist<-function(){
+  rnull<-rasterToPoints(r,sp=T)
+  rnull$cell<-cellFromXY(r,rnull@coords)
+  
+  #take 0's layer
+  rnull$layer<-sample(rnull$layer)
+  
+  #new raster object
+  r_null<-raster(r)
+  r_null[rnull$cell]<-rnull$layer
+}
+```
+
+## Randomization II: Do whales behave non-randomly within management units?
+
+Given the number of observations in each unit, which are being disproportionately used for foraging?
+
+Steps
+* Randomize labels of foraging and traveling at each observation
+* Calculate the total time foraging and traveling in each unit
+* Compare this null distribution to the observed value
+
+```{r}
+nullR<-function(mxy){
+
+  mxy$phi_null<-sample(c("Traveling","Area-restricted Search"),replace=T,size=nrow(mxy))
+  #mxy$phi_null<-sample(mxy$phistate)
+  
+  nullt<-mxy %>% group_by(Unit,phi_null) %>% summarize(n=n())
+  nullt[is.na(nullt$Unit),"Unit"]<-"Outside"
+  nullt<-dcast(nullt,Unit~phi_null)
+  
+  #as fraction
+  nullt$P_ARS<-nullt$`Area-restricted Search`/(nullt$Traveling+nullt$`Area-restricted Search`)
+  return(nullt)
+}
+
+nullframe<-lapply(1:1000,function(x) nullR(mxy))
+nullframe<-melt(nullframe)
+
+#as a percentage and time seperately.
+nulltimes<-nullframe %>% filter(variable %in% c("Traveling","Area-restricted Search"))
+
+nullprop<-nullframe %>% filter(!variable %in% c("Traveling","Area-restricted Search"))
+
+ggplot(nullprop,aes(x=value)) + geom_density(aes(fill=Unit)) + theme_bw()
+```
+
+Observed values
+
+```{r}
+truet<-mxy %>% group_by(Unit,phistate) %>% summarize(n=n())
+truet[is.na(truet$Unit),"Unit"]<-"Outside"
+truet<-dcast(truet,Unit~phistate)
+truet$P_ARS<-truet$`Area-restricted Search`/(truet$Traveling+truet$`Area-restricted Search`)
+truet<-melt(truet)
+
+#true proportion
+trueprop<-truet %>% filter(!variable %in% c("Traveling","Area-restricted Search"))
+
+ggplot(nullprop,aes(x=value)) + geom_density(fill="grey40") + facet_wrap(~Unit,scale="free",nrow=3) +theme_bw() + geom_vline(data=trueprop,aes(xintercept=value),col="black",size=1,linetype="dashed")
+```
+
+Add in krill catch.
+
+```{r}
+krill_unit[is.na(krill_unit$Unit),"Unit"]<-"Outside"
+
+nullp<-merge(krill_unit,nullprop,by="Unit")
+
+#just since 2009
+nullp<-nullp %>% filter(Year %in%  "2009-2016")
+
+ggplot(nullp,aes(x=value)) + geom_density(aes(fill=Density)) + facet_wrap(~Unit,scale="free",nrow=2) +theme_bw() + geom_vline(data=trueprop,aes(xintercept=value),col="black",size=1,linetype="dashed") + scale_fill_continuous(low="blue",high="red")  + scale_x_continuous(labels = scales::percent) + labs(x="Proportion of time foraging")
+ggsave("Figures/RandomizationUnit.jpeg",height=4,width=9)
 ```
 
 ```{r,eval=T}
