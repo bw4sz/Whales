@@ -936,7 +936,20 @@ null_dist<-function(){
   #new raster object
   r_null<-raster(r)
   r_null[rnull$cell]<-rnull$layer
+  
+  time_unit<-raster::extract(y=ccamlr,x=r_null,fun=sum,na.rm=T)
+  return(data.frame(ccamlr$Unit,Hours=time_unit))
 }
+
+nullhour<-lapply(1:100,function(x) null_dist())
+nullhour<-melt(nullhour)
+```
+
+True time per unit
+
+```{r}
+ttime_unit<-data.frame(ccamlr$Unit,Hours=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
+ggplot(nullhour,aes(x=ccamlr.Unit,y=value)) + geom_violin() + coord_flip() + geom_point(data=ttime_unit,col="red") + theme_bw()
 ```
 
 ## Randomization II: Do whales behave non-randomly within management units?
