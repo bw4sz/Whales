@@ -160,7 +160,10 @@ ggsave("Figures/MonthTracks_BW.jpeg",height=4, width=5)
 ```{r}
 ccamlr<-readShapePoly("InputData/SSMU_2013/CROPCCAMLR.shp")
 
-ccamlr$Unit<-gsub(x=ccamlr$SSMUname,pattern="Antarctic Peninsula ",rep="")
+ccamlr$Unit<-factor(gsub(x=ccamlr$SSMUname,pattern="Antarctic Peninsula ",rep=""))
+levels(ccamlr$Unit)[levels(ccamlr$Unit) %in% "West"]<-"AP West"
+levels(ccamlr$Unit)[levels(ccamlr$Unit) %in% "East (partly in 485)"]<-"AP East"
+levels(ccamlr$Unit)[levels(ccamlr$Unit) %in% "Pelagic Area"]<-"AP Pelagic Area"
 
 fccamlr<-fortify(ccamlr,region="Unit")
 
@@ -173,7 +176,6 @@ ggmap(m)+geom_path(data=mxy, aes(x=x, y=y,col=as.factor(Animal)),size=.5) + scal
 #format better
 m <- get_map(location=bbox(ccamlr),zoom=5,scale=2,maptype="satellite",color = "bw")
 fccamlr$Unit<-as.factor(fccamlr$id)
-levels(fccamlr$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
 ggmap(m) + geom_polygon(data=fccamlr,aes(x=long,y=lat,fill=Unit),alpha=0.9) + mytheme + scale_fill_brewer(palette="Accent") 
 ggsave("Figures/Units.jpeg",height=6,width=6)
 
@@ -563,8 +565,6 @@ mxy$phistate<-cut(mxy$phi,c(0,0.5,1),labels=c("Traveling","Area-restricted Searc
 
 #ensure order for plotting
 mxy<-mxy %>% arrange(Animal,Track,step,jStep)
-
-
 ```
 
 Relationship between phi and state
@@ -645,7 +645,7 @@ ksp<-SpatialPointsDataFrame(cbind(krill$GridMidpointDegreeLon,krill$GridMidpoint
 ksp$Year<-cut(ksp$SeasonAbbreviation,c(1980,2009,2016),labels=c("1980-2009","2009-2016"))
 
 #aggregate total by unit.
-krill_unit<-as.data.frame(ksp) %>% group_by(Unit,Areakm2,Year) %>% summarize(Krill=sum(C1KRIcatchKG)/1000) %>% mutate(Density=Krill/Areakm2)
+krill_unit<-as.data.frame(ksp) %>% group_by(Unit,Areakm2,Year) %>% summarize(Krill=sum(C1KRIcatchKG)/1000) %>% mutate(Density=Krill/Areakm2) %>% filter(!is.na(Unit))
 
 krill_unit
 ggplot(data=as.data.frame(ksp),aes(x=GridMidpointDegreeLon,y=GridMidpointHalfDegreeLat,col=Unit)) + geom_point()
@@ -902,35 +902,47 @@ ggsave("Figures/TravelingResidencyDays_Krill_BW_all.jpeg",height=4,width=6,dpi=3
 ```{r}
 plot(r,main="Total observation time")
 
-null_dist<-function(){
-  rnull<-rasterToPoints(r,sp=T)
-  rnull$cell<-cellFromXY(r,rnull@coords)
-  
-  #take 0's layer
-  rnull$layer<-sample(rnull$layer)
-  
-  #new raster object
-  r_null<-raster(r)
-  r_null[rnull$cell]<-rnull$layer
-  
-  time_unit<-raster::extract(y=ccamlr,x=r_null,fun=sum,na.rm=T)
-  return(data.frame(ccamlr$Unit,Hours=time_unit))
+camr<-rasterize(ccamlr,r)
+rnull<-as.data.frame(camr)
+rnull<-rnull[!is.na(rnull$Id),]
+
+null_dist<-function(camr,rnull){
+  n<-nrow(rnull)
+  k<-sum(r[],na.rm=T)
+  rnull$Days<-rmultinom(n=1,size=k,prob=rep(k/n,n))
+  out<-rnull %>% group_by(Unit) %>% summarize(Days=sum(Days))
+  return(out)
 }
 
-nullhour<-lapply(1:100,function(x) null_dist())
-nullhour<-melt(nullhour)
+nullhour<-lapply(1:100,function(x) null_dist(camr,rnull))
+nullhour<-bind_rows(nullhour)
 
+#format labels
+nullhour$Unit<-factor(nullhour$Unit)
+
+#order by krill
+krill_unit<-krill_unit[!is.na(krill_unit$Unit),]
+krill_unit$Unit<-as.factor(krill_unit$Unit)
+
+nullhour<-merge(krill_unit,nullhour,by="Unit")
+
+#just since 2009
+nullhour<-nullhour %>% filter(Year %in%  "2009-2016")
+
+#order by Krill catch unit
+ord<-krill_unit %>% group_by(Unit) %>% filter(Year %in%  "2009-2016") %>% distinct(Density) %>% arrange(desc(Density)) %>% .$Unit 
+#add in AP EAST
+ord<-c(as.character(ord),"AP East")
+nullhour$Unit<-factor(nullhour$Unit,levels=rev(ord))
 ```
 
 True time per unit
 
 ```{r}
-ttime_unit<-data.frame(ccamlr$Unit,value=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
-nullhour$ccamlr.Unit<-
-levels(nullhour$ccamlr.Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
-levels(ttime_unit$ccamlr.Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","AP East","Elephant Island","AP Pelagic Area","AP West")
+ttime_unit<-data.frame(Unit=ccamlr$Unit,Days=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
+ttime_unit$Unit<-factor(ttime_unit$Unit,levels=rev(ord))
 
-ggplot(nullhour,aes(x=ccamlr.Unit,y=value)) + geom_violin() + coord_flip() + geom_point(data=ttime_unit,col="grey50",size=3) + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") + theme(plot.margin=margin(20,20,20,20))
+ggplot()  + geom_violin(data=nullhour,fill="black",aes(x=Unit,y=Days)) + coord_flip() + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") +geom_point(data=ttime_unit,col="grey50",size=3,aes(x=Unit,y=Days))
 ggsave("Figures/RandomizationI.jpeg",height=5,width=4)
 ```
 
@@ -973,7 +985,6 @@ Observed values
 
 ```{r}
 truet<-mxy %>% group_by(Unit,phistate) %>% summarize(n=n())
-truet[is.na(truet$Unit),"Unit"]<-"Outside"
 truet<-dcast(truet,Unit~phistate)
 truet$P_ARS<-truet$`Area-restricted Search`/(truet$Traveling+truet$`Area-restricted Search`)
 truet<-melt(truet)
@@ -982,11 +993,6 @@ truet<-melt(truet)
 trueprop<-truet %>% filter(!variable %in% c("Traveling","Area-restricted Search"))
 trueprop$Unit<-factor(trueprop$Unit)
 
-levels(trueprop$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","Outside","AP Pelagic Area","AP West")
-
-nullp$Unit<-as.factor(nullp$Unit)
-levels(nullp$Unit)<-c("Bransfield Strait East","Bransfield Strait West","Drake Passage East","Drake Passage West","Outside","AP Pelagic Area","AP West")
-
 ggplot(nullp,aes(x=value)) + geom_density(fill="grey60") + facet_wrap(~Unit,scale="free",nrow=2) +theme_bw() + geom_vline(data=trueprop,aes(xintercept=value),col="black",size=1,linetype="dashed") + scale_x_continuous(labels = scales::percent) + labs(x="Proportion of time foraging")
 ggsave("Figures/RandomizationUnit.jpeg",height=4,width=9)
 ```
@@ -994,8 +1000,6 @@ ggsave("Figures/RandomizationUnit.jpeg",height=4,width=9)
 Add in krill catch.
 
 ```{r}
-krill_unit[is.na(krill_unit$Unit),"Unit"]<-"Outside"
-
 nullp<-merge(krill_unit,nullprop,by="Unit")
 
 #just since 2009
@@ -1004,8 +1008,8 @@ nullp<-nullp %>% filter(Year %in%  "2009-2016")
 #order by Krill catch unit
 ord<-nullp %>% group_by(Unit) %>% distinct(Density) %>% arrange(desc(Density)) %>% .$Unit
 nullp$Unit<-factor(nullp$Unit,levels=rev(ord))
-ggplot(nullp,aes(x=Unit,y=value)) + geom_violin(aes(fill=Density)) +theme_bw() + geom_point(data=trueprop,col="grey50",size=3)  + scale_y_continuous(labels = scales::percent) + labs(y="Proportion of time foraging",fill="Krill Catch Desnity\n(Metric Tons/Area)") + coord_flip()
-ggsave("Figures/RandomizationUnit.jpeg",height=4,width=9)
+ggplot(nullp,aes(x=Unit,y=value)) + geom_violin(aes(fill=Density)) +theme_bw() + geom_point(data=trueprop,col="grey50",size=3)  + scale_y_continuous(labels = scales::percent) + labs(y="Proportion of time foraging",fill="Krill Catch Desnity\n(Metric Tons/Area)") + coord_flip() + scale_fill_continuous(low="grey50",high="black")
+ggsave("Figures/RandomizationUnit.jpeg",height=4,width=7)
 ```
 
 ```{r,eval=T}
