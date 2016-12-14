@@ -914,7 +914,7 @@ null_dist<-function(camr,rnull){
   return(out)
 }
 
-nullhour<-lapply(1:100,function(x) null_dist(camr,rnull))
+nullhour<-lapply(1:5000,function(x) null_dist(camr,rnull))
 nullhour<-bind_rows(nullhour)
 
 #format labels
@@ -924,12 +924,7 @@ nullhour$Unit<-factor(nullhour$Unit)
 krill_unit<-krill_unit[!is.na(krill_unit$Unit),]
 krill_unit$Unit<-as.factor(krill_unit$Unit)
 
-nullhour<-merge(krill_unit,nullhour,by="Unit")
-
-#just since 2009
-nullhour<-nullhour %>% filter(Year %in%  "2009-2016")
-
-#order by Krill catch unit
+#order by Krill catch unit, just since 2009
 ord<-krill_unit %>% group_by(Unit) %>% filter(Year %in%  "2009-2016") %>% distinct(Density) %>% arrange(desc(Density)) %>% .$Unit 
 #add in AP EAST
 ord<-c(as.character(ord),"AP East")
@@ -942,8 +937,11 @@ True time per unit
 ttime_unit<-data.frame(Unit=ccamlr$Unit,Days=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
 ttime_unit$Unit<-factor(ttime_unit$Unit,levels=rev(ord))
 
-ggplot()  + geom_violin(data=nullhour,fill="black",aes(x=Unit,y=Days)) + coord_flip() + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") +geom_point(data=ttime_unit,col="grey50",size=3,aes(x=Unit,y=Days))
-ggsave("Figures/RandomizationI.jpeg",height=5,width=4)
+#format distributions
+nulld<-nullhour %>% group_by(Unit) %>%summarize(mean=mean(Days),upper=quantile(Days,0.95),lower=quantile(Days,0.05))
+
+ggplot()  + geom_linerange(data=nulld,col="black",aes(x=Unit,ymax=upper,ymin=lower),size=1) + coord_flip() + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") +geom_point(data=ttime_unit,col="grey50",size=3,aes(x=Unit,y=Days))
+ggsave("Figures/RandomizationI.jpeg",height=3,width=5)
 ```
 
 ## Randomization II: Do whales behave non-randomly within management units?
