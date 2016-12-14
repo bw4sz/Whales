@@ -940,8 +940,8 @@ ttime_unit$Unit<-factor(ttime_unit$Unit,levels=rev(ord))
 #format distributions
 nulld<-nullhour %>% group_by(Unit) %>%summarize(mean=mean(Days),upper=quantile(Days,0.95),lower=quantile(Days,0.05))
 
-ggplot()  + geom_linerange(data=nulld,col="black",aes(x=Unit,ymax=upper,ymin=lower),size=1) + coord_flip() + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") +geom_point(data=ttime_unit,col="grey50",size=3,aes(x=Unit,y=Days))
-ggsave("Figures/RandomizationI.jpeg",height=3,width=5)
+ggplot()  + geom_linerange(data=nulld,col="grey60",aes(x=Unit,ymax=upper,ymin=lower),size=2) + coord_flip() + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Days") +geom_point(data=ttime_unit,col="black",size=4,aes(x=Unit,y=Days))
+ggsave("Figures/RandomizationI.jpeg",height=4,width=5)
 ```
 
 ## Randomization II: Do whales behave non-randomly within management units?
@@ -957,10 +957,8 @@ Steps
 nullR<-function(mxy){
 
   mxy$phi_null<-sample(c("Traveling","Area-restricted Search"),replace=T,size=nrow(mxy))
-  #mxy$phi_null<-sample(mxy$phistate)
   
-  nullt<-mxy %>% group_by(Unit,phi_null) %>% summarize(n=n())
-  nullt[is.na(nullt$Unit),"Unit"]<-"Outside"
+  nullt<-mxy %>% group_by(Unit,phi_null) %>% summarize(n=n()) %>% filter(!is.na(Unit))
   nullt<-dcast(nullt,Unit~phi_null)
   
   #as fraction
@@ -982,7 +980,7 @@ ggplot(nullprop,aes(x=value)) + geom_density(aes(fill=Unit)) + theme_bw()
 Observed values
 
 ```{r}
-truet<-mxy %>% group_by(Unit,phistate) %>% summarize(n=n())
+truet<-mxy %>% group_by(Unit,phistate) %>% summarize(n=n()) %>% filter(!is.na(Unit))
 truet<-dcast(truet,Unit~phistate)
 truet$P_ARS<-truet$`Area-restricted Search`/(truet$Traveling+truet$`Area-restricted Search`)
 truet<-melt(truet)
@@ -991,23 +989,14 @@ truet<-melt(truet)
 trueprop<-truet %>% filter(!variable %in% c("Traveling","Area-restricted Search"))
 trueprop$Unit<-factor(trueprop$Unit)
 
-ggplot(nullp,aes(x=value)) + geom_density(fill="grey60") + facet_wrap(~Unit,scale="free",nrow=2) +theme_bw() + geom_vline(data=trueprop,aes(xintercept=value),col="black",size=1,linetype="dashed") + scale_x_continuous(labels = scales::percent) + labs(x="Proportion of time foraging")
-ggsave("Figures/RandomizationUnit.jpeg",height=4,width=9)
-```
+#order by krill catch
+nullprop$Unit<-factor(nullprop$Unit,levels=rev(ord))
+trueprop$Unit<-factor(trueprop$Unit,levels=rev(ord))
 
-Add in krill catch.
+nullrange<-nullprop %>% group_by(Unit) %>%summarize(mean=mean(value),upper=quantile(value,0.95),lower=quantile(value,0.05))
 
-```{r}
-nullp<-merge(krill_unit,nullprop,by="Unit")
-
-#just since 2009
-nullp<-nullp %>% filter(Year %in%  "2009-2016")
-
-#order by Krill catch unit
-ord<-nullp %>% group_by(Unit) %>% distinct(Density) %>% arrange(desc(Density)) %>% .$Unit
-nullp$Unit<-factor(nullp$Unit,levels=rev(ord))
-ggplot(nullp,aes(x=Unit,y=value)) + geom_violin(aes(fill=Density)) +theme_bw() + geom_point(data=trueprop,col="grey50",size=3)  + scale_y_continuous(labels = scales::percent) + labs(y="Proportion of time foraging",fill="Krill Catch Desnity\n(Metric Tons/Area)") + coord_flip() + scale_fill_continuous(low="grey50",high="black")
-ggsave("Figures/RandomizationUnit.jpeg",height=4,width=7)
+ggplot(nullrange,aes(x=Unit)) + geom_point(data=trueprop,aes(y=value),col="black",size=4)  + geom_linerange(col="grey60",aes(x=Unit,ymin=lower,ymax=upper),size=2)+ scale_y_continuous(labels = scales::percent) +labs(y="Proportion of time foraging") + theme_bw() + coord_flip()
+ggsave("Figures/RandomizationI.jpeg",height=4,width=5)
 ```
 
 ```{r,eval=T}
