@@ -233,34 +233,11 @@ cat("
 sink()
 
 
-```
-##      user    system   elapsed 
-##   528.134     6.301 20678.711
-```
 
 
 
 ##Chains
 
-```
-##                               Type       Size    PrettySize  Rows Columns
-## jagM                rjags.parallel 3180217112    [1] "3 Gb"     6      NA
-## data                          list   80981360 [1] "77.2 Mb"    10      NA
-## argos                        array   39720952 [1] "37.9 Mb"    33      20
-## obs                          array   39720952 [1] "37.9 Mb"    33      20
-## argos_class                  array   19867968 [1] "18.9 Mb"    33      20
-## j                            array   19867968 [1] "18.9 Mb"    33      20
-## obs_class                    array   19867968 [1] "18.9 Mb"    33      20
-## b           SpatialPointsDataFrame   16418080 [1] "15.7 Mb" 46421      47
-## mdat                    data.frame   16339200 [1] "15.6 Mb" 49859      47
-## m                            ggmap   13116240 [1] "12.5 Mb"  1280    1280
-```
-
-```
-##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells   1790210   95.7    3886542  207.6   3886542  207.6
-## Vcells 458848171 3500.8 1032714783 7879.0 890967591 6797.6
-```
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
@@ -281,6 +258,7 @@ Overall relationship between phi and state, nice test of convergence.
 ![](SingleSpecies_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 ## Parameter Summary
+
 
 ```
 ##   parameter         par       mean        lower      upper
@@ -328,6 +306,32 @@ Overlay phi and state
 
 # Overlap with Krill Fishery
 
+```
+## Source: local data frame [17 x 5]
+## Groups: Unit, Areakm2 [8]
+## 
+##                      Unit   Areakm2      Year       Krill      Density
+##                    <fctr>     <dbl>    <fctr>       <dbl>        <dbl>
+## 1  Bransfield Strait East  28316.91 1980-2009  39365.1770 1.390165e+00
+## 2  Bransfield Strait East  28316.91 2009-2016  66267.4220 2.340207e+00
+## 3  Bransfield Strait West  22505.23 1980-2009  39109.4540 1.737794e+00
+## 4  Bransfield Strait West  22505.23 2009-2016 334129.5481 1.484675e+01
+## 5      Drake Passage East  16679.78 1980-2009 200773.1174 1.203692e+01
+## 6      Drake Passage East  16679.78 2009-2016  29296.7391 1.756423e+00
+## 7      Drake Passage West  16067.73 1980-2009 515394.5366 3.207638e+01
+## 8      Drake Passage West  16067.73 2009-2016  60794.8695 3.783663e+00
+## 9      Drake Passage West  16067.73        NA     52.0590 3.239973e-03
+## 10                AP East  57248.36 1980-2009   4551.0500 7.949660e-02
+## 11        Elephant Island  36693.83 1980-2009 316615.9470 8.628589e+00
+## 12        Elephant Island  36693.83 2009-2016   3721.3692 1.014168e-01
+## 13        AP Pelagic Area 441721.50 1980-2009  60383.9770 1.367015e-01
+## 14        AP Pelagic Area 441721.50 2009-2016    848.3244 1.920496e-03
+## 15        AP Pelagic Area 441721.50        NA     16.7160 3.784285e-05
+## 16                AP West  37218.83 1980-2009   9645.8810 2.591667e-01
+## 17                AP West  37218.83 2009-2016  56013.8708 1.504987e+00
+```
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
 
 #Time spent in grid cell
 
@@ -345,22 +349,44 @@ Overlay phi and state
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
 
-```
-##          All Behaviors              Traveling Area-restricted Search 
-##             0.09285648            -0.05510307             0.17112208
-```
-
 ### Time by management unit
 
 
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
+
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
 
-![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-48-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-48-3.png)<!-- -->
+![](SingleSpecies_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
 
 ![](SingleSpecies_files/figure-html/unnamed-chunk-49-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-49-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-49-3.png)<!-- -->
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-50-1.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-50-2.png)<!-- -->![](SingleSpecies_files/figure-html/unnamed-chunk-50-3.png)<!-- -->
+
+#Randomization tests.
+
+## Randomization I: Do whales use SSMUs non-randomly?
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+
+True time per unit
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+
+## Randomization II: Do whales behave non-randomly within management units?
+
+Given the number of observations in each unit, which are being disproportionately used for foraging?
+
+Steps
+* Randomize labels of foraging and traveling at each observation
+* Calculate the total time foraging and traveling in each unit
+* Compare this null distribution to the observed value
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-53-1.png)<!-- -->
+
+Observed values
+
+![](SingleSpecies_files/figure-html/unnamed-chunk-54-1.png)<!-- -->
 
 
 ```
@@ -378,7 +404,7 @@ Overlay phi and state
 ```
 
 ```
-##             used  (Mb) gc trigger   (Mb)   max used   (Mb)
-## Ncells   1679680  89.8    5103933  272.6    9968622  532.4
-## Vcells 121359676 926.0  338399979 2581.8 1030480797 7862.0
+##             used   (Mb) gc trigger   (Mb)  max used   (Mb)
+## Ncells   1693469   90.5    3886542  207.6   3886542  207.6
+## Vcells 136618826 1042.4  298864534 2280.2 298863716 2280.2
 ```
