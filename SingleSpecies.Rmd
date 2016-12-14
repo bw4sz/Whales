@@ -33,14 +33,14 @@ library(maptools)
 library(raster)
 
 #New model to be run, flag turned off if just updating.
-newModel<-T
+newModel<-F
 ```
 
-```{r,eval=F}
+```{r,eval=T}
 #Load in data
 load("SingleSpecies.RData")
 #jags$recompile()
-newModel<-T
+newModel<-F
 ```
 
 ```{r}
@@ -394,7 +394,7 @@ ggplot(data=steps_all,aes(x=Track)) + geom_histogram() + labs(x="Subtracks per A
 ```{r,child="Bayesian/MultiSpecies.R",eval=T}
 ```
 
-```{r,eval=T}
+```{r,eval=F}
 #source jags file
 source("Bayesian/MultiSpecies.R")
 
@@ -418,7 +418,7 @@ jagM <- update(jagM,n.iter=300,n.burnin=0,n.thin=0)
 ```
 
 ##Chains
-```{r,eval=T}
+```{r,eval=F}
 
 #check memory size
 lsos()
@@ -661,10 +661,8 @@ r<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 #put cellindex number
 r[]<-1:ncell(r)
 
-sxy<-split(mxy,mxy$Animal,mxy$Track,drop=T)
+sxy<-split(mxy,list(mxy$Animal,mxy$Track),drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
-
-#plot(rasterize(j,r,field="Index",fun='count'))
 
 #time in each cell
 timecell<-function(j){
@@ -739,34 +737,10 @@ rtraveling<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 rtraveling[]<-1:ncell(rtraveling)
 
 
-sxy<-split(traveling,traveling$Animal,traveling$Track,drop=T)
+sxy<-split(traveling,list(traveling$Animal,traveling$Track),drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
 #plot(rasterize(j,rtraveling,field="Index",fun='count'))
-
-#time in each cell
-timecell<-function(j){
-  
-  rlej<-rle(x=diff(j$Index))
-  position<-c(1,cumsum(rlej$lengths))
-  timestack<-c()
-  
-  #if only one position
-  if(length(position)==1){
-    timestack[1]<-0
-    
-  } else {
-    
-    #time difference between first and last point in the cell
-      for(x in 2:length(position)){
-        timed<-j[position[x-1]:position[x],]
-        timestack[x-1]<-difftime(max(timed$timestamp),min(timed$timestamp),units="days")
-    }
-  }
-
-  out<-data.frame(Sum=sum(timestack))
-  return(out)
-}
 
 #loop through all animals
 sptracks<-lapply(sxy,function(x){
@@ -806,7 +780,7 @@ rforaging<-raster(extent(d)*c(1.1,1.1),nrow=100,ncol=100)
 #put cellindex number
 rforaging[]<-1:ncell(rforaging)
 
-sxy<-split(foraging,foraging$Animal,foraging$Track,drop=T)
+sxy<-split(foraging,list(foraging$Animal,foraging$Track),drop=T)
 sxy<-lapply(sxy,function(x) {x$Index<-1:nrow(x); return(x)})
 
 #loop through all animals
@@ -866,6 +840,8 @@ d<-SpatialPointsDataFrame(cbind(mxy$x,mxy$y),data=mxy,proj4string=CRS("+proj=lon
 projection(ccamlr)<-CRS("+proj=longlat +datum=WGS84")
 b<-over(d,ccamlr)
 mxy<-data.frame(mxy,b)
+
+test<-mxy %>% group_by(Animal,Track) %>% mutate(Index=1:n()) %>% group_by(Animal,Unit,Track) %>%  do(timecell(.)) %>% group_by(Unit) %>% summarize(s=sum(Sum))
 
 test<-mxy %>% group_by(Animal,Track) %>% mutate(Index=1:n()) %>% group_by(Animal,Unit,Track,phistate) %>%  do(timecell(.)) %>% group_by(Unit,phistate) %>% summarize(s=sum(Sum)) %>% spread(key=phistate,value=s)
 
@@ -948,8 +924,8 @@ nullhour<-melt(nullhour)
 True time per unit
 
 ```{r}
-ttime_unit<-data.frame(ccamlr$Unit,Hours=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
-ggplot(nullhour,aes(x=ccamlr.Unit,y=value)) + geom_violin() + coord_flip() + geom_point(data=ttime_unit,col="red") + theme_bw()
+ttime_unit<-data.frame(ccamlr$Unit,value=raster::extract(y=ccamlr,x=r,fun=sum,na.rm=T))
+ggplot(nullhour,aes(x=ccamlr.Unit,y=value)) + geom_violin() + coord_flip() + geom_point(data=ttime_unit,col="red") + theme_bw() + labs(y="Hours") + labs(x="Unit",y="Observation Hours")
 ```
 
 ## Randomization II: Do whales behave non-randomly within management units?
