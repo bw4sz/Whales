@@ -988,7 +988,7 @@ trueprop$Unit<-factor(trueprop$Unit,levels=rev(ord))
 
 nullrange<-nullprop %>% group_by(Unit) %>%summarize(mean=mean(value),upper=quantile(value,0.95),lower=quantile(value,0.05))
 
-ggplot(nullrange,aes(x=Unit)) + geom_point(data=trueprop,aes(y=value),col="black",size=4)  + geom_linerange(col="grey60",aes(x=Unit,ymin=lower,ymax=upper),size=2)+ scale_y_continuous(labels = scales::percent) +labs(y="Proportion of time foraging") + theme_bw() + coord_flip()
+ggplot(nullrange,aes(x=Unit)) + geom_point(data=trueprop,aes(y=value),col="black",size=4)  + geom_linerange(col="grey60",aes(x=Unit,ymin=lower,ymax=upper),size=2)+ scale_y_continuous(labels = scales::percent) +labs(y="Proportion of time in Area-restricted Search") + theme_bw() + coord_flip()
 ggsave("Figures/RandomizationII.jpeg",height=4,width=5)
 ```
 
