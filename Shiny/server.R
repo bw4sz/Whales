@@ -9,8 +9,6 @@ server <- function(input, output, session) {
   #Read in data
   d<-read.csv("FilteredData.csv",row.names=1)
   
-  #ice data
-  
   ##Base map
   wrapper <- function(df) {
     df  %>% select(x,y) %>% as.data.frame %>% Line %>% list %>% return
@@ -44,10 +42,12 @@ server <- function(input, output, session) {
       mapply(x = y$res, ids = ids, FUN = function(x,ids) {Lines(x,ID=ids)})
       ,proj4string=CRS("+proj=longlat +datum=WGS84"))
     
-    dinfo<-d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) %>% distinct() %>% arrange(Animal) %>% as.data.frame() 
+    line_info<-d  %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) 
+    
+    dinfo<-line_info %>% group_by(Animal) %>% distinct() %>% arrange(Animal) %>% as.data.frame() 
     spl<-SpatialLinesDataFrame(sl=data,data=dinfo)
     
-    return(spl)
+    return(list(spl,line_info))
   })
   
   
@@ -56,7 +56,13 @@ observe({
   
   
   #check if there is data for the month year combination
-  addD<-filteredData()
+  newdata<-filteredData()
+  
+  #spatial info
+  addD<-newdata[[1]]
+  
+  #dataframe
+  line_info<-newdata[[2]]
   
   #color new data
   pal<-colorFactor(topo.colors(10),addD$Animal)
@@ -72,13 +78,15 @@ observe({
   if(length(unique(addD$Animal))==1){
     
     #get spatial points for that animal
-    ll<-d %>% filter(Animal %in% unique(addD$Animal)) %>% as.data.frame() 
+    ll<-d %>% filter(Month %in% line_info$Month, Year %in% line_info$Year,Animal %in% line_info$Animal) %>% as.data.frame() 
+
+        if(!nrow(ll)==0){
     ll<-SpatialPointsDataFrame(cbind(ll$x,ll$y),data=ll)
 
-    #add timestamp points
+    #add timestamp points, if exists
     proxy<-leafletProxy("mymap") %>% clearShapes() %>% addPolylines(data=addD,color=~pal(Animal),weight=4)  %>% addCircles(data=ll,popup=~as.character(timestamp),weight = 4, radius=60, 
                                                                                     color="#000000", stroke = TRUE, fillOpacity = 0.8)  
-    
+    }
   }
 })
   output$mymap <- renderLeaflet(m)
