@@ -2,6 +2,6 @@ name: WhaleViz
 account: weinstein
 server: shinyapps.io
 appId: 126596
-bundleId: 575379
+bundleId: 670626
 url: https://weinstein.shinyapps.io/WhaleViz/
-when: 1475519003.45682
+when: 1483649296.34837

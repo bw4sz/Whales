@@ -7,7 +7,7 @@ library(htmltools)
 server <- function(input, output, session) {
   
   #Read in data
-  d<-read.csv("WhaleDat.csv")
+  d<-read.csv("FilteredData.csv",row.names=1)
   
   #ice data
   
@@ -27,8 +27,13 @@ server <- function(input, output, session) {
     
     if(input$ind=="All"){i<-unique(d$Animal)} else{i<-input$ind}
     
+    #get order
+    
     y <-  d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) %>%
-      do(res = wrapper(.))
+      do(res = wrapper(.)) %>% arrange(Animal)
+    
+    #keep order
+    
     
     #break if there is no data
     if(nrow(y)==0){return(NULL)}
@@ -39,8 +44,8 @@ server <- function(input, output, session) {
       mapply(x = y$res, ids = ids, FUN = function(x,ids) {Lines(x,ID=ids)})
       ,proj4string=CRS("+proj=longlat +datum=WGS84"))
     
-    dinfo<-d %>% filter(Year %in% yr, Month %in% mn) %>% distinct(Animal) 
-    spl<-SpatialLinesDataFrame(data,dinfo)
+    dinfo<-d %>% group_by(Animal) %>% filter(Year %in% yr,Month %in% mn,Animal %in% i) %>% distinct() %>% arrange(Animal) %>% as.data.frame() 
+    spl<-SpatialLinesDataFrame(sl=data,data=dinfo)
     
     return(spl)
   })
@@ -62,6 +67,18 @@ observe({
   }else{
     #add tracks
     proxy<-leafletProxy("mymap",data=addD) %>% clearShapes() %>% addPolylines(popup=~as.character(Animal),color=~pal(Animal),weight=2)  
+  }
+  #if only one animal is plotted, add points.
+  if(length(unique(addD$Animal))==1){
+    
+    #get spatial points for that animal
+    ll<-d %>% filter(Animal %in% unique(addD$Animal)) %>% as.data.frame() 
+    ll<-SpatialPointsDataFrame(cbind(ll$x,ll$y),data=ll)
+
+    #add timestamp points
+    proxy<-leafletProxy("mymap") %>% clearShapes() %>% addPolylines(data=addD,color=~pal(Animal),weight=4)  %>% addCircles(data=ll,popup=~as.character(timestamp),weight = 4, radius=60, 
+                                                                                    color="#000000", stroke = TRUE, fillOpacity = 0.8)  
+    
   }
 })
   output$mymap <- renderLeaflet(m)
